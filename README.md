@@ -2,7 +2,7 @@
 2019-여름-SIG에 참가하여 개발하게 된 메세지 카테고리 분류 앱입니다.
 
 # License
-Copyright 2016 Team Lettre
+Copyright 2019 Team Lettre
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
