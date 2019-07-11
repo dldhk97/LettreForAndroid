@@ -23,7 +23,7 @@ namespace LettreForAndroid
 
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
-
+            
             //BlurView Start
             root = FindViewById<ViewGroup>(Resource.Id.root);
             mainBlurView = FindViewById<BlurView>(Resource.Id.mainBlurView);
