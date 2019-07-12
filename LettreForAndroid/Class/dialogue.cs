@@ -15,15 +15,51 @@ namespace LettreForAndroid.Class
     public class Dialogue
     {
         private string address;
-        List<SMS> messages;
+        List<Sms> messages;
     }
 
-    public class SMS
+    public class Sms
     {
-        private string plainText;
+        private string id;
+        private string address;
+        private string msg;
+        private string readState;   //"0" for have not read sms and "1" for have read sms
+        private string time;
+        private string folderName;
+
+        public string Id
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        public string Address
+        {
+            get { return address; }
+            set { address = value; }
+        }
+        public string Msg
+        {
+            get { return msg; }
+            set { msg = value; }
+        }
+        public string ReadState
+        {
+            get { return readState; }
+            set { readState = value; }
+        }
+        public string Time
+        {
+            get { return time; }
+            set { time = value; }
+        }
+        public string FolderName
+        {
+            get { return folderName; }
+            set { FolderName = value; }
+        }
     }
 
-    public class MMS : SMS
+    public class Mms : Sms
     {
         private string smil;
     }

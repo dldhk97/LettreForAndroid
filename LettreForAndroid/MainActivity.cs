@@ -10,6 +10,16 @@ using Android.Views;
 using Com.EightbitLab.BlurViewBinding;
 using Android.Graphics.Drawables;
 using Android.Widget;
+using Android.Provider;
+using System.Collections.Generic;
+
+using Android.Content;
+using Android.Net;
+using Android.Database;
+using Android;
+
+using LettreForAndroid.Class;
+using LettreForAndroid.Utility;
 
 namespace LettreForAndroid
 {
@@ -22,9 +32,100 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
+            //if(isDefaultApp() == false)
+            //{
+            //    SetAsDefaultApp();
+            //}
+
+            PermissionManager.RequestEssentialPermission(this);
+
+            GetSms();
+
             SetupBlurView();
             SetupToolBar();
             SetupTabLayout();
+        }
+
+        public bool isDefaultApp()
+        {
+            return PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this));
+        }
+
+        public void SetAsDefaultApp()
+        {
+            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.Kitkat)
+            {
+                string myPackageName = PackageName;
+                if (!Telephony.Sms.GetDefaultSmsPackage(this).Equals(myPackageName))
+                {
+                    Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
+                    intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, myPackageName);
+                    StartActivityForResult(intent, 0);
+                }
+                else
+                {
+                    List<Sms> lst = getAllSms();
+                }
+            }
+            else
+            {
+                List<Sms> lst = getAllSms();
+            }
+        }
+        public void GetSms()
+        {
+            if(Build.VERSION.SdkInt >= Build.VERSION_CODES.Kitkat)
+            {
+                string test = Telephony.Sms.GetDefaultSmsPackage(this);     //for debug
+                //if (Telephony.Sms.GetDefaultSmsPackage(this).Equals(PackageName))
+                //{
+                    List<Sms> lst = getAllSms();
+                //}
+
+            }
+        }
+
+        //GetSMS
+        public List<Sms> getAllSms()
+        {
+            List<Sms> lstSms = new List<Sms>();
+            Sms objSms = new Sms();
+            Uri message = Uri.Parse("content://sms/");
+            ContentResolver cr = this.ContentResolver;
+
+            ICursor c = cr.Query(message, null, null, null, null);
+            this.StartManagingCursor(c);
+            int totalSMS = c.Count;
+
+            if (c.MoveToFirst())
+            {
+                for (int i = 0; i < totalSMS; i++)
+                {
+                    objSms = new Sms();
+                    objSms.Id = c.GetString(c.GetColumnIndexOrThrow("_id"));
+                    objSms.Address = c.GetString(c.GetColumnIndexOrThrow("address"));
+                    objSms.Msg = c.GetString(c.GetColumnIndexOrThrow("body"));
+                    objSms.ReadState = c.GetString(c.GetColumnIndex("read"));
+                    objSms.Time = c.GetString(c.GetColumnIndexOrThrow("date"));
+                    if (c.GetString(c.GetColumnIndexOrThrow("type")).Contains("1"))
+                    {
+                        objSms.FolderName = "inbox";
+                    }
+                    else
+                    {
+                        objSms.FolderName = "sent";
+                    }
+
+                    lstSms.Add(objSms);
+                    c.MoveToNext();
+                }
+            }
+            // else {
+            // throw new RuntimeException("You have no SMS");
+            // }
+            c.Close();
+
+            return lstSms;
         }
 
         //BlurView 적용

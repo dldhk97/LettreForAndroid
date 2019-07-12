@@ -13,6 +13,7 @@
       android:layout_height="wrap_content"
       app:blurOverlayColor="#00000000">
 
+        <!--아래부터 내용물 들어있음.-->
         <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -42,6 +43,17 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:foregroundGravity="center" />
+
+            <ImageButton
+                android:id="@+id/sendButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/design_fab_background"
+                android:src="@drawable/dd9_send_64"
+                android:scaleType="centerCrop"  />
         </LinearLayout>
     </eightbitlab.com.blurview.BlurView>
 </LinearLayout>
