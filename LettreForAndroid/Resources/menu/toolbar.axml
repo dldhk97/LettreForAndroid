@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	  xmlns:local="http://schemas.android.com/apk/res-auto">
+  <item
+       android:id="@+id/toolbar_search"
+       android:icon="@drawable/search_256"
+       local:showAsAction="always"
+       android:title="검색" 
+       android:orderInCategory="100"/>
+  <item
+       android:id="@+id/toolbar_select"
+       local:showAsAction="never"
+       android:title="다중 선택"
+       android:orderInCategory="200"/>
+  <item
+      android:id="@+id/toolbar_category"
+      local:showAsAction="never"
+      android:title="카테고리 편집"
+      android:orderInCategory="300"/>
+  <item
+      android:id="@+id/toolbar_deposit"
+      local:showAsAction="never"
+      android:title="보관함"
+      android:orderInCategory="400"/>
+  <item
+      android:id="@+id/toolbar_settings"
+      local:showAsAction="never"
+      android:title="설정"
+      android:orderInCategory="500"/>
+</menu>

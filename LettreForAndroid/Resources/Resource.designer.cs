@@ -2331,26 +2331,26 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f020053
 			public const int avd_hide_password = 2130837587;
 			
-			// aapt resource value: 0x7f02006f
-			public const int avd_hide_password_1 = 2130837615;
+			// aapt resource value: 0x7f020073
+			public const int avd_hide_password_1 = 2130837619;
 			
-			// aapt resource value: 0x7f020070
-			public const int avd_hide_password_2 = 2130837616;
+			// aapt resource value: 0x7f020074
+			public const int avd_hide_password_2 = 2130837620;
 			
-			// aapt resource value: 0x7f020071
-			public const int avd_hide_password_3 = 2130837617;
+			// aapt resource value: 0x7f020075
+			public const int avd_hide_password_3 = 2130837621;
 			
 			// aapt resource value: 0x7f020054
 			public const int avd_show_password = 2130837588;
 			
-			// aapt resource value: 0x7f020072
-			public const int avd_show_password_1 = 2130837618;
+			// aapt resource value: 0x7f020076
+			public const int avd_show_password_1 = 2130837622;
 			
-			// aapt resource value: 0x7f020073
-			public const int avd_show_password_2 = 2130837619;
+			// aapt resource value: 0x7f020077
+			public const int avd_show_password_2 = 2130837623;
 			
-			// aapt resource value: 0x7f020074
-			public const int avd_show_password_3 = 2130837620;
+			// aapt resource value: 0x7f020078
+			public const int avd_show_password_3 = 2130837624;
 			
 			// aapt resource value: 0x7f020055
 			public const int design_bottom_navigation_item_background = 2130837589;
@@ -2409,11 +2409,11 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f020067
 			public const int notification_icon_background = 2130837607;
 			
-			// aapt resource value: 0x7f02006d
-			public const int notification_template_icon_bg = 2130837613;
+			// aapt resource value: 0x7f020071
+			public const int notification_template_icon_bg = 2130837617;
 			
-			// aapt resource value: 0x7f02006e
-			public const int notification_template_icon_low_bg = 2130837614;
+			// aapt resource value: 0x7f020072
+			public const int notification_template_icon_low_bg = 2130837618;
 			
 			// aapt resource value: 0x7f020068
 			public const int notification_tile_bg = 2130837608;
@@ -2422,13 +2422,25 @@ namespace LettreForAndroid
 			public const int notify_panel_notification_icon_bg = 2130837609;
 			
 			// aapt resource value: 0x7f02006a
-			public const int test_background = 2130837610;
+			public const int Search_128 = 2130837610;
 			
 			// aapt resource value: 0x7f02006b
-			public const int tooltip_frame_dark = 2130837611;
+			public const int Search_256 = 2130837611;
 			
 			// aapt resource value: 0x7f02006c
-			public const int tooltip_frame_light = 2130837612;
+			public const int Search_32 = 2130837612;
+			
+			// aapt resource value: 0x7f02006d
+			public const int Search_64 = 2130837613;
+			
+			// aapt resource value: 0x7f02006e
+			public const int test_background = 2130837614;
+			
+			// aapt resource value: 0x7f02006f
+			public const int tooltip_frame_dark = 2130837615;
+			
+			// aapt resource value: 0x7f020070
+			public const int tooltip_frame_light = 2130837616;
 			
 			static Drawable()
 			{
@@ -2935,6 +2947,21 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f09006e
 			public const int title_template = 2131296366;
 			
+			// aapt resource value: 0x7f0900b5
+			public const int toolbar_category = 2131296437;
+			
+			// aapt resource value: 0x7f0900b6
+			public const int toolbar_deposit = 2131296438;
+			
+			// aapt resource value: 0x7f0900b3
+			public const int toolbar_search = 2131296435;
+			
+			// aapt resource value: 0x7f0900b4
+			public const int toolbar_select = 2131296436;
+			
+			// aapt resource value: 0x7f0900b7
+			public const int toolbar_settings = 2131296439;
+			
 			// aapt resource value: 0x7f09003d
 			public const int top = 2131296317;
 			
@@ -3238,6 +3265,22 @@ namespace LettreForAndroid
 			}
 		}
 		
+		public partial class Menu
+		{
+			
+			// aapt resource value: 0x7f0f0000
+			public const int toolbar = 2131689472;
+			
+			static Menu()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Menu()
+			{
+			}
+		}
+		
 		public partial class Mipmap
 		{
 			
@@ -3262,12 +3305,6 @@ namespace LettreForAndroid
 		
 		public partial class String
 		{
-			
-			// aapt resource value: 0x7f0a002c
-			public const int ApplicationName = 2131361836;
-			
-			// aapt resource value: 0x7f0a002b
-			public const int Hello = 2131361835;
 			
 			// aapt resource value: 0x7f0a0000
 			public const int abc_action_bar_home_description = 2131361792;
@@ -3918,8 +3955,14 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0b016b
 			public const int Base_Widget_Design_TabLayout = 2131427691;
 			
+			// aapt resource value: 0x7f0b018c
+			public const int BasicPopupMenuStyle = 2131427724;
+			
 			// aapt resource value: 0x7f0b018a
 			public const int BasicTheme = 2131427722;
+			
+			// aapt resource value: 0x7f0b018b
+			public const int BasicToolBarStyle = 2131427723;
 			
 			// aapt resource value: 0x7f0b001e
 			public const int Platform_AppCompat = 2131427358;

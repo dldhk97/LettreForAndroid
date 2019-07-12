@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Lettre</string>
     <string name="action_settings">Settings</string>
-    <string name="Hello">Hello World, Click Me!</string>
-    <string name="ApplicationName">HelloSwipeViewWithTabs</string>
 </resources>
