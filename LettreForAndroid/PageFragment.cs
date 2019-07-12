@@ -30,8 +30,8 @@ namespace LettreForAndroid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_page, container, false);
-            var textView = (TextView)view;
-            textView.Text = "페이지 #" + mPage;
+            TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            textView1.Text = "페이지 #" + mPage;
             return view;
         }
     }
