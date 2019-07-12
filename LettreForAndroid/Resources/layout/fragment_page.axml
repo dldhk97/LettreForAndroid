@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:gravity="center" 
     android:id="@+id/fragPage_linearLayout1">
-    <TextView
-        android:text="Text"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:id="@+id/fragPage_textView1" />
+        android:id="@+id/fragPage_recyclerView1" 
+        android:scrollbars="vertical"/>
+    
 </LinearLayout>

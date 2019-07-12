@@ -2684,7 +2684,7 @@ namespace LettreForAndroid
 			public const int fragPage_linearLayout1 = 2131296416;
 			
 			// aapt resource value: 0x7f0900a1
-			public const int fragPage_textView1 = 2131296417;
+			public const int fragPage_recyclerView1 = 2131296417;
 			
 			// aapt resource value: 0x7f09000a
 			public const int ghost_view = 2131296266;

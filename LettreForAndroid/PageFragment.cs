@@ -4,6 +4,7 @@ using Android.Support.V4.App;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
+using Android.Support.V7.Widget;
 
 namespace LettreForAndroid
 {
@@ -30,8 +31,13 @@ namespace LettreForAndroid
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_page, container, false);
-            TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
-            textView1.Text = "페이지 #" + mPage;
+            //TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            //textView1.Text = "페이지 #" + mPage;
+
+            //RecyclerView 초기화
+            RecyclerView recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+            recyclerView.SetLayoutManager(new LinearLayoutManager(view.Context));
+
             return view;
         }
     }

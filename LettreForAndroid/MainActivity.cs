@@ -20,7 +20,6 @@ namespace LettreForAndroid
         {
             base.OnCreate(bundle);
 
-            // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
             SetupBlurView();
@@ -52,7 +51,6 @@ namespace LettreForAndroid
 
             SetSupportActionBar(toolbar);
             SupportActionBar.Title = "Lettre";
-            //SupportActionBar.Hide();
         }
         //툴바에 메뉴 추가
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -90,7 +88,20 @@ namespace LettreForAndroid
                 TabLayout.Tab tab = tabLayout.GetTabAt(i);
                 tab.SetCustomView(adapter.GetTabView(i));
             }
+            tabLayout.TabSelected += TabLayout_TabSelected;
+            tabLayout.TabUnselected += TabLayout_TabUnselected;
+        }
 
+        private void TabLayout_TabSelected(object sender, TabLayout.TabSelectedEventArgs e)
+        {
+            TextView tv = e.Tab.CustomView.FindViewById<TextView>(Resource.Id.custTab_title);
+            //Toast.MakeText(this, tv.Text + "선택됨" , ToastLength.Short).Show();
+            tv.SetTypeface(tv.Typeface, Android.Graphics.TypefaceStyle.Bold);
+        }
+        private void TabLayout_TabUnselected(object sender, TabLayout.TabUnselectedEventArgs e)
+        {
+            TextView tv = e.Tab.CustomView.FindViewById<TextView>(Resource.Id.custTab_title);
+            tv.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
         }
     }
 }
