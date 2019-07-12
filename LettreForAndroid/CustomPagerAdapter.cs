@@ -6,12 +6,14 @@ using Android.Views;
 using Android.Widget;
 using Java.Lang;
 
+using System.Collections.Generic;
+using LettreForAndroid.Class;
+
 namespace LettreForAndroid
 {
     public class CustomPagerAdapter : FragmentPagerAdapter
     {
-        const int PAGE_COUNT = 8;
-        private string[] tabTitles = { "전체", "대화", "택배", "공공기관", "인증", "카드", "스팸", "기타" };
+        private List<TabFrag> tabs = new List<TabFrag>();
         readonly Context context;
 
         public CustomPagerAdapter(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
@@ -25,7 +27,7 @@ namespace LettreForAndroid
 
         public override int Count
         {
-            get { return PAGE_COUNT; }
+            get { return tabs.Count; }
         }
 
         public override Fragment GetItem(int position)
@@ -33,18 +35,34 @@ namespace LettreForAndroid
             return PageFragment.newInstance(position + 1);
         }
 
-        public override ICharSequence GetPageTitleFormatted(int position)
-        {
-            // Generate title based on item position
-            return CharSequence.ArrayFromStringArray(tabTitles)[position];
-        }
-
         public View GetTabView(int position)
         {
-            // Given you have a custom layout in `res/layout/custom_tab.xml` with a TextView
-            var tv = (TextView)LayoutInflater.From(context).Inflate(Resource.Layout.custom_tab, null);
-            tv.Text = tabTitles[position];
-            return tv;
+            var view = LayoutInflater.From(context).Inflate(Resource.Layout.custom_tab, null);
+
+            TextView tabTitle = view.FindViewById<TextView>(Resource.Id.custTab_title);
+            TextView count = view.FindViewById<TextView>(Resource.Id.custTab_count);
+
+            tabTitle.Text = tabs[position].TabTitle;
+            count.Text = tabs[position].NotiCount.ToString();
+
+            return view;
+        }
+
+        //public void AddTab(TabFrag tabFrag)
+        //{
+        //    tabs.Add(tabFrag);
+        //}
+
+        public void initTabs()
+        {
+            tabs.Add(new TabFrag("전체", 0));
+            tabs.Add(new TabFrag("대화", 2));
+            tabs.Add(new TabFrag("택배", 3));
+            tabs.Add(new TabFrag("공공기관", 4));
+            tabs.Add(new TabFrag("인증", 5));
+            tabs.Add(new TabFrag("카드", 77));
+            tabs.Add(new TabFrag("스팸", 100));   //99개 이상일땐 99개로 표시해야하나?
+            tabs.Add(new TabFrag("기타", 99));
         }
     }
 }
