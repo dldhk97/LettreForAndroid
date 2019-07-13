@@ -25,15 +25,16 @@ using System.Threading;
 
 namespace LettreForAndroid
 {
-    [Activity(Label = "@string/app_name", Icon ="@drawable/Icon_128", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
-        bool isFirst = true;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             SetContentView(Resource.Layout.activity_main);
+
+            bool isFirst = DataStorageManager.loadBoolData(this, "isFirst", true);
 
             if (isFirst)
             {
@@ -164,7 +165,16 @@ namespace LettreForAndroid
         //툴바 선택시
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
+            //Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
+            if(item.ItemId == Resource.Id.toolbar_search)
+            {
+                string str = DataStorageManager.loadStringData(this,"temp", "NULL");
+                Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
+            }
+            else
+            {
+                DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
+            }
             return base.OnOptionsItemSelected(item);
         }
 

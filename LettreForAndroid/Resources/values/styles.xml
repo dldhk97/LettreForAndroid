@@ -35,4 +35,8 @@
       </item>
     </style>
 
+    <style name="BasicButtonStyle" parent="Widget.AppCompat.Button.Colored">
+      <item name="colorAccent">@android:color/black</item>
+    </style>
+
 </resources>

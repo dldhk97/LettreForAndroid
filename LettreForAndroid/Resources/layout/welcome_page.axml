@@ -2,9 +2,9 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#80000000">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/transparent">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="35dp"
@@ -16,8 +16,8 @@
         android:text="레뜨레를 사용하시려면 권한과 기본 앱으로 설정해주셔야 합니다."
         android:paddingLeft="10dp"
         android:textColor="#000"
-        android:background="@android:color/holo_orange_light"
-        android:gravity="center" />
+        android:gravity="center"
+        android:layout_gravity="top" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="35dp"
@@ -41,7 +41,8 @@
         android:textStyle="bold"
         android:height="70dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp" 
+        android:layout_marginBottom="10dp"
+        android:theme="@style/Widget.AppCompat.Button.Colored" 
         />
     <TextView
         android:layout_width="wrap_content"
@@ -65,6 +66,5 @@
         android:textColor="#fff"
         android:textStyle="bold"
         android:height="70dp"
-        android:layout_centerHorizontal="true"
-            />
+        android:layout_centerHorizontal="true"/>
 </LinearLayout>

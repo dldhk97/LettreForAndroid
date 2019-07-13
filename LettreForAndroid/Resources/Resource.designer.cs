@@ -4006,6 +4006,9 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0b016b
 			public const int Base_Widget_Design_TabLayout = 2131427691;
 			
+			// aapt resource value: 0x7f0b018e
+			public const int BasicButtonStyle = 2131427726;
+			
 			// aapt resource value: 0x7f0b018c
 			public const int BasicPopupMenuStyle = 2131427724;
 			

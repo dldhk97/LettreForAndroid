@@ -5,6 +5,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
@@ -58,6 +59,8 @@ namespace LettreForAndroid.Page
         {
             base.OnCreateView(inflater, container, savedInstanceState);
 
+            this.Cancelable = false;
+
             var view = inflater.Inflate(Resource.Layout.welcome_page, container, false);
 
             mBtnGetPermission = view.FindViewById<Button>(Resource.Id.welcomepage_button1);
@@ -77,8 +80,6 @@ namespace LettreForAndroid.Page
                 isPermissionGranted = true;
                 SetBtnDisable(mBtnGetPermission, "모든 권한이 허가되었습니다.");
             }
-
-            CheckDismiss();
 
             return view;
         }
@@ -115,15 +116,28 @@ namespace LettreForAndroid.Page
             if (isDefaultPackage && isPermissionGranted)
             {
                 Toast.MakeText(Context, "기본앱 설정과 권한이 승인되었습니다.", ToastLength.Short).Show();
+                DataStorageManager.saveBoolData(Context, "isFirst", false);
                 Dismiss();
             }
         }
 
         public override void OnActivityCreated(Bundle savedInstanceState)
         {
-            Dialog.Window.RequestFeature(WindowFeatures.NoTitle);       //title bar을 투명으로
-            base.OnActivityCreated(savedInstanceState);
-            Dialog.Window.Attributes.WindowAnimations = Resource.Style.dialog_animation;    //animation 세팅
+            if(Dialog != null)
+            {
+                Dialog.Window.RequestFeature(WindowFeatures.NoTitle);       //title bar을 투명으로
+                base.OnActivityCreated(savedInstanceState);
+                Dialog.Window.Attributes.WindowAnimations = Resource.Style.dialog_animation;    //animation 세팅
+            }
+            //권한과 기본앱 설정이 이미 되있으면 창 내림.
+            CheckDismiss();
+
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
         }
 
     }
