@@ -1,5 +1,6 @@
 <resources>
 
+    <!-- 기본 스타일-->
     <style name="BasicTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -11,16 +12,27 @@
 
     </style>
 
-    <!-- If you want to changing toolBar style -->
-    <style name="BasicToolBarStyle" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- 툴바 스타일 -->
+    <style name="BasicToolBarStyle" parent="BasicTheme">
       <item name="android:textColorPrimary">@android:color/white</item>
       <item name="android:textColorSecondary">@android:color/white</item>
       <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
-    <style name="BasicPopupMenuStyle" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- 팝업 스타일 -->
+    <style name="BasicPopupMenuStyle" parent="BasicTheme">
       <item name="android:colorBackground">@android:color/white</item>
       <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!-- 애니메이션 스타일 -->
+    <style name="dialog_animation">
+      <item name="android:windowEnterAnimation">
+        @anim/abc_fade_in
+      </item>
+      <item name="android:windowExitAnimation">
+        @anim/abc_fade_out
+      </item>
     </style>
 
 </resources>

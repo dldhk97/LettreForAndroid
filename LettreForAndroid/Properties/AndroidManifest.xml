@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.SIG19.Lettre" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.TeamLettre.Lettre" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="26" android:targetSdkVersion="26" />
 	<application android:allowBackup="true" android:icon="@drawable/Icon_256" android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/BasicTheme">
 		<!-- BroadcastReceiver that listens for incoming SMS messages -->
@@ -51,9 +51,7 @@
 	<uses-permission android:name="android.permission.RECEIVE_SMS" />
 	<uses-permission android:name="android.permission.SEND_SMS" />
 	<uses-permission android:name="android.permission.WRITE_SMS" />
-	<uses-permission android:name="android.permission.BROADCAST_SMS" />
 	<uses-permission android:name="android.permission.RECEIVE_MMS" />
 	<!-- WAP_PUSH 관련 -->
-	<uses-permission android:name="android.permission.BROADCAST_WAP_PUSH" />
 	<uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
 </manifest>

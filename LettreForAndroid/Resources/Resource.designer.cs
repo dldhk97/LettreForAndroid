@@ -2749,8 +2749,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f09008b
 			public const int mainBlurView = 2131296395;
 			
-			// aapt resource value: 0x7f0900b8
-			public const int masked = 2131296440;
+			// aapt resource value: 0x7f0900bd
+			public const int masked = 2131296445;
 			
 			// aapt resource value: 0x7f0900a9
 			public const int media_actions = 2131296425;
@@ -2980,20 +2980,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f09006e
 			public const int title_template = 2131296366;
 			
-			// aapt resource value: 0x7f0900bb
-			public const int toolbar_category = 2131296443;
+			// aapt resource value: 0x7f0900c0
+			public const int toolbar_category = 2131296448;
 			
-			// aapt resource value: 0x7f0900bc
-			public const int toolbar_deposit = 2131296444;
+			// aapt resource value: 0x7f0900c1
+			public const int toolbar_deposit = 2131296449;
 			
-			// aapt resource value: 0x7f0900b9
-			public const int toolbar_search = 2131296441;
+			// aapt resource value: 0x7f0900be
+			public const int toolbar_search = 2131296446;
 			
-			// aapt resource value: 0x7f0900ba
-			public const int toolbar_select = 2131296442;
+			// aapt resource value: 0x7f0900bf
+			public const int toolbar_select = 2131296447;
 			
-			// aapt resource value: 0x7f0900bd
-			public const int toolbar_settings = 2131296445;
+			// aapt resource value: 0x7f0900c2
+			public const int toolbar_settings = 2131296450;
 			
 			// aapt resource value: 0x7f09003d
 			public const int top = 2131296317;
@@ -3031,8 +3031,23 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f090016
 			public const int view_offset_helper = 2131296278;
 			
+			// aapt resource value: 0x7f0900bc
+			public const int visible = 2131296444;
+			
 			// aapt resource value: 0x7f0900b7
-			public const int visible = 2131296439;
+			public const int welcomepage_Title = 2131296439;
+			
+			// aapt resource value: 0x7f0900b9
+			public const int welcomepage_button1 = 2131296441;
+			
+			// aapt resource value: 0x7f0900bb
+			public const int welcomepage_button2 = 2131296443;
+			
+			// aapt resource value: 0x7f0900b8
+			public const int welcomepage_guidetext1 = 2131296440;
+			
+			// aapt resource value: 0x7f0900ba
+			public const int welcomepage_guidetext2 = 2131296442;
 			
 			// aapt resource value: 0x7f09003b
 			public const int withText = 2131296315;
@@ -3287,6 +3302,9 @@ namespace LettreForAndroid
 			
 			// aapt resource value: 0x7f04003f
 			public const int tooltip = 2130968639;
+			
+			// aapt resource value: 0x7f040040
+			public const int welcome_page = 2130968640;
 			
 			static Layout()
 			{
@@ -4671,6 +4689,9 @@ namespace LettreForAndroid
 			
 			// aapt resource value: 0x7f0b0182
 			public const int Widget_Design_TextInputLayout = 2131427714;
+			
+			// aapt resource value: 0x7f0b018d
+			public const int dialog_animation = 2131427725;
 			
 			static Style()
 			{

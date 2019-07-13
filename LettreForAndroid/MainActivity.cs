@@ -20,24 +20,30 @@ using Android;
 
 using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
+using LettreForAndroid.Page;
+using System.Threading;
 
 namespace LettreForAndroid
 {
     [Activity(Label = "@string/app_name", Icon ="@drawable/Icon_128", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+        bool isFirst = true;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             SetContentView(Resource.Layout.activity_main);
 
-            if(isDefaultApp() == false)
+            if (isFirst)
             {
-                SetAsDefaultApp();
+                Android.App.FragmentTransaction transaction = FragmentManager.BeginTransaction();
+                welcome_page signUpDialog = new welcome_page();
+                signUpDialog.Show(transaction, "dialog_fragment");
+                signUpDialog.mOnSignUpComplete += SignUpDialog_mOnSignUpComplete;
             }
 
-            PermissionManager.RequestEssentialPermission(this);
+            //PermissionManager.RequestEssentialPermission(this);
 
             //GetSms();
 
@@ -46,7 +52,16 @@ namespace LettreForAndroid
             SetupTabLayout();
         }
 
-
+        private void SignUpDialog_mOnSignUpComplete(object sender, OnSignUpEventArgs e)
+        {
+            Thread thread = new Thread(ActLikeRequest);
+            thread.Start();
+        }
+        private void ActLikeRequest()
+        {
+            Thread.Sleep(3000);
+            RunOnUiThread(() => {  });
+        }
         public bool isDefaultApp()
         {
             return PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this));
@@ -60,14 +75,14 @@ namespace LettreForAndroid
         }
         public void GetSms()
         {
-            if(Build.VERSION.SdkInt >= Build.VERSION_CODES.Kitkat)
+            if (isDefaultApp())
             {
-                string test = Telephony.Sms.GetDefaultSmsPackage(this);     //for debug
-                //if (Telephony.Sms.GetDefaultSmsPackage(this).Equals(PackageName))
-                //{
-                    List<Sms> lst = getAllSms();
-                //}
-
+                List<Sms> lst = getAllSms();
+            }
+            else
+            {
+                //기본앱으로 설정해야하는 이유를 알려주고 표시해라.
+                SetAsDefaultApp();
             }
         }
 

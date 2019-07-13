@@ -10,8 +10,8 @@ namespace LettreForAndroid.Utility
     public class PermissionManager
     {
         const int PERMISSION_ALL = 1;
-
-        public static string[] smsPermissions = { Manifest.Permission.ReadSms, Manifest.Permission.ReceiveSms, Manifest.Permission.BroadcastSms, Manifest.Permission.SendSms, Manifest.Permission.WriteSms, Manifest.Permission.ReceiveMms, Manifest.Permission.ReadContacts, Manifest.Permission.WriteContacts, Manifest.Permission.Internet, Manifest.Permission.AccessNetworkState, Manifest.Permission.BroadcastWapPush, Manifest.Permission.ReceiveWapPush };
+        //Manifest.Permission.BroadcastSms, Manifest.Permission.BroadcastWapPush 는 안되는듯하다.
+        public static string[] essentailPermissions = { Manifest.Permission.ReadSms, Manifest.Permission.ReceiveSms,  Manifest.Permission.SendSms, Manifest.Permission.WriteSms, Manifest.Permission.ReceiveMms, Manifest.Permission.ReadContacts, Manifest.Permission.WriteContacts, Manifest.Permission.Internet, Manifest.Permission.AccessNetworkState, Manifest.Permission.ReceiveWapPush };
 
         public static bool HasPermissions(Context context, string[] permissions)
         {
@@ -29,13 +29,16 @@ namespace LettreForAndroid.Utility
         }
         public static void RequestEssentialPermission(Activity activtiy)
         {
-            if (!HasPermissions(activtiy, smsPermissions))
+            if (!HasPermissions(activtiy, essentailPermissions))
             {
-                ActivityCompat.RequestPermissions(activtiy, smsPermissions, PERMISSION_ALL);
+                ActivityCompat.RequestPermissions(activtiy, essentailPermissions, PERMISSION_ALL);
             }
 
         }
 
-        
+        public static bool HasEssentialPermission(Activity activtiy)
+        {
+            return HasPermissions(activtiy, essentailPermissions);
+        }
     }
 }

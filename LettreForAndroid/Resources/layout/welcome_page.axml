@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#80000000">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:id="@+id/welcomepage_Title"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="25dp"
+        android:text="레뜨레를 사용하시려면 권한과 기본 앱으로 설정해주셔야 합니다."
+        android:paddingLeft="10dp"
+        android:textColor="#000"
+        android:background="@android:color/holo_orange_light"
+        android:gravity="center" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:id="@+id/welcomepage_guidetext1"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="25dp"
+        android:text="레뜨레를 사용하시려면 권한을 승인해주셔야 합니다.&#10;아래 버튼을 클랙하여 승인해주세요!"
+        android:paddingLeft="10dp"
+        android:textColor="#000"
+        android:background="@android:color/holo_orange_light"
+        android:gravity="center" />
+    <Button
+        android:text="권한 승인"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/welcomepage_button1"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:height="70dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp" 
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/welcomepage_guidetext2"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="25dp"
+        android:text="안드로이드 6.0부터 기본 문자앱만 문자 접근이 가능합니다. &#10;아래 버튼을 눌러 기본 문자앱으로 설정해주세요!"
+        android:paddingLeft="10dp"
+        android:textColor="#000"
+        android:background="@android:color/holo_orange_light"
+        android:gravity="center" />
+    <Button
+        android:text="기본 앱으로 설정"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/welcomepage_button2"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:height="70dp"
+        android:layout_centerHorizontal="true"
+            />
+</LinearLayout>
