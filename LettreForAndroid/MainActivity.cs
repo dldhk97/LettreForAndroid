@@ -32,19 +32,20 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
-            //if(isDefaultApp() == false)
-            //{
-            //    SetAsDefaultApp();
-            //}
+            if(isDefaultApp() == false)
+            {
+                SetAsDefaultApp();
+            }
 
             PermissionManager.RequestEssentialPermission(this);
 
-            GetSms();
+            //GetSms();
 
             SetupBlurView();
             SetupToolBar();
             SetupTabLayout();
         }
+
 
         public bool isDefaultApp()
         {
@@ -53,24 +54,9 @@ namespace LettreForAndroid
 
         public void SetAsDefaultApp()
         {
-            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.Kitkat)
-            {
-                string myPackageName = PackageName;
-                if (!Telephony.Sms.GetDefaultSmsPackage(this).Equals(myPackageName))
-                {
-                    Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
-                    intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, myPackageName);
-                    StartActivityForResult(intent, 0);
-                }
-                else
-                {
-                    List<Sms> lst = getAllSms();
-                }
-            }
-            else
-            {
-                List<Sms> lst = getAllSms();
-            }
+            Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
+            intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, PackageName);
+            StartActivityForResult(intent, 0);
         }
         public void GetSms()
         {
