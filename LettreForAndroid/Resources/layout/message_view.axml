@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        card_view:cardBackgroundColor="#70000000">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="4dp">
+            <ImageButton
+                android:src="@drawable/dd9_send_256"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/mv_profileImage"
+                android:background="@drawable/design_fab_background"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center_vertical" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/linearLayout1"
+                android:layout_marginLeft="4dp"
+                android:minWidth="150dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/linearLayout1"
+                    android:minWidth="150dp">
+
+                    <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="12dp"
+                    android:textColor="#FFFFFFFF"
+                    android:text="010-XXXX-XXXX"
+                    android:id="@+id/mv_address"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:layout_gravity="left"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:src="@drawable/noti_background_64"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:id="@+id/mv_readStateIndicator"
+                        android:layout_gravity="right" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/linearLayout2" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="#FFFFFFFF"
+                        android:text="this is text messages. Do a barrel rool. adsasdasdasdasd"
+                        android:id="@+id/mv_msg"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:singleLine="true"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10dp"
+                        android:textColor="#FFFFFFFF"
+                        android:text="6월 24일 오전 00:00"
+                        android:id="@+id/mv_time"
+                        android:layout_gravity="right|bottom"
+                        android:singleLine="true"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</FrameLayout>

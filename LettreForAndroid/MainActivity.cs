@@ -34,21 +34,31 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
+            //메인 화면 세팅
+            //SetupBlurView();      //블러뷰 적용시 배경화면이 뭉개져서 주석처리.
+            SetupToolBar();
+            SetupTabLayout();
+
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
             {
                 Android.App.FragmentTransaction transaction = FragmentManager.BeginTransaction();
                 welcome_page firstMeetDialog = new welcome_page();
                 firstMeetDialog.Show(transaction, "dialog_fragment");
+                firstMeetDialog.onWelcomeComplete += FirstMeetDialog_onWelcomeComplete;     //Welcome Page에서 Dismiss되면 메소드 호출
+            }
+            else
+            {
+                GetTextMessage();
             }
 
-            //PermissionManager.RequestEssentialPermission(this);
+            
 
-            //GetSms();
+        }
 
-            //SetupBlurView();      //블러뷰 적용시 배경화면이 뭉개져서 주석처리.
-            SetupToolBar();
-            SetupTabLayout();
+        private void FirstMeetDialog_onWelcomeComplete(object sender, welcome_page.OnWelcomeEventArgs e)
+        {
+            GetTextMessage();
         }
 
         public bool isDefaultApp()
@@ -56,11 +66,11 @@ namespace LettreForAndroid
             return PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this));
         }
 
-        public void GetSms()
+        public void GetTextMessage()
         {
             if (DataStorageManager.loadBoolData(this, "isDefaultPackage", false))
             {
-                List<Sms> lst = getAllSms();
+                List<TextMessage> lst = getAllTextMessages();
             }
             else
             {
@@ -69,11 +79,11 @@ namespace LettreForAndroid
             }
         }
 
-        //GetSMS
-        public List<Sms> getAllSms()
+        //GetTextMessage
+        public List<TextMessage> getAllTextMessages()
         {
-            List<Sms> lstSms = new List<Sms>();
-            Sms objSms = new Sms();
+            List<TextMessage> lstSms = new List<TextMessage>();
+            TextMessage objSms = new TextMessage();
             Uri message = Uri.Parse("content://sms/");
             ContentResolver cr = this.ContentResolver;
 
@@ -85,7 +95,7 @@ namespace LettreForAndroid
             {
                 for (int i = 0; i < totalSMS; i++)
                 {
-                    objSms = new Sms();
+                    objSms = new TextMessage();
                     objSms.Id = c.GetString(c.GetColumnIndexOrThrow("_id"));
                     objSms.Address = c.GetString(c.GetColumnIndexOrThrow("address"));
                     objSms.Msg = c.GetString(c.GetColumnIndexOrThrow("body"));
@@ -93,11 +103,11 @@ namespace LettreForAndroid
                     objSms.Time = c.GetString(c.GetColumnIndexOrThrow("date"));
                     if (c.GetString(c.GetColumnIndexOrThrow("type")).Contains("1"))
                     {
-                        objSms.FolderName = "inbox";
+                        objSms.Folder = "inbox";
                     }
                     else
                     {
-                        objSms.FolderName = "sent";
+                        objSms.Folder = "sent";
                     }
 
                     lstSms.Add(objSms);

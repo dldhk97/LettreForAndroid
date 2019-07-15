@@ -20,6 +20,13 @@ namespace LettreForAndroid.Page
 {
     class welcome_page : DialogFragment
     {
+        public class OnWelcomeEventArgs : EventArgs
+        {
+            public OnWelcomeEventArgs()
+            {
+
+            }
+        }
         public readonly string[] essentailPermissions = 
             {
             Manifest.Permission.ReadSms,
@@ -39,6 +46,9 @@ namespace LettreForAndroid.Page
         const string permission = Android.Manifest.Permission.ReadSms;
 
         TextView hiddenGuideText;
+
+        public event EventHandler<OnWelcomeEventArgs> onWelcomeComplete;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreateView(inflater, container, savedInstanceState);
@@ -160,6 +170,7 @@ namespace LettreForAndroid.Page
             {
                 Toast.MakeText(Context, "이제 레뜨레를 사용하실 수 있습니다!", ToastLength.Short).Show();
                 DataStorageManager.saveBoolData(Context, "isFirst", false);
+                onWelcomeComplete.Invoke(this, new OnWelcomeEventArgs());
                 Dismiss();
             }
         }
