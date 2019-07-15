@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/test_background"
+    android:background="@drawable/background_8"
     android:id="@+id/root">
 
     <eightbitlab.com.blurview.BlurView
@@ -52,7 +52,7 @@
                 android:layout_marginBottom="16dp"
                 android:layout_marginRight="16dp"
                 android:background="@drawable/design_fab_background"
-                android:src="@drawable/dd9_send_64"
+                android:src="@drawable/dd9_send_256"
                 android:scaleType="centerCrop"  />
         </LinearLayout>
     </eightbitlab.com.blurview.BlurView>

@@ -18,35 +18,6 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.Page
 {
-    public class OnSignUpEventArgs : EventArgs
-    {
-        private string mFirstName;
-        private string mEmail;
-        private string mPassword;
-
-        public string FirstName
-        {
-            get { return mFirstName; }
-            set { mFirstName = value; }
-        }
-        public string Email
-        {
-            get { return mEmail; }
-            set { mEmail = value; }
-        }
-        public string Password
-        {
-            get { return mPassword; }
-            set { mPassword = value; }
-        }
-
-        public OnSignUpEventArgs(string firstName, string email, string password) : base()
-        {
-            FirstName = firstName;
-            Email = email;
-            Password = password;
-        }
-    }
     class welcome_page : DialogFragment
     {
         public readonly string[] essentailPermissions = 
@@ -64,13 +35,10 @@ namespace LettreForAndroid.Page
             };
         const int REQUEST_ESSENTIAL_CALLBACK = 1;         //onRequestPermissionsResult에서 이 요청값으로 권한 획득 구분가능. INT형가능.
         const int REQUEST_DEFAULT_CALLBACK = 0;
+
         const string permission = Android.Manifest.Permission.ReadSms;
 
-        private Button mBtnSetDefault;
-        private Button mBtnGetPermission;
-
-        public event EventHandler<OnSignUpEventArgs> mOnSignUpComplete;
-
+        TextView hiddenGuideText;
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             base.OnCreateView(inflater, container, savedInstanceState);
@@ -79,38 +47,14 @@ namespace LettreForAndroid.Page
 
             var view = inflater.Inflate(Resource.Layout.welcome_page, container, false);
 
-            mBtnGetPermission = view.FindViewById<Button>(Resource.Id.welcomepage_button1);
-            mBtnSetDefault = view.FindViewById<Button>(Resource.Id.welcomepage_button2);
+            Button mBtnContinue = view.FindViewById<Button>(Resource.Id.welcomepage_button1);
+            hiddenGuideText = view.FindViewById<TextView>(Resource.Id.welcomepage_hiddenGuideText1);
 
-            mBtnGetPermission.Click += async (sender, e) =>
+            mBtnContinue.Click += async (sender, e) =>
             {
-                if (!PermissionManager.HasEssentialPermission(Activity)) //권한 없으면
-                {
-                    await GetEsentialPermissionAsync();
-                }
-                else
-                {
-                    //권한 있으면?
-                    var snack = Snackbar.Make(View, "권한이 이미 승인되어 있습니다.", Snackbar.LengthShort);
-                    snack.Show();
-                }
-                CheckDismiss();
+                //권한 체크와 승인, 이후 기본앱 설정
+                await GetEsentialPermissionAsync();
             };
-
-            mBtnSetDefault.Click += async (sender, e) =>
-            {
-                if(!Context.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(Activity)))   //기본 앱이 아니면
-                {
-                    await RequestSetAsDefaultAsync();
-                }
-                else
-                {
-                    var snack = Snackbar.Make(View, "이미 기본앱으로 설정되어 있습니다.", Snackbar.LengthShort);
-                    snack.Show();
-                }
-                CheckDismiss();
-            };
-
             return view;
         }
 
@@ -119,26 +63,30 @@ namespace LettreForAndroid.Page
         {
             if (PermissionManager.HasEssentialPermission(Activity))
             {
-                //권한이 이미 있으면 그냥 반환
-                var snack = Snackbar.Make(View, "권한이 이미 승인되어있습니다.", Snackbar.LengthShort);
-                snack.Show();
+                //권한이 이미 있으면 기본앱 체크
+                Toast.MakeText(Context, "권한이 이미 승인되어 있습니다.", ToastLength.Short).Show();
+                DataStorageManager.saveBoolData(Context, "isPermissionGranted", true);
+
+                //기본앱 체크
+                await RequestSetAsDefaultAsync();
                 return;
             }
 
-            //need to request permission
+            //이미 한번 거절당한 경우.
             if (ShouldShowRequestPermissionRationale(permission))
             {
-                //이미 한번 거절당한 경우.
                 //권한이 필요한 이유를 말해주고, OK누르면 요청 후 반환
-                Snackbar.Make(this.View, "승인 버튼을 눌러주면 권한 승인 메세지가 표시됩니다.", Snackbar.LengthIndefinite)
+                Snackbar.Make(this.View, "레뜨레 사용을 위해 승인을 눌러주세요.", Snackbar.LengthShort)
                         .SetAction("승인", v => RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK))
                         .Show();
+                hiddenGuideText.Visibility = ViewStates.Visible;
                 return;
             }
             //권한 요청
             RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK);
         }
 
+        //권한 요청 후 결과 받음.
         public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
             switch (requestCode)
@@ -147,14 +95,15 @@ namespace LettreForAndroid.Page
                     {
                         if (grantResults[0] == Permission.Granted)
                         {
-                            var snack = Snackbar.Make(View, "권한이 승인되었습니다.", Snackbar.LengthShort);
-                            snack.Show();
+                            Toast.MakeText(Context, "권한이 승인되었습니다.", ToastLength.Short).Show();
                             DataStorageManager.saveBoolData(Context, "isPermissionGranted", true);
+                            
+                            //기본앱 체크
+                            await RequestSetAsDefaultAsync();
                         }
                         else
                         {
-                            var snack = Snackbar.Make(View, "권한이 거절당했습니다. 레뜨레를 사용하시려면 권한 승인 버튼을 다시 눌러주세요! ", Snackbar.LengthLong);
-                            snack.Show();
+                            Toast.MakeText(Context, "권한이 거절당했습니다. 레뜨레를 사용하시려면 버튼을 다시 눌러주세요!", ToastLength.Short).Show();
                             DataStorageManager.saveBoolData(Context, "isPermissionGranted", false);
                         }
                     }
@@ -166,9 +115,9 @@ namespace LettreForAndroid.Page
         {
             if(Context.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(Activity)))
             {
-                var snack = Snackbar.Make(View, "이미 기본 앱으로 설정되어 있습니다.", Snackbar.LengthShort);
-                snack.Show();
+                Toast.MakeText(Context, "이미 기본 앱으로 설정되어 있습니다.", ToastLength.Short).Show();
                 DataStorageManager.saveBoolData(Context, "isDefaultPackage", true);
+                CheckDismiss();
             }
             else
             {
@@ -191,14 +140,13 @@ namespace LettreForAndroid.Page
                 case REQUEST_DEFAULT_CALLBACK:
                     if (Context.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(Activity)))
                     {
-                        var snack = Snackbar.Make(View, "기본 앱으로 설정되었습니다.", Snackbar.LengthShort);
-                        snack.Show();
+                        Toast.MakeText(Context, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
                         DataStorageManager.saveBoolData(Context, "isDefaultPackage", true);
+                        CheckDismiss();
                     }
                     else
                     {
-                        var snack = Snackbar.Make(View, "기본 앱으로 설정되지 않았습니다. 다시 버튼을 눌러주세요.", Snackbar.LengthShort);
-                        snack.Show();
+                        Toast.MakeText(Context, "기본 앱으로 설정되지 않았습니다. 기본 앱으로 지정해야 레뜨레를 사용할 수 있습니다.", ToastLength.Short).Show();
                         DataStorageManager.saveBoolData(Context, "isDefaultPackage", false);
                     }
                     break;
@@ -210,7 +158,7 @@ namespace LettreForAndroid.Page
         {
             if (DataStorageManager.loadBoolData(Context, "isDefaultPackage", false) && DataStorageManager.loadBoolData(Context, "isPermissionGranted", false))
             {
-                Toast.MakeText(Context, "기본앱 설정과 권한이 승인되었습니다.", ToastLength.Short).Show();
+                Toast.MakeText(Context, "이제 레뜨레를 사용하실 수 있습니다!", ToastLength.Short).Show();
                 DataStorageManager.saveBoolData(Context, "isFirst", false);
                 Dismiss();
             }

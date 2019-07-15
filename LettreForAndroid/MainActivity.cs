@@ -34,56 +34,38 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
-            bool isFirst = DataStorageManager.loadBoolData(this, "isFirst", true);
-
-            if (isFirst)
+            //처음 사용자면 welcompage 표시
+            if (DataStorageManager.loadBoolData(this, "isFirst", true))
             {
                 Android.App.FragmentTransaction transaction = FragmentManager.BeginTransaction();
-                welcome_page signUpDialog = new welcome_page();
-                signUpDialog.Show(transaction, "dialog_fragment");
-                signUpDialog.mOnSignUpComplete += SignUpDialog_mOnSignUpComplete;
+                welcome_page firstMeetDialog = new welcome_page();
+                firstMeetDialog.Show(transaction, "dialog_fragment");
             }
 
             //PermissionManager.RequestEssentialPermission(this);
 
             //GetSms();
 
-            SetupBlurView();
+            //SetupBlurView();      //블러뷰 적용시 배경화면이 뭉개져서 주석처리.
             SetupToolBar();
             SetupTabLayout();
         }
 
-        private void SignUpDialog_mOnSignUpComplete(object sender, OnSignUpEventArgs e)
-        {
-            Thread thread = new Thread(ActLikeRequest);
-            thread.Start();
-        }
-        private void ActLikeRequest()
-        {
-            Thread.Sleep(3000);
-            RunOnUiThread(() => {  });
-        }
         public bool isDefaultApp()
         {
             return PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this));
         }
 
-        public void SetAsDefaultApp()
-        {
-            Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
-            intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, PackageName);
-            StartActivityForResult(intent, 0);
-        }
         public void GetSms()
         {
-            if (isDefaultApp())
+            if (DataStorageManager.loadBoolData(this, "isDefaultPackage", false))
             {
                 List<Sms> lst = getAllSms();
             }
             else
             {
                 //기본앱으로 설정해야하는 이유를 알려주고 표시해라.
-                SetAsDefaultApp();
+                //SetAsDefaultApp();
             }
         }
 
@@ -136,7 +118,7 @@ namespace LettreForAndroid
             ViewGroup root = FindViewById<ViewGroup>(Resource.Id.root);
             BlurView mainBlurView = FindViewById<BlurView>(Resource.Id.mainBlurView);
 
-            float radius = 0.5F;
+            float radius = 0.0001F;
 
             Drawable windowBackground = Window.DecorView.Background;
 
