@@ -49,7 +49,7 @@ namespace LettreForAndroid.Class
         private string msg;         //메세지(body)
         private string person;      //누가 보냈는지 contact와 연관하는 것인데, 뭔지 모름.
         private string readState;   //0은 읽지않음, 1은 읽음.
-        private string time;        //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
+        private long time;        //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
         private string folder;      //폴더, 수신(inbox)인지 발신(sent)인지? 0 혹은 1?
         private string thread_id;   //대화방 고유 ID?
 
@@ -78,7 +78,7 @@ namespace LettreForAndroid.Class
             get { return readState; }
             set { readState = value; }
         }
-        public string Time
+        public long Time
         {
             get { return time; }
             set { time = value; }

@@ -27,7 +27,6 @@ namespace LettreForAndroid
             //BlurViewManager bvm = new BlurViewManager(this);
             //bvm.SetupBlurView();      //블러뷰 적용시 배경화면이 뭉개져서 주석처리.
 
-
             //툴바 세팅
             ToolbarManager tm = new ToolbarManager(this, this);
             tm.SetupToolBar();
@@ -57,6 +56,7 @@ namespace LettreForAndroid
         public void OnWelcomeComplete()
         {
             tfm.SetupTabLayout();
+            MessageManager.Get().Initialization(this);
         }
         
     }

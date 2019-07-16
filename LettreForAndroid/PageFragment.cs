@@ -14,9 +14,7 @@ namespace LettreForAndroid
 {
     public class PageFragment : Fragment
     {
-        const string ARG_POSITION = "ARG_POSITION";
-        const string ARG_CODE = "ARG_CODE";
-        private int currentPosition;
+        const string ARG_CATEGORY = "ARG_CATEGORY";
         private int currentCategory;
 
         //리사이클러뷰 연습
@@ -24,13 +22,10 @@ namespace LettreForAndroid
         RecyclerView.LayoutManager mLayoutManager;
         DialogueAdpater mAdapter;
 
-        MessageManager mm;
-
-        public static PageFragment newInstance(int position, int code)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
+        public static PageFragment newInstance(int category)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
             var args = new Bundle();
-            args.PutInt(ARG_POSITION, position);
-            args.PutInt(ARG_CODE, code);
+            args.PutInt(ARG_CATEGORY, category);
             var fragment = new PageFragment();
             fragment.Arguments = args;
             return fragment;
@@ -39,9 +34,7 @@ namespace LettreForAndroid
         public override void OnCreate(Bundle savedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
             base.OnCreate(savedInstanceState);
-            currentPosition = Arguments.GetInt(ARG_POSITION);
-            currentCategory = Arguments.GetInt(ARG_CODE);
-            mm = new MessageManager(Activity);
+            currentCategory = Arguments.GetInt(ARG_CATEGORY);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -50,9 +43,8 @@ namespace LettreForAndroid
             TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
             mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
-            //현재페이지의 위치와 코드가 담긴 전역변수에서 값 가져옴.
+            //현재페이지의 카테고리 번호가 담긴 전역변수에서 값 가져옴.
             string thisCode = currentCategory.ToString();
-            string thisPosition = currentPosition.ToString();
 
             //여기부턴 리사이클 뷰
 
@@ -60,17 +52,17 @@ namespace LettreForAndroid
             List<TextMessage> messageList;
             if(currentCategory == (int)TabFrag.CATEGORY.ALL)
             {
-                 messageList = mm.AllMessages;
+                 messageList = MessageManager.Get().getAllMessages();
             }
             else
             {
-                messageList = mm.AllMessages;
+                messageList = MessageManager.Get().getAllMessages();
             }
             
             Dialogue mDialogue = new Dialogue(messageList);
 
             //문자가 있으면
-            if(mm.AllMessages.Count > 0)
+            if(MessageManager.Get().Count > 0)
             {
                 //어뎁터 준비
                 mAdapter = new DialogueAdpater(mDialogue);
