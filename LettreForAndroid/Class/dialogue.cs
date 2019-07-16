@@ -68,6 +68,11 @@ namespace LettreForAndroid.Class
             get { return msg; }
             set { msg = value; }
         }
+        public string Person
+        {
+            get { return person; }
+            set { person = value; }
+        }
         public string ReadState
         {
             get { return readState; }
@@ -82,6 +87,11 @@ namespace LettreForAndroid.Class
         {
             get { return folder; }
             set { folder = value; }
+        }
+        public string Thread_id
+        {
+            get { return thread_id; }
+            set { thread_id = value; }
         }
     }
 

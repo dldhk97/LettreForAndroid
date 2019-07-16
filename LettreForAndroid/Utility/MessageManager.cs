@@ -19,34 +19,28 @@ namespace LettreForAndroid.Utility
     class MessageManager
     {
         readonly Activity mActivity;
+        private List<TextMessage> mAllMessages;
 
-        public MessageManager(Activity activity)
+        public List<TextMessage> AllMessages
         {
-            mActivity = activity;
-        }
-        public void GetTextMessage()
-        {
-            //기본앱으로 지정되있고, 권한이 있으면?
-            if (DataStorageManager.loadBoolData(mActivity.BaseContext, "isDefaultPackage", false))
-            {
-                List<TextMessage> lst = getAllTextMessages();
-            }
-            else
-            {
-                //기본앱으로 설정해야하는 이유를 알려주고 표시해라.
-                //SetAsDefaultApp();
-            }
+            get { return mAllMessages; }
         }
 
-        //GetTextMessage
-        public List<TextMessage> getAllTextMessages()
+        //객체 생성 시 모든 문자메세지를 가져옴.
+        public MessageManager(Activity iActivity)
         {
-            List<TextMessage> lstSms = new List<TextMessage>();
+            mActivity = iActivity;
+            refreshMessages();
+        }
+
+        private void refreshMessages()
+        {
+            mAllMessages = new List<TextMessage>();
             TextMessage objSms = new TextMessage();
             Uri message = Uri.Parse("content://sms/");
             ContentResolver cr = mActivity.BaseContext.ContentResolver;
 
-            ICursor c = cr.Query(message, null, null, null, null);
+            ICursor c = cr.Query(message, null, null, null, "thread_id asc, date desc");
             mActivity.StartManagingCursor(c);
             int totalSMS = c.Count;
 
@@ -57,19 +51,14 @@ namespace LettreForAndroid.Utility
                     objSms = new TextMessage();
                     objSms.Id = c.GetString(c.GetColumnIndexOrThrow("_id"));
                     objSms.Address = c.GetString(c.GetColumnIndexOrThrow("address"));
+                    objSms.Person = c.GetString(c.GetColumnIndexOrThrow("person"));     //현재 null값만 있는거같음
                     objSms.Msg = c.GetString(c.GetColumnIndexOrThrow("body"));
                     objSms.ReadState = c.GetString(c.GetColumnIndex("read"));
                     objSms.Time = c.GetString(c.GetColumnIndexOrThrow("date"));
-                    if (c.GetString(c.GetColumnIndexOrThrow("type")).Contains("1"))
-                    {
-                        objSms.Folder = "inbox";
-                    }
-                    else
-                    {
-                        objSms.Folder = "sent";
-                    }
+                    objSms.Thread_id = c.GetString(c.GetColumnIndexOrThrow("thread_id"));
+                    objSms.Folder = c.GetString(c.GetColumnIndexOrThrow("type"));
 
-                    lstSms.Add(objSms);
+                    mAllMessages.Add(objSms);
                     c.MoveToNext();
                 }
             }
@@ -77,8 +66,6 @@ namespace LettreForAndroid.Utility
             // throw new RuntimeException("You have no SMS");
             // }
             c.Close();
-
-            return lstSms;
         }
     }
 }

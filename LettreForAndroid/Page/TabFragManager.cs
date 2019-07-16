@@ -22,17 +22,16 @@ namespace LettreForAndroid.Page
 {
     public class TabFragManager
     {
-
         TabFrag[] tabFrags = 
         {
-            new TabFrag(0, "전체", 0),
-            new TabFrag(1, "대화", 0),
-            new TabFrag(2, "인증", 0),
-            new TabFrag(3, "택배", 0),
-            new TabFrag(4, "공공기관", 0),
-            new TabFrag(5, "카드", 0),
-            new TabFrag(6, "스팸", 0),
-            new TabFrag(7, "미분류", 0),
+            new TabFrag("전체", (int)TabFrag.CATEGORY.ALL, 0, 0),
+            new TabFrag("대화", (int)TabFrag.CATEGORY.COMMON, 1, 0),
+            new TabFrag("인증", (int)TabFrag.CATEGORY.IDENTIFICATION, 2, 0),
+            new TabFrag("택배", (int)TabFrag.CATEGORY.DELIVERY, 3, 0),
+            new TabFrag("공공기관", (int)TabFrag.CATEGORY.PUBLIC, 4, 0),
+            new TabFrag("카드", (int)TabFrag.CATEGORY.CARD, 5, 0),
+            new TabFrag("스팸", (int)TabFrag.CATEGORY.SPAM, 6, 0),
+            new TabFrag("미분류", (int)TabFrag.CATEGORY.UNKNOWN, 7, 0),
         };
 
         readonly Activity activity;

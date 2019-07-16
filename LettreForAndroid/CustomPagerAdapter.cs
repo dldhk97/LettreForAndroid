@@ -30,9 +30,10 @@ namespace LettreForAndroid
             get { return tabs.Count; }
         }
 
+        //메인문이 모두 끝나면, 이 메소드가 호출되어 newInstance가 각 FragmentPage의 내용물을 채움
         public override Fragment GetItem(int position)
         {
-            return PageFragment.newInstance(position + 1);
+            return PageFragment.newInstance(position, tabs[position].Category);
         }
 
         public View GetTabView(int position)
@@ -47,16 +48,6 @@ namespace LettreForAndroid
 
             return view;
         }
-
-
-        //public void initTabs()
-        //{
-        //    tabs.Add(new TabFrag(0, "전체", 0));
-        //    tabs.Add(new TabFrag(1, "대화", 2));
-        //    tabs.Add(new TabFrag(2, "택배", 3));
-        //    tabs.Add(new TabFrag(3, "공공기관", 4));
-        //    tabs.Add(new TabFrag(4, "인증", 5));
-        //}
 
         public void AddTab(TabFrag iTabFrag)
         {

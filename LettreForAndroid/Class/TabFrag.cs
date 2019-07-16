@@ -14,31 +14,39 @@ namespace LettreForAndroid.Class
 {
     public class TabFrag
     {
-        private int code;           //탭의 고유 코드, 전체 0, 대화 1, 인증 2, 택배 3, 공공기관 4, 카드 5, 스팸 6, 미분류 7
-        private string tabTitle;    //탭에 표시될 제목
-        private int notiCount;      //알림 카운트
+        public enum CATEGORY { ALL = 0, COMMON, IDENTIFICATION, DELIVERY, PUBLIC, CARD, SPAM, UNKNOWN };
 
-        public TabFrag(int iCode, string iTabTitle, int iNotiCount)
+        private string mTabTitle;    //탭에 표시될 제목
+        private int mCategory;       //탭의 고유 코드, 전체 0, 대화 1, 인증 2, 택배 3, 공공기관 4, 카드 5, 스팸 6, 미분류 7
+        private int mPosition;       //위치
+        private int mNotiCount;      //알림 카운트
+
+        public TabFrag(string iTabTitle, int iCategory, int iPosition, int iNotiCount)
         {
-            code = iCode;
-            tabTitle = iTabTitle;
-            notiCount = iNotiCount;
+            mTabTitle = iTabTitle;
+            mCategory = iCategory;
+            mPosition = iPosition;
+            mNotiCount = iNotiCount;
         }
         public string TabTitle
         {
-            get { return tabTitle; }
-            set { tabTitle = value; }
+            get { return mTabTitle; }
+            set { mTabTitle = value; }
         }
-        public int Code
+        public int Category
         {
-            get { return code; }
-            set { code = value; }
+            get { return mCategory; }
+            set { mCategory = value; }
+        }
+        public int Position
+        {
+            get { return mPosition; }
+            set { mPosition = value; }
         }
         public int NotiCount
         {
-            get { return notiCount; }
-            set { notiCount = value; }
+            get { return mNotiCount; }
+            set { mNotiCount = value; }
         }
-
     }
 }

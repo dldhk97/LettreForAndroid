@@ -14,31 +14,33 @@ namespace LettreForAndroid
 {
     public class PageFragment : Fragment
     {
-        const string ARG_PAGE = "ARG_PAGE";
-        private int mPage;
+        const string ARG_POSITION = "ARG_POSITION";
+        const string ARG_CODE = "ARG_CODE";
+        private int currentPosition;
+        private int currentCategory;
 
         //리사이클러뷰 연습
         RecyclerView mRecyclerView;
         RecyclerView.LayoutManager mLayoutManager;
         DialogueAdpater mAdapter;
-        Dialogue mDialogue;
 
         MessageManager mm;
-        List<TextMessage> allMessages;
 
-        public static PageFragment newInstance(int page)
+        public static PageFragment newInstance(int position, int code)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
             var args = new Bundle();
-            args.PutInt(ARG_PAGE, page);
+            args.PutInt(ARG_POSITION, position);
+            args.PutInt(ARG_CODE, code);
             var fragment = new PageFragment();
             fragment.Arguments = args;
             return fragment;
         }
 
-        public override void OnCreate(Bundle savedInstanceState)
+        public override void OnCreate(Bundle savedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
             base.OnCreate(savedInstanceState);
-            mPage = Arguments.GetInt(ARG_PAGE);
+            currentPosition = Arguments.GetInt(ARG_POSITION);
+            currentCategory = Arguments.GetInt(ARG_CODE);
             mm = new MessageManager(Activity);
         }
 
@@ -47,16 +49,28 @@ namespace LettreForAndroid
             var view = inflater.Inflate(Resource.Layout.fragment_page, container, false);
             TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
             mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
-            //textView1.Text = "페이지 #" + mPage;
 
-            //여기부턴 리사이클 뷰 연습
+            //현재페이지의 위치와 코드가 담긴 전역변수에서 값 가져옴.
+            string thisCode = currentCategory.ToString();
+            string thisPosition = currentPosition.ToString();
+
+            //여기부턴 리사이클 뷰
 
             //데이터 준비
-            allMessages = mm.getAllTextMessages();
-            mDialogue = new Dialogue(allMessages);
+            List<TextMessage> messageList;
+            if(currentCategory == (int)TabFrag.CATEGORY.ALL)
+            {
+                 messageList = mm.AllMessages;
+            }
+            else
+            {
+                messageList = mm.AllMessages;
+            }
+            
+            Dialogue mDialogue = new Dialogue(messageList);
 
             //문자가 있으면
-            if(allMessages.Count > 0)
+            if(mm.AllMessages.Count > 0)
             {
                 //어뎁터 준비
                 mAdapter = new DialogueAdpater(mDialogue);
@@ -88,17 +102,21 @@ namespace LettreForAndroid
         // 그것들은 리사이클러뷰 안의 행으로써 표시됨.
         public class MessageViewHolder : RecyclerView.ViewHolder
         {
-            public ImageButton ImageButton { get; private set; }
+            public ImageButton ProfileImage { get; private set; }
             public TextView Address { get; private set; }
             public TextView Msg { get; private set; }
+            public TextView Time { get; private set; }
+            public ImageView ReadStateIndicator { get; private set; }
 
             // 카드뷰 레이아웃(message_view) 내 객체들 참조.
             public MessageViewHolder(View itemView, System.Action<int> listener) : base(itemView)
             {
                 // Locate and cache view references:
-                ImageButton = itemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
+                ProfileImage = itemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
                 Address = itemView.FindViewById<TextView>(Resource.Id.mv_address);
                 Msg = itemView.FindViewById<TextView>(Resource.Id.mv_msg);
+                Time = itemView.FindViewById<TextView>(Resource.Id.mv_time);
+                ReadStateIndicator = itemView.FindViewById<ImageView>(Resource.Id.mv_readStateIndicator);
 
                 // Detect user clicks on the item view and report which item
                 // was clicked (by layout position) to the listener:
@@ -138,11 +156,15 @@ namespace LettreForAndroid
             {
                 MessageViewHolder vh = holder as MessageViewHolder;
 
-                // Set the ImageView and TextView in this ViewHolder's CardView 
-                // from this position in the photo album:
-                //vh.Image.SetImageResource(mDialogue[position].Id);
+                //vh.ProfileImage.SetImageResource(mDialogue[position]) //대충 프로필사진으로 때운다는 내용
                 vh.Address.Text = mDialogue[position].Address;
                 vh.Msg.Text = mDialogue[position].Msg;
+
+                var time = TimeSpan.FromMilliseconds(Convert.ToDouble(mDialogue[position].Time));
+                DateTime dt = new DateTime(1970,1,1) + time;
+                vh.Time.Text = dt.ToLongDateString() + dt.ToLongTimeString();
+
+                vh.ReadStateIndicator.Visibility = mDialogue[position].ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
             }
 
             // Return the number of photos available in the photo album:
