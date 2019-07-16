@@ -54,8 +54,8 @@
 
                     <ImageView
                         android:src="@drawable/noti_background_64"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
                         android:id="@+id/mv_readStateIndicator"
                         android:layout_gravity="right" />
 
@@ -72,7 +72,7 @@
                         android:layout_height="match_parent"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#FFFFFFFF"
-                        android:text="this is text messages. Do a barrel rool. adsasdasdasdasd"
+                        android:text="this is text messages. Do a barrel roll. adsasdasdasdasd"
                         android:id="@+id/mv_msg"
                         android:layout_marginLeft="4dp"
                         android:layout_marginRight="4dp"

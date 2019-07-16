@@ -5,7 +5,10 @@ using Android.Views;
 using Android.Widget;
 using Java.Lang;
 using Android.Support.V7.Widget;
+
 using LettreForAndroid.Class;
+using LettreForAndroid.Utility;
+using System.Collections.Generic;
 
 namespace LettreForAndroid
 {
@@ -20,6 +23,8 @@ namespace LettreForAndroid
         DialogueAdpater mAdapter;
         Dialogue mDialogue;
 
+        MessageManager mm;
+        List<TextMessage> allMessages;
 
         public static PageFragment newInstance(int page)
         {
@@ -34,34 +39,44 @@ namespace LettreForAndroid
         {
             base.OnCreate(savedInstanceState);
             mPage = Arguments.GetInt(ARG_PAGE);
+            mm = new MessageManager(Activity);
         }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_page, container, false);
-            //TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
             //textView1.Text = "페이지 #" + mPage;
 
             //여기부턴 리사이클 뷰 연습
 
             //데이터 준비
-            mDialogue = new Dialogue();
+            allMessages = mm.getAllTextMessages();
+            mDialogue = new Dialogue(allMessages);
 
-            //어뎁터 준비
-            mAdapter = new DialogueAdpater(mDialogue);
+            //문자가 있으면
+            if(allMessages.Count > 0)
+            {
+                //어뎁터 준비
+                mAdapter = new DialogueAdpater(mDialogue);
 
-            //RecyclerView 가져오기
-            mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+                //RecyclerView에 어댑터 Plug
+                mRecyclerView.SetAdapter(mAdapter);
 
-            //RecyclerView에 어댑터 Plug
-            mRecyclerView.SetAdapter(mAdapter);
+                mLayoutManager = new LinearLayoutManager(Context);
+                mRecyclerView.SetLayoutManager(mLayoutManager);
 
-            mLayoutManager = new LinearLayoutManager(Context);
-            mRecyclerView.SetLayoutManager(mLayoutManager);
-
-            //내 어댑터 Plug In
-            mAdapter = new DialogueAdpater(mDialogue);
-            mRecyclerView.SetAdapter(mAdapter);
+                //내 어댑터 Plug In
+                mAdapter = new DialogueAdpater(mDialogue);
+                mRecyclerView.SetAdapter(mAdapter);
+            }
+            else
+            {
+                //문자가 없으면 
+                textView1.Visibility = ViewStates.Visible;
+                mRecyclerView.Visibility = ViewStates.Gone;
+            }
 
             return view;
         }

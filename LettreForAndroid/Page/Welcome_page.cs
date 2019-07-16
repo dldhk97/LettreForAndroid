@@ -20,6 +20,7 @@ namespace LettreForAndroid.Page
 {
     class welcome_page : DialogFragment
     {
+        //이벤트 핸들러, mainAcitivity에서 WelcomePage의 역할이 끝난것을 알아차리기 위함.
         public class OnWelcomeEventArgs : EventArgs
         {
             public OnWelcomeEventArgs()
@@ -27,6 +28,8 @@ namespace LettreForAndroid.Page
 
             }
         }
+        
+        //필수 퍼미션들
         public readonly string[] essentailPermissions = 
             {
             Manifest.Permission.ReadSms,
@@ -45,8 +48,6 @@ namespace LettreForAndroid.Page
 
         const string permission = Android.Manifest.Permission.ReadSms;
 
-        TextView hiddenGuideText;
-
         public event EventHandler<OnWelcomeEventArgs> onWelcomeComplete;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -58,7 +59,7 @@ namespace LettreForAndroid.Page
             var view = inflater.Inflate(Resource.Layout.welcome_page, container, false);
 
             Button mBtnContinue = view.FindViewById<Button>(Resource.Id.welcomepage_button1);
-            hiddenGuideText = view.FindViewById<TextView>(Resource.Id.welcomepage_hiddenGuideText1);
+            
 
             mBtnContinue.Click += async (sender, e) =>
             {
@@ -89,6 +90,7 @@ namespace LettreForAndroid.Page
                 Snackbar.Make(this.View, "레뜨레 사용을 위해 승인을 눌러주세요.", Snackbar.LengthShort)
                         .SetAction("승인", v => RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK))
                         .Show();
+                TextView hiddenGuideText = View.FindViewById<TextView>(Resource.Id.welcomepage_hiddenGuideText1);
                 hiddenGuideText.Visibility = ViewStates.Visible;
                 return;
             }

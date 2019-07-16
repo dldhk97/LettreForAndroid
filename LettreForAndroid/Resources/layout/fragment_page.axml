@@ -9,5 +9,14 @@
         android:layout_height="match_parent"
         android:id="@+id/fragPage_recyclerView1" 
         android:scrollbars="vertical"/>
+    <TextView
+        android:text="현재 메시지가 존재하지 않아요!"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#FFFFFFFF"
+        android:id="@+id/fragPage_textView1"
+        android:visibility="gone"
+        android:gravity="center"
+        android:textSize="20dp"  />
     
 </LinearLayout>

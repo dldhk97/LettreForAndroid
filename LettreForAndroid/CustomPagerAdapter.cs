@@ -16,9 +16,9 @@ namespace LettreForAndroid
         private List<TabFrag> tabs = new List<TabFrag>();
         readonly Context context;
 
-        public CustomPagerAdapter(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
+        //public CustomPagerAdapter(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+        //{
+        //}
 
         public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
         {
@@ -48,21 +48,24 @@ namespace LettreForAndroid
             return view;
         }
 
-        //public void AddTab(TabFrag tabFrag)
+
+        //public void initTabs()
         //{
-        //    tabs.Add(tabFrag);
+        //    tabs.Add(new TabFrag(0, "전체", 0));
+        //    tabs.Add(new TabFrag(1, "대화", 2));
+        //    tabs.Add(new TabFrag(2, "택배", 3));
+        //    tabs.Add(new TabFrag(3, "공공기관", 4));
+        //    tabs.Add(new TabFrag(4, "인증", 5));
         //}
 
-        public void initTabs()
+        public void AddTab(TabFrag iTabFrag)
         {
-            tabs.Add(new TabFrag("전체", 0));
-            tabs.Add(new TabFrag("대화", 2));
-            tabs.Add(new TabFrag("택배", 3));
-            tabs.Add(new TabFrag("공공기관", 4));
-            tabs.Add(new TabFrag("인증", 5));
-            tabs.Add(new TabFrag("카드", 77));
-            tabs.Add(new TabFrag("스팸", 100));   //99개 이상일땐 99개로 표시해야하나?
-            tabs.Add(new TabFrag("기타", 99));
+            tabs.Add(iTabFrag);
+        }
+        public void AddTab(TabFrag[] iTabFrags)
+        {
+            for(int i = 0; i < iTabFrags.Length; i++)
+                tabs.Add(iTabFrags[i]);
         }
     }
 }

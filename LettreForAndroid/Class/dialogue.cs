@@ -20,35 +20,17 @@ namespace LettreForAndroid.Class
         private string category;    //카테고리
 
         //메세지들의 배열, 대화를 구성함.
-        private TextMessage[] textMessages;
+        private List<TextMessage> textMessages;
 
-        //임시 데이터, 데이터베이스로 대체할 것.
-        TextMessage[] tempTextMessages =
+        public Dialogue(List<TextMessage> tm)
         {
-            new TextMessage {Id = "1", Address = "010-1234-1234", Msg = "헬로 월드!", ReadState = "0", Time = "2019-07-11 14:02", Folder = "0"},
-            new TextMessage {Id = "2", Address = "010-1234-2234", Msg = "안녕 세상아!", ReadState = "0", Time = "2019-07-12 14:02", Folder = "0"},
-            new TextMessage {Id = "3", Address = "010-1234-3234", Msg = "Hello World!", ReadState = "0", Time = "2019-07-13 14:02", Folder = "0"},
-            new TextMessage {Id = "4", Address = "010-1234-4234", Msg = "더 월드!", ReadState = "0", Time = "2019-07-14 14:02", Folder = "0"},
-            new TextMessage {Id = "5", Address = "010-1234-1234", Msg = "헬로 월드!", ReadState = "0", Time = "2019-07-11 14:02", Folder = "0"},
-            new TextMessage {Id = "6", Address = "010-1234-2234", Msg = "안녕 세상아!", ReadState = "0", Time = "2019-07-12 14:02", Folder = "0"},
-            new TextMessage {Id = "7", Address = "010-1234-3234", Msg = "Hello World!", ReadState = "0", Time = "2019-07-13 14:02", Folder = "0"},
-            new TextMessage {Id = "8", Address = "010-1234-4234", Msg = "더 월드!", ReadState = "0", Time = "2019-07-14 14:02", Folder = "0"},
-            new TextMessage {Id = "9", Address = "010-1234-1234", Msg = "헬로 월드!", ReadState = "0", Time = "2019-07-11 14:02", Folder = "0"},
-            new TextMessage {Id = "10", Address = "010-1234-2234", Msg = "안녕 세상아!", ReadState = "0", Time = "2019-07-12 14:02", Folder = "0"},
-            new TextMessage {Id = "11", Address = "010-1234-3234", Msg = "Hello World!", ReadState = "0", Time = "2019-07-13 14:02", Folder = "0"},
-            new TextMessage {Id = "12", Address = "010-1234-4234", Msg = "더 월드!", ReadState = "0", Time = "2019-07-14 14:02", Folder = "0"},
-        };
-
-        public Dialogue()
-        {
-            //임시 데이터 삽입
-            textMessages = tempTextMessages;
+            textMessages = tm;
         }
 
         //대화 내 메세지의 개수
         public int NumMessages
         {
-            get { return textMessages.Length; }
+            get { return textMessages.Count; }
         }
 
         //인덱서
@@ -63,11 +45,13 @@ namespace LettreForAndroid.Class
     public class TextMessage
     {
         private string id;          //ID
-        private string address;     //보낸사람
-        private string msg;         //메세지
+        private string address;     //보낸사람, MMS 메세지는 여기서 번호 안나옴.
+        private string msg;         //메세지(body)
+        private string person;      //누가 보냈는지 contact와 연관하는 것인데, 뭔지 모름.
         private string readState;   //0은 읽지않음, 1은 읽음.
-        private string time;        //시간
-        private string folder;      //폴더, 수신(inbox)인지 발신(sent)인지
+        private string time;        //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
+        private string folder;      //폴더, 수신(inbox)인지 발신(sent)인지? 0 혹은 1?
+        private string thread_id;   //대화방 고유 ID?
 
         public string Id
         {
@@ -103,7 +87,9 @@ namespace LettreForAndroid.Class
 
     public class MultimediaMessage : TextMessage
     {
-        private string smil;
+        private string sub;     //MMS의 제목
+        private string m_id;    //MMS일때 이 값을 가지며, SMS인경우 NULL임.
+        private string m_type;  //MMS일때 가짐. 132는 상대방이 보낸 것, 128은 내가보낸 것.
     }
 
 }
