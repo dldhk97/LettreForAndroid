@@ -11,6 +11,8 @@ using LettreForAndroid.Utility;
 using LettreForAndroid.Page;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
+using Android.Content;
+using Android.Runtime;
 
 namespace LettreForAndroid
 {
@@ -19,6 +21,8 @@ namespace LettreForAndroid
     {
         TabFragManager tfm;
         Toolbar mToolbar;
+
+        const int mWelcomeActivityCallback = 1;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -35,15 +39,23 @@ namespace LettreForAndroid
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
             {
-                Android.App.FragmentTransaction transaction = FragmentManager.BeginTransaction();
-                welcome_page firstMeetDialog = new welcome_page();
-                firstMeetDialog.Show(transaction, "dialog_fragment");
-                firstMeetDialog.onWelcomeComplete += FirstMeetDialog_onWelcomeComplete;     //Welcome Page에서 Dismiss되면 메소드 호출
+                StartActivityForResult(typeof(welcome_page), mWelcomeActivityCallback);
             }
             else
             {
                 //처음 사용자가 아니면 바로 할일 함.
                 OnWelcomeComplete();
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            switch (requestCode)
+            {
+                case mWelcomeActivityCallback:
+                    OnWelcomeComplete();
+                    break;
             }
 
         }
@@ -87,6 +99,7 @@ namespace LettreForAndroid
             {
                 string str = DataStorageManager.loadStringData(this,"temp", "NULL");
                 Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
+                StartActivity(typeof(dialogue_page));
             }
             else
             {
