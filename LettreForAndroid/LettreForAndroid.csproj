@@ -68,7 +68,6 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="PageFragment.cs" />
     <Compile Include="Page\TabFragManager.cs" />
-    <Compile Include="Page\ToolbarManager.cs" />
     <Compile Include="Page\welcome_page.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

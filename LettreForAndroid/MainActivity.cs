@@ -6,10 +6,11 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 
-
 using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
 using LettreForAndroid.Page;
+
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace LettreForAndroid
 {
@@ -17,6 +18,8 @@ namespace LettreForAndroid
     public class MainActivity : AppCompatActivity
     {
         TabFragManager tfm;
+        Toolbar mToolbar;
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -27,8 +30,7 @@ namespace LettreForAndroid
             tfm = new TabFragManager(this, SupportFragmentManager);
 
             //툴바 세팅
-            ToolbarManager tm = new ToolbarManager(this, this);
-            tm.SetupToolBar();
+            SetupToolBar();
 
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
@@ -62,5 +64,35 @@ namespace LettreForAndroid
             //이게 끝나면 각 리사이클뷰 내용 표시 처리함.
         }
         
+         //툴바 적용
+        public void SetupToolBar()
+        {
+            mToolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
+
+            SetSupportActionBar(mToolbar);
+            SupportActionBar.Title = "Lettre";
+        }
+        //툴바에 메뉴 추가
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.toolbar, menu);
+            return base.OnCreateOptionsMenu(menu);
+        }
+
+        //툴바 선택시
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            //Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
+            if(item.ItemId == Resource.Id.toolbar_search)
+            {
+                string str = DataStorageManager.loadStringData(this,"temp", "NULL");
+                Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
+            }
+            else
+            {
+                DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
+            }
+            return base.OnOptionsItemSelected(item);
+        }
     }
 }

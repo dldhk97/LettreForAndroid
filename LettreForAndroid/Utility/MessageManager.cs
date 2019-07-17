@@ -123,12 +123,16 @@ namespace LettreForAndroid.Utility
                 }
             }
 
-            resultMessageList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+            if(mDialogueList.Count > 0)
             {
-                if (A[0].Time < B[0].Time) return 1;
-                else if (A[0].Time > B[0].Time) return -1;
-                return 0;
-            });
+                resultMessageList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+                {
+                    if (A[0].Time < B[0].Time) return 1;
+                    else if (A[0].Time > B[0].Time) return -1;
+                    return 0;
+                });
+            }
+            
 
             return resultMessageList;
         }
