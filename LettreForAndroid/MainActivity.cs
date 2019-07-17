@@ -23,15 +23,12 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
-            //메인 화면 세팅
-            //BlurViewManager bvm = new BlurViewManager(this);
-            //bvm.SetupBlurView();      //블러뷰 적용시 배경화면이 뭉개져서 주석처리.
+            //Tab Fragment Manger 초기화
+            tfm = new TabFragManager(this, SupportFragmentManager);
 
             //툴바 세팅
             ToolbarManager tm = new ToolbarManager(this, this);
             tm.SetupToolBar();
-
-            tfm = new TabFragManager(this, SupportFragmentManager);
 
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
@@ -43,6 +40,7 @@ namespace LettreForAndroid
             }
             else
             {
+                //처음 사용자가 아니면 바로 할일 함.
                 OnWelcomeComplete();
             }
 
@@ -53,10 +51,15 @@ namespace LettreForAndroid
             OnWelcomeComplete();
         }
 
+        //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
         public void OnWelcomeComplete()
         {
+            //탭 레이아웃 세팅
             tfm.SetupTabLayout();
+            //메세지 매니저(싱글톤)세팅
+            ContactManager.Get().Initialization(this);
             MessageManager.Get().Initialization(this);
+            //이게 끝나면 각 리사이클뷰 내용 표시 처리함.
         }
         
     }

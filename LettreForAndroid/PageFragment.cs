@@ -15,57 +15,57 @@ namespace LettreForAndroid
     public class PageFragment : Fragment
     {
         const string ARG_CATEGORY = "ARG_CATEGORY";
-        private int currentCategory;
+        private int mCurrentCategory;
 
-        //리사이클러뷰 연습
         RecyclerView mRecyclerView;
         RecyclerView.LayoutManager mLayoutManager;
-        DialogueAdpater mAdapter;
+        DialogueListAdpater mAdapter;
 
-        public static PageFragment newInstance(int category)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
+        public static PageFragment newInstance(int iCategory)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
             var args = new Bundle();
-            args.PutInt(ARG_CATEGORY, category);
+            args.PutInt(ARG_CATEGORY, iCategory);
             var fragment = new PageFragment();
             fragment.Arguments = args;
             return fragment;
         }
 
-        public override void OnCreate(Bundle savedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
+        public override void OnCreate(Bundle iSavedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
-            base.OnCreate(savedInstanceState);
-            currentCategory = Arguments.GetInt(ARG_CATEGORY);
+            base.OnCreate(iSavedInstanceState);
+            mCurrentCategory = Arguments.GetInt(ARG_CATEGORY);
         }
 
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        public override View OnCreateView(LayoutInflater iInflater, ViewGroup iContainer, Bundle iSavedInstanceState)
         {
-            var view = inflater.Inflate(Resource.Layout.fragment_page, container, false);
+            var view = iInflater.Inflate(Resource.Layout.fragment_page, iContainer, false);
             TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
             mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
             //현재페이지의 카테고리 번호가 담긴 전역변수에서 값 가져옴.
-            string thisCode = currentCategory.ToString();
+            string thisCode = mCurrentCategory.ToString();
 
             //여기부턴 리사이클 뷰
 
             //데이터 준비
-            List<TextMessage> messageList;
-            if(currentCategory == (int)TabFrag.CATEGORY.ALL)
+            //messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
+            List<Dialogue> dialogueList;
+            if(mCurrentCategory == (int)TabFrag.CATEGORY.ALL)
             {
-                 messageList = MessageManager.Get().getAllMessages();
+                dialogueList = MessageManager.Get().getAllMessages(1);
             }
             else
             {
-                messageList = MessageManager.Get().getAllMessages();
+                dialogueList = MessageManager.Get().getAllMessages(1);
             }
-            
-            Dialogue mDialogue = new Dialogue(messageList);
 
-            //문자가 있으면
-            if(MessageManager.Get().Count > 0)
+            //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
+
+            //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
+            if(dialogueList.Count > 0)
             {
                 //어뎁터 준비
-                mAdapter = new DialogueAdpater(mDialogue);
+                mAdapter = new DialogueListAdpater(dialogueList);
 
                 //RecyclerView에 어댑터 Plug
                 mRecyclerView.SetAdapter(mAdapter);
@@ -74,7 +74,7 @@ namespace LettreForAndroid
                 mRecyclerView.SetLayoutManager(mLayoutManager);
 
                 //내 어댑터 Plug In
-                mAdapter = new DialogueAdpater(mDialogue);
+                mAdapter = new DialogueListAdpater(dialogueList);
                 mRecyclerView.SetAdapter(mAdapter);
             }
             else
@@ -92,84 +92,89 @@ namespace LettreForAndroid
 
         // 뷰홀더 패턴 적용 : 각각의 뷰홀더가 CardView 안에 있는 UI 컴포넨트(이미지뷰와 텍스트뷰)를 참조한다.
         // 그것들은 리사이클러뷰 안의 행으로써 표시됨.
-        public class MessageViewHolder : RecyclerView.ViewHolder
+        public class DialogueViewHolder : RecyclerView.ViewHolder
         {
-            public ImageButton ProfileImage { get; private set; }
-            public TextView Address { get; private set; }
-            public TextView Msg { get; private set; }
-            public TextView Time { get; private set; }
-            public ImageView ReadStateIndicator { get; private set; }
+            public ImageButton mProfileImage { get; private set; }
+            public TextView mAddress { get; private set; }
+            public TextView mMsg { get; private set; }
+            public TextView mTime { get; private set; }
+            public ImageView mReadStateIndicator { get; private set; }
 
             // 카드뷰 레이아웃(message_view) 내 객체들 참조.
-            public MessageViewHolder(View itemView, System.Action<int> listener) : base(itemView)
+            public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 // Locate and cache view references:
-                ProfileImage = itemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
-                Address = itemView.FindViewById<TextView>(Resource.Id.mv_address);
-                Msg = itemView.FindViewById<TextView>(Resource.Id.mv_msg);
-                Time = itemView.FindViewById<TextView>(Resource.Id.mv_time);
-                ReadStateIndicator = itemView.FindViewById<ImageView>(Resource.Id.mv_readStateIndicator);
+                mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
+                mAddress = iItemView.FindViewById<TextView>(Resource.Id.mv_address);
+                mMsg = iItemView.FindViewById<TextView>(Resource.Id.mv_msg);
+                mTime = iItemView.FindViewById<TextView>(Resource.Id.mv_time);
+                mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.mv_readStateIndicator);
 
                 // Detect user clicks on the item view and report which item
                 // was clicked (by layout position) to the listener:
-                itemView.Click += (sender, e) => listener(base.LayoutPosition);
+                iItemView.Click += (sender, e) => iListener(base.LayoutPosition);
             }
         }
 
-        public class DialogueAdpater : RecyclerView.Adapter
+        public class DialogueListAdpater : RecyclerView.Adapter
         {
             // Event handler for item clicks:
-            public event System.EventHandler<int> ItemClick;
+            public event System.EventHandler<int> mItemClick;
 
             // Underlying data set (a photo album):
-            public Dialogue mDialogue;
+            public List<Dialogue> mDialogueList;
 
             // Load the adapter with the data set (photo album) at construction time:
-            public DialogueAdpater(Dialogue dialogue)
+            public DialogueListAdpater(List<Dialogue> iDialogueList)
             {
-                mDialogue = dialogue;
+                mDialogueList = iDialogueList;
             }
 
-            // Create a new photo CardView (invoked by the layout manager): 
-            public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+            // 새 카드뷰 생성 (invoked by the layout manager): 
+            public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup iParent, int iViewType)
             {
                 // Inflate the CardView for the photo:
-                View itemView = LayoutInflater.From(parent.Context).
-                            Inflate(Resource.Layout.message_view, parent, false);
+                View itemView = LayoutInflater.From(iParent.Context).
+                            Inflate(Resource.Layout.message_view, iParent, false);
 
                 // Create a ViewHolder to find and hold these view references, and 
                 // register OnClick with the view holder:
-                MessageViewHolder vh = new MessageViewHolder(itemView, OnClick);
+                DialogueViewHolder vh = new DialogueViewHolder(itemView, OnClick);
                 return vh;
             }
 
-            // Fill in the contents of the photo card (invoked by the layout manager):
-            public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+            // 리사이클러 뷰 한칸을 컨텐츠로 채운다 (invoked by the layout manager):
+            public override void OnBindViewHolder(RecyclerView.ViewHolder iHolder, int iPosition)
             {
-                MessageViewHolder vh = holder as MessageViewHolder;
+                DialogueViewHolder vh = iHolder as DialogueViewHolder;
+
+                //해당 대화의 첫번째 메세지의 연락처, 메세지, 시간 등등 표시
+                TextMessage currentMsg = mDialogueList[iPosition][0];
 
                 //vh.ProfileImage.SetImageResource(mDialogue[position]) //대충 프로필사진으로 때운다는 내용
-                vh.Address.Text = mDialogue[position].Address;
-                vh.Msg.Text = mDialogue[position].Msg;
+                vh.mAddress.Text = currentMsg.Address;
+                vh.mMsg.Text = currentMsg.Msg;
 
-                var time = TimeSpan.FromMilliseconds(Convert.ToDouble(mDialogue[position].Time));
-                DateTime dt = new DateTime(1970,1,1) + time;
-                vh.Time.Text = dt.ToLongDateString() + dt.ToLongTimeString();
+                long milTime = currentMsg.Time;
+                string pattern = "yyyy-MM-dd HH:mm:ss";
+                Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat(pattern);
+                string date = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
+                vh.mTime.Text = date;
 
-                vh.ReadStateIndicator.Visibility = mDialogue[position].ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
+                vh.mReadStateIndicator.Visibility = currentMsg.ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
             }
 
             // Return the number of photos available in the photo album:
             public override int ItemCount
             {
-                get { return mDialogue.NumMessages; }
+                get { return mDialogueList.Count; }
             }
 
             // Raise an event when the item-click takes place:
-            void OnClick(int position)
+            void OnClick(int iPosition)
             {
-                if (ItemClick != null)
-                    ItemClick(this, position);
+                if (mItemClick != null)
+                    mItemClick(this, iPosition);
             }
         }
     }

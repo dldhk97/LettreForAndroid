@@ -60,10 +60,6 @@ namespace LettreForAndroid
             return view;
         }
 
-        public void AddTab(TabFrag iTabFrag)
-        {
-            tabs.Add(iTabFrag);
-        }
         public void AddTab(TabFrag[] iTabFrags)
         {
             for(int i = 0; i < iTabFrags.Length; i++)

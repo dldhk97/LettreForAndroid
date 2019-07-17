@@ -17,42 +17,42 @@ namespace LettreForAndroid.Page
 {
     class ToolbarManager : AppCompatActivity
     {
-        Activity activity;
-        AppCompatActivity appCompatActivity;
+        readonly Activity mActivity;
+        AppCompatActivity mAppCompatActivity;
         public ToolbarManager(Activity iActivity, AppCompatActivity iAppcompatActivity)
         {
-            activity = iActivity;
-            appCompatActivity = iAppcompatActivity;
+            mActivity = iActivity;
+            mAppCompatActivity = iAppcompatActivity;
         }
         //툴바 적용
         public void SetupToolBar()
         {
-            var toolbar = activity.FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.my_toolbar);
+            var toolbar = mActivity.FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.my_toolbar);
 
-            appCompatActivity.SetSupportActionBar(toolbar);
-            appCompatActivity.SupportActionBar.Title = "Lettre";
+            mAppCompatActivity.SetSupportActionBar(toolbar);
+            mAppCompatActivity.SupportActionBar.Title = "Lettre";
         }
         //툴바에 메뉴 추가
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            activity.MenuInflater.Inflate(Resource.Menu.toolbar, menu);
-            return appCompatActivity.OnCreateOptionsMenu(menu);
+            mActivity.MenuInflater.Inflate(Resource.Menu.toolbar, menu);
+            return mAppCompatActivity.OnCreateOptionsMenu(menu);
         }
 
         //툴바 선택시
-        public override bool OnOptionsItemSelected(IMenuItem item)
+        public override bool OnOptionsItemSelected(IMenuItem iItem)
         {
             //Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
-            if (item.ItemId == Resource.Id.toolbar_search)
+            if (iItem.ItemId == Resource.Id.toolbar_search)
             {
-                string str = DataStorageManager.loadStringData(activity, "temp", "NULL");
-                Toast.MakeText(activity, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
+                string str = DataStorageManager.loadStringData(mActivity, "temp", "NULL");
+                Toast.MakeText(mActivity, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
             }
             else
             {
-                DataStorageManager.saveStringData(activity, "temp", item.TitleFormatted.ToString());
+                DataStorageManager.saveStringData(mActivity, "temp", iItem.TitleFormatted.ToString());
             }
-            return appCompatActivity.OnOptionsItemSelected(item);
+            return mAppCompatActivity.OnOptionsItemSelected(iItem);
         }
     }
 }

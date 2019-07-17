@@ -13,13 +13,13 @@ namespace LettreForAndroid.Utility
         //Manifest.Permission.BroadcastSms, Manifest.Permission.BroadcastWapPush 는 안되는듯하다.
         public static string[] essentailPermissions = { Manifest.Permission.ReadSms, Manifest.Permission.ReceiveSms,  Manifest.Permission.SendSms, Manifest.Permission.WriteSms, Manifest.Permission.ReceiveMms, Manifest.Permission.ReadContacts, Manifest.Permission.WriteContacts, Manifest.Permission.Internet, Manifest.Permission.AccessNetworkState, Manifest.Permission.ReceiveWapPush };
 
-        public static bool HasPermissions(Context context, string[] permissions)
+        public static bool HasPermissions(Context iContext, string[] iPermissions)
         {
-            if (context != null && permissions != null)
+            if (iContext != null && iPermissions != null)
             {
-                foreach (string permission in permissions)
+                foreach (string permission in iPermissions)
                 {
-                    if (ActivityCompat.CheckSelfPermission(context, permission) != Permission.Granted)
+                    if (ActivityCompat.CheckSelfPermission(iContext, permission) != Permission.Granted)
                     {
                         return false;
                     }
@@ -27,18 +27,18 @@ namespace LettreForAndroid.Utility
             }
             return true;
         }
-        public static void RequestEssentialPermission(Activity activtiy)
+        public static void RequestEssentialPermission(Activity iActivtiy)
         {
-            if (!HasPermissions(activtiy, essentailPermissions))
+            if (!HasPermissions(iActivtiy, essentailPermissions))
             {
-                ActivityCompat.RequestPermissions(activtiy, essentailPermissions, PERMISSION_ALL);
+                ActivityCompat.RequestPermissions(iActivtiy, essentailPermissions, PERMISSION_ALL);
             }
 
         }
 
-        public static bool HasEssentialPermission(Activity activtiy)
+        public static bool HasEssentialPermission(Activity iActivtiy)
         {
-            return HasPermissions(activtiy, essentailPermissions);
+            return HasPermissions(iActivtiy, essentailPermissions);
         }
     }
 }

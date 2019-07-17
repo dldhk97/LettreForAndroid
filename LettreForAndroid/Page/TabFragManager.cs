@@ -26,12 +26,13 @@ namespace LettreForAndroid.Page
         {
             new TabFrag("전체", (int)TabFrag.CATEGORY.ALL, 0, 0),
             new TabFrag("대화", (int)TabFrag.CATEGORY.COMMON, 1, 0),
-            new TabFrag("인증", (int)TabFrag.CATEGORY.IDENTIFICATION, 2, 0),
-            new TabFrag("택배", (int)TabFrag.CATEGORY.DELIVERY, 3, 0),
-            new TabFrag("공공기관", (int)TabFrag.CATEGORY.PUBLIC, 4, 0),
-            new TabFrag("카드", (int)TabFrag.CATEGORY.CARD, 5, 0),
-            new TabFrag("스팸", (int)TabFrag.CATEGORY.SPAM, 6, 0),
-            new TabFrag("미분류", (int)TabFrag.CATEGORY.UNKNOWN, 7, 0),
+            new TabFrag("택배", (int)TabFrag.CATEGORY.DELIVERY, 2, 0),
+            new TabFrag("카드", (int)TabFrag.CATEGORY.CARD, 3, 0),
+            new TabFrag("인증", (int)TabFrag.CATEGORY.IDENTIFICATION, 4, 0),
+            new TabFrag("공공기관", (int)TabFrag.CATEGORY.PUBLIC, 5, 0),
+            new TabFrag("통신사", (int)TabFrag.CATEGORY.AGENCY, 6, 0),
+            new TabFrag("스팸", (int)TabFrag.CATEGORY.SPAM, 7, 0),
+            
         };
 
         readonly Activity activity;
