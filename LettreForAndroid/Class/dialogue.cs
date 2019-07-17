@@ -10,13 +10,14 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using LettreForAndroid.Utility;
+
 namespace LettreForAndroid.Class
 {
     //TextMessage집합 개체, 특정 인물(연락처)와 대화
     public class Dialogue
     {
-        private string address;     //이 대화의 주체
-        private string thread_id;   //대화방 고유 ID
+        private Contact contact;
         private int category;       //카테고리
 
         //메세지들의 배열, 대화를 구성함.
@@ -38,16 +39,16 @@ namespace LettreForAndroid.Class
             get { return textMessageList.Count; }
         }
 
+        public Contact Contact
+        {
+            set { contact = value; }
+            get { return contact; }
+        }
+
         public int Category
         {
             set { category = value; }
             get { return category; }
-        }
-
-        public string Thread_id
-        {
-            set { thread_id = value; }
-            get { return thread_id; }
         }
 
         //인덱서

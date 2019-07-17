@@ -43,21 +43,12 @@ namespace LettreForAndroid
             mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
             //현재페이지의 카테고리 번호가 담긴 전역변수에서 값 가져옴.
-            string thisCode = mCurrentCategory.ToString();
 
             //여기부턴 리사이클 뷰
 
-            //데이터 준비
-            //messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
-            List<Dialogue> dialogueList;
-            if(mCurrentCategory == (int)TabFrag.CATEGORY.ALL)
-            {
-                dialogueList = MessageManager.Get().getAllMessages(1);
-            }
-            else
-            {
-                dialogueList = MessageManager.Get().getAllMessages(1);
-            }
+
+            //데이터 준비 : messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
+            List<Dialogue> dialogueList = MessageManager.Get().getAllMessages(mCurrentCategory);
 
             //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
 
@@ -65,7 +56,7 @@ namespace LettreForAndroid
             if(dialogueList.Count > 0)
             {
                 //어뎁터 준비
-                mAdapter = new DialogueListAdpater(dialogueList);
+                //mAdapter = new DialogueListAdpater(dialogueList);
 
                 //RecyclerView에 어댑터 Plug
                 mRecyclerView.SetAdapter(mAdapter);
@@ -79,7 +70,7 @@ namespace LettreForAndroid
             }
             else
             {
-                //문자가 없으면 
+                //문자가 없으면 없다고 알려준다.
                 textView1.Visibility = ViewStates.Visible;
                 mRecyclerView.Visibility = ViewStates.Gone;
             }
@@ -112,16 +103,20 @@ namespace LettreForAndroid
 
                 // Detect user clicks on the item view and report which item
                 // was clicked (by layout position) to the listener:
-                iItemView.Click += (sender, e) => iListener(base.LayoutPosition);
+                iItemView.Click += (sender, e) =>
+                {
+                    iListener(base.LayoutPosition);
+                };
+
             }
         }
 
         public class DialogueListAdpater : RecyclerView.Adapter
         {
+
             // Event handler for item clicks:
             public event System.EventHandler<int> mItemClick;
-
-            // Underlying data set (a photo album):
+            // 대화 목록
             public List<Dialogue> mDialogueList;
 
             // Load the adapter with the data set (photo album) at construction time:
@@ -130,7 +125,7 @@ namespace LettreForAndroid
                 mDialogueList = iDialogueList;
             }
 
-            // 새 카드뷰 생성 (invoked by the layout manager): 
+            // 뷰 홀더 생성
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup iParent, int iViewType)
             {
                 // Inflate the CardView for the photo:
@@ -143,16 +138,30 @@ namespace LettreForAndroid
                 return vh;
             }
 
-            // 리사이클러 뷰 한칸을 컨텐츠로 채운다 (invoked by the layout manager):
+            // 뷰 홀더에 데이터를 설정하는 부분
             public override void OnBindViewHolder(RecyclerView.ViewHolder iHolder, int iPosition)
             {
                 DialogueViewHolder vh = iHolder as DialogueViewHolder;
 
-                //해당 대화의 첫번째 메세지의 연락처, 메세지, 시간 등등 표시
-                TextMessage currentMsg = mDialogueList[iPosition][0];
+                //해당 대화와 가장 첫번째 메세지
+                Dialogue currentDialogue = mDialogueList[iPosition];
+                TextMessage currentMsg = currentDialogue[0];
 
-                //vh.ProfileImage.SetImageResource(mDialogue[position]) //대충 프로필사진으로 때운다는 내용
-                vh.mAddress.Text = currentMsg.Address;
+                //연락처에 있는 사람이면
+                if(currentDialogue.Contact != null)
+                {
+                    if(currentDialogue.Contact.Photo_uri != null)
+                        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(currentDialogue.Contact.Photo_uri));
+                    else
+                        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    vh.mAddress.Text = currentDialogue.Contact.Name;
+                }
+                else
+                {
+                    vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    vh.mAddress.Text = currentMsg.Address;
+                }
+
                 vh.mMsg.Text = currentMsg.Msg;
 
                 long milTime = currentMsg.Time;
@@ -175,6 +184,7 @@ namespace LettreForAndroid
             {
                 if (mItemClick != null)
                     mItemClick(this, iPosition);
+                Console.WriteLine(mDialogueList[iPosition][0].Msg);
             }
         }
     }

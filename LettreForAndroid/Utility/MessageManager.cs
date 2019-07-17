@@ -53,10 +53,10 @@ namespace LettreForAndroid.Utility
             ContentResolver cr = mActivity.BaseContext.ContentResolver;
 
             Uri uri = Uri.Parse("content://sms/");
-            string[] projection = new string[] { "DISTINCT thread_id", "_id", "address", "person", "body", "read", "date", "type" };  //SELECT 절에 해당함. DISTINCT는 반드시 배열 앞부분에 등장해야함.
-            string selectionClause = "address = ?";                //WHERE 절에 해당함
-            string[] selectionArgs = {"114"};                     //Selection을 지정했을 때 Where절에 해당하는 값들을 배열로 적어야댐.
-            string sortOrder = "thread_id asc";                   //정렬조건
+            string[] projection = new string[] {"_id", "address", "thread_id", "person", "body", "read", "date", "type" };  //SELECT 절에 해당함. DISTINCT는 반드시 배열 앞부분에 등장해야함.
+            //string selectionClause = "address = ?";                //WHERE 절에 해당함
+            //string[] selectionArgs = {"114"};                     //Selection을 지정했을 때 Where절에 해당하는 값들을 배열로 적어야댐.
+            string sortOrder = "thread_id asc, date desc";                   //정렬조건
             ICursor cursor = cr.Query(uri, projection, null, null, sortOrder);
 
             mActivity.StartManagingCursor(cursor);
@@ -80,13 +80,19 @@ namespace LettreForAndroid.Utility
                     //탐색한 메세지의 Thread_id가 이전과 다르다면
                     if(objSms.Thread_id != prevThreadId)
                     {
-                        objDialogue = new Dialogue();               //대화를 새로 만듬.
-                        mDialogueList.Add(objDialogue);
-                        objDialogue.Thread_id = objSms.Thread_id;   //Thread_id 설정
-                        objDialogue.Category = 1;                   //DEBUG 테스트로 1로 설정
-                        prevThreadId = objDialogue.Thread_id;       //마지막 Thread_id로 설정
+                        objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
+                        objDialogue.Contact = ContactManager.Get().getContactIdByPhoneNumber(objSms.Address); //연락처 가져와 저장
+
+                        if (objDialogue.Contact != null)                                                      //연락처가 존재하면, 카테고리 1로 분류
+                            objDialogue.Category = 1;
+                        else
+                            objDialogue.Category = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
+
+                        mDialogueList.Add(objDialogue);                                                     //대화리스트에 추가
+
+                        prevThreadId = objSms.Thread_id;
                     }
-                    objDialogue.Add(objSms);                    //대화에 이번에 탐색한 메세지 추가
+                    objDialogue.Add(objSms);
                     cursor.MoveToNext();
                 }
             }
@@ -98,94 +104,34 @@ namespace LettreForAndroid.Utility
 
         }
 
-        //public void refreshMessages2()
-        //{
-        //    mDialogueList = new List<Dialogue>();
-        //    MultimediaMessage objMms = new MultimediaMessage();
-        //    Uri message = Uri.Parse("content://mms/");
-        //    ContentResolver cr = mActivity.BaseContext.ContentResolver;
-
-        //    ICursor cursor = cr.Query(message, null, null, null, "thread_id asc, date desc");
-        //    mActivity.StartManagingCursor(cursor);
-        //    int totalMMS = cursor.Count;
-
-        //    if (cursor.MoveToFirst())
-        //    {
-        //        string prevThreadId = "NULL";
-        //        Dialogue objDialogue = new Dialogue();
-        //        for (int i = 0; i < totalMMS; i++)
-        //        {
-        //            objMms = new MultimediaMessage();
-        //            objMms.Id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
-        //            //objSms.Address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-        //            //objSms.Person = cursor.GetString(cursor.GetColumnIndexOrThrow("person"));     //현재 null값만 있는거같음
-        //            //objSms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
-        //            objMms.ReadState = cursor.GetString(cursor.GetColumnIndex("read"));
-        //            objMms.Time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
-        //            objMms.Thread_id = cursor.GetString(cursor.GetColumnIndexOrThrow("thread_id"));
-        //            objMms.Sub = cursor.GetString(cursor.GetColumnIndexOrThrow("sub"));
-        //            objMms.Type = cursor.GetString(cursor.GetColumnIndexOrThrow("m_type"));
-        //            objMms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("msg_box"));
-        //            //objSms.Folder = cursor.GetString(cursor.GetColumnIndexOrThrow("type"));
-
-        //            //탐색한 메세지의 Thread_id가 이전과 다르다면
-        //            if (objMms.Thread_id != prevThreadId)
-        //            {
-        //                objDialogue = new Dialogue();               //대화를 새로 만듬.
-        //                mDialogueList.Add(objDialogue);
-        //                objDialogue.Thread_id = objMms.Thread_id;   //Thread_id 설정
-        //                objDialogue.Category = 1;                   //DEBUG 테스트로 1로 설정
-        //                prevThreadId = objDialogue.Thread_id;       //마지막 Thread_id로 설정
-        //            }
-        //            objDialogue.Add(objMms);                    //대화에 이번에 탐색한 메세지 추가
-        //            cursor.MoveToNext();
-        //        }
-        //        //mAllDialogues.Add(objDialogue);                 //이전 대화는 저장저장
-        //    }
-        //    // else {
-        //    // throw new RuntimeException("You have no SMS");
-        //    // }
-        //    mActivity.StopManagingCursor(cursor);
-        //    cursor.Close();
-        //}
-
 
         //카테고리별 대화내역 가져옴
         public List<Dialogue> getAllMessages(int category)
         {
-            string prevThreadId = "NULL";
-            List<Dialogue> resultMessages = new List<Dialogue>();
+            List<Dialogue> resultMessageList = new List<Dialogue>();
             for (int i = 0; i < mDialogueList.Count; i++)
             {
                 Dialogue currentDialgoue = mDialogueList[i];
-                if (currentDialgoue.Category == category)     //카테고리가 동일하면
+
+                if(category == (int)TabFrag.CATEGORY.ALL)           //전체 보기인 경우
                 {
-                    resultMessages.Add(currentDialgoue);
-                    prevThreadId = currentDialgoue.Thread_id;
+                    resultMessageList.Add(currentDialgoue);
+                }
+                else if (currentDialgoue.Category == category)     //카테고리가 동일하면 결과리스트에 추가
+                {
+                    resultMessageList.Add(currentDialgoue);
                 }
             }
 
-            return resultMessages;
+            resultMessageList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+            {
+                if (A[0].Time < B[0].Time) return 1;
+                else if (A[0].Time > B[0].Time) return -1;
+                return 0;
+            });
+
+            return resultMessageList;
         }
 
-        //특정 카테고리인 문자를 가져오는건데, category 0으로 설정하면 위에있는 getAllMessages와 합칠 수 있을듯.
-        //public List<TextMessage> getMessages(int category)
-        //{
-        //    string prevThreadId = "NULL";
-        //    SortedList<long, TextMessage> resultMessages = new SortedList<long, TextMessage>();
-        //    for (int i = 0; i < mAllMessages.Count; i++)
-        //    {
-        //        if (mAllMessages[i].Thread_id != prevThreadId)
-        //        {
-        //            //if 연락처_카테고리 DB와 비교해서, 해당 문자의 카테고리가 int category와같으면 list에 넣고 똑같이 반환!
-        //            resultMessages.Add(mAllMessages[i].Time, mAllMessages[i]);
-        //            prevThreadId = mAllMessages[i].Thread_id;
-        //        }
-        //    }
-
-        //    var desc = resultMessages.Values.ToList();
-        //    desc.Reverse();
-        //    return desc;
-        //}
     }
 }

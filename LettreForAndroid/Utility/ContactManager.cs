@@ -16,22 +16,22 @@ using Uri = Android.Net.Uri;
 
 namespace LettreForAndroid.Utility
 {
-    class Contact
+    public class Contact
     {
         private string id;
-        private string phoneNumber;
+        private string address;
         private string name;
-        private string photo_id;
+        private string photo_uri;
 
         public string Id
         {
             get { return id; }
             set { id = value; }
         }
-        public string PhoneNumber
+        public string Address
         {
-            get { return phoneNumber; }
-            set { phoneNumber = value; }
+            get { return address; }
+            set { address = value; }
         }
 
         public string Name
@@ -40,10 +40,10 @@ namespace LettreForAndroid.Utility
             set { name = value; }
         }
 
-        public string Photo_id
+        public string Photo_uri
         {
-            get { return photo_id; }
-            set { photo_id = value; }
+            get { return photo_uri; }
+            set { photo_uri = value; }
         }
     };
 
@@ -76,6 +76,54 @@ namespace LettreForAndroid.Utility
         {
             get { return contactList.Count; }
         }
+
+        //연락처 DB에서 번호로 탐색함.
+        public Contact getContactIdByPhoneNumber(string address)
+        {
+            ContentResolver cr = mActivity.BaseContext.ContentResolver;
+
+            string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
+            string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
+            string name_code = ContactsContract.Contacts.InterfaceConsts.DisplayName;
+            string photo_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoUri;
+
+            Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
+
+            //SQLITE 조건문 설정
+            string[] projection = {id_code, phoneNumber_code, name_code, photo_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
+            string selectionClause = phoneNumber_code + " = ?";                                //이 때 변수 address와 행의 address_code가 일치하는 것만 빼냄.
+            string[] selectionArgs = {address};                                               //Selection을 지정했을 때 Where절에 해당하는 값들을 배열로 적어야되서 넣음.
+
+            ICursor cursor = cr.Query(uri, projection, selectionClause, selectionArgs, null);   //쿼리
+
+            Contact result = null;
+
+            if (cursor == null)
+            {
+                return result;
+            }
+            else
+            {
+                try
+                {
+                    if(cursor.MoveToFirst())
+                    {
+                        result = new Contact();
+                        result.Id = cursor.GetString(cursor.GetColumnIndex(projection[0]));
+                        result.Address = cursor.GetString(cursor.GetColumnIndex(projection[1]));
+                        result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
+                        result.Photo_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
+                    }
+                }
+                finally
+                {
+                    cursor.Close();
+                }
+
+                return result;
+            }
+        }
+
 
         //public void refreshContact()
         //{
@@ -111,37 +159,5 @@ namespace LettreForAndroid.Utility
         //        } while (cursor.MoveToNext());
         //    }
         //}
-
-        public string getContactbyPhoneNumber(string phoneNumber)
-        {
-
-            Uri uri = Uri.WithAppendedPath(ContactsContract.Contacts.ContentFilterUri, Uri.Encode(phoneNumber));
-            string[] projection = { ContactsContract.Contacts.InterfaceConsts.DisplayName };
-
-            ContentResolver cr = mActivity.BaseContext.ContentResolver;
-            ICursor cursor = cr.Query(uri, projection, null, null, null);
-
-            if (cursor == null)
-            {
-                return phoneNumber;
-            }
-            else
-            {
-                string name = phoneNumber;
-                try
-                {
-                    if (cursor.MoveToFirst())
-                    {
-                        name = cursor.GetString(cursor.GetColumnIndex(ContactsContract.Contacts.InterfaceConsts.DisplayName));
-                    }
-                }
-                finally
-                {
-                    cursor.Close();
-                }
-
-                return name;
-            }
-        }
     }
 }
