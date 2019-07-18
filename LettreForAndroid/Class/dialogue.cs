@@ -14,6 +14,47 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.Class
 {
+    //DialogueSet > Dialogue > Message
+    //DialogueSetList = 전체, DialogueSet(dialogueList) = 한 탭, Dialgoue = 한 사람과의 대화, TextMessage = 한 문자
+    public class DialogueSet
+    {
+        private List<Dialogue> dialogueList;
+        int category;
+
+        public DialogueSet()
+        {
+            dialogueList = new List<Dialogue>();
+        }
+
+        public List<Dialogue> DialogueList
+        {
+            get { return dialogueList; }
+        }
+
+        //탭 내 대화(채팅방)의 개수
+        public int Count
+        {
+            get { return dialogueList.Count; }
+        }
+
+        public Dialogue this[int i]
+        {
+            get { return dialogueList[i]; }
+        }
+
+        public int Category
+        {
+            get { return category; }
+            set { category = value; }
+        }
+
+        public void Add(Dialogue dialogue)
+        {
+            dialogueList.Add(dialogue);
+        }
+    }
+
+
     //TextMessage집합 개체, 특정 인물(연락처)와 대화
     public class Dialogue
     {

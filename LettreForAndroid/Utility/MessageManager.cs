@@ -19,11 +19,12 @@ namespace LettreForAndroid.Utility
     //싱글톤 사용.
     //리사이클 뷰에서 메세지를 가져올때마다 만들면 너무 비효율적이라 판단하여 사용했음.
     //사용할때는 MessageManager.Get().refreshMessages()이런식으로 사용하면 됨.
+
     public class MessageManager
     {
         private static Activity mActivity;
         private static MessageManager mInstance = null;
-        private static List<Dialogue> mDialogueList;
+        private static List<DialogueSet> mDialogueSets;     //인덱스 = 카테고리인 총 문자 집합, 0번 인덱스는 비어있다.
 
         public static MessageManager Get()
         {
@@ -31,27 +32,32 @@ namespace LettreForAndroid.Utility
                 mInstance = new MessageManager();
             return mInstance;
         }
+
         //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
         public void Initialization(Activity iActivity)
         {
             mActivity = iActivity;
-            //refreshMessages();
-            refreshMessages();
-        }
 
-        public int Count
-        {
-            get { return mDialogueList.Count; }
+            mDialogueSets = new List<DialogueSet>();
+            for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
+            {
+                mDialogueSets.Add(new DialogueSet());
+                mDialogueSets[i].Category = i;
+            }
+                
+
+            refreshMessages();
         }
 
         //모든 문자메세지를 thread_id별로 묶어 mAllDialgoues에 저장
         public void refreshMessages()
         {
-            mDialogueList = new List<Dialogue>();
+
             TextMessage objSms = new TextMessage();
 
             ContentResolver cr = mActivity.BaseContext.ContentResolver;
 
+            //DB 탐색 SQL문 설정
             Uri uri = Uri.Parse("content://sms/");
             string[] projection = new string[] {"_id", "address", "thread_id", "person", "body", "read", "date", "type" };  //SELECT 절에 해당함. DISTINCT는 반드시 배열 앞부분에 등장해야함.
             //string selectionClause = "address = ?";                //WHERE 절에 해당함
@@ -62,6 +68,7 @@ namespace LettreForAndroid.Utility
             mActivity.StartManagingCursor(cursor);
             int totalSMS = cursor.Count;
 
+            //탐색 시작
             if (cursor.MoveToFirst())
             {
                 string prevThreadId = "NULL";
@@ -83,12 +90,14 @@ namespace LettreForAndroid.Utility
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
                         objDialogue.Contact = ContactManager.Get().getContactIdByPhoneNumber(objSms.Address); //연락처 가져와 저장
 
+                        int curCategory;
                         if (objDialogue.Contact != null)                                                      //연락처가 존재하면, 카테고리 1로 분류
-                            objDialogue.Category = 1;
+                            curCategory = 1;
                         else
-                            objDialogue.Category = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
+                            curCategory = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
 
-                        mDialogueList.Add(objDialogue);                                                     //대화리스트에 추가
+                        objDialogue.Category = curCategory;
+                        mDialogueSets[curCategory].Add(objDialogue);                                                     //대화리스트에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
@@ -104,37 +113,53 @@ namespace LettreForAndroid.Utility
 
         }
 
-
-        //카테고리별 대화내역 가져옴
-        public List<Dialogue> getAllMessages(int category)
+        public DialogueSet getAllMessages()
         {
-            List<Dialogue> resultMessageList = new List<Dialogue>();
-            for (int i = 0; i < mDialogueList.Count; i++)
+            DialogueSet resultDialogueSet = new DialogueSet();
+            resultDialogueSet.Category = (int)TabFrag.CATEGORY.ALL;
+            //카테고리 0~7까지 병합
+            for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                Dialogue currentDialgoue = mDialogueList[i];
-
-                if(category == (int)TabFrag.CATEGORY.ALL)           //전체 보기인 경우
-                {
-                    resultMessageList.Add(currentDialgoue);
-                }
-                else if (currentDialgoue.Category == category)     //카테고리가 동일하면 결과리스트에 추가
-                {
-                    resultMessageList.Add(currentDialgoue);
-                }
+                resultDialogueSet.DialogueList.AddRange(mDialogueSets[i].DialogueList);
             }
 
-            if(mDialogueList.Count > 0)
+            if (resultDialogueSet.Count > 0)
             {
-                resultMessageList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+                resultDialogueSet.DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
                 {
                     if (A[0].Time < B[0].Time) return 1;
                     else if (A[0].Time > B[0].Time) return -1;
                     return 0;
                 });
             }
-            
 
-            return resultMessageList;
+            return resultDialogueSet;
+        }
+
+        //카테고리별 대화내역 가져옴
+        public DialogueSet getMessagesByCategory(int category)
+        {
+            DialogueSet resultDialogueSet = new DialogueSet();
+            resultDialogueSet.Category = category;
+
+            int dialogueCnt = mDialogueSets[category].Count;        //현재 카테고리의 총 대화 수
+
+            for (int i = 0; i < dialogueCnt; i++)
+            {
+                resultDialogueSet.Add(mDialogueSets[category][i]);
+            }
+
+            if(dialogueCnt > 0)
+            {
+                resultDialogueSet.DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+                {
+                    if (A[0].Time < B[0].Time) return 1;
+                    else if (A[0].Time > B[0].Time) return -1;
+                    return 0;
+                });
+            }
+
+            return resultDialogueSet;
         }
 
     }

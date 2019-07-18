@@ -51,6 +51,7 @@ namespace LettreForAndroid
             SetContentView(Resource.Layout.welcome_page);
 
             mBtnContinue = FindViewById<Button>(Resource.Id.welcomepage_button1);
+            welcomepage_guidetext1 = FindViewById<TextView>(Resource.Id.welcomepage_guidetext1);
 
             mBtnContinue.Click += async (sender, e) =>
             {
@@ -86,7 +87,6 @@ namespace LettreForAndroid
                 Snackbar.Make(Window.DecorView.RootView, "레뜨레 사용을 위해 승인을 눌러주세요.", Snackbar.LengthShort)
                         .SetAction("승인", v => RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK))
                         .Show();
-                welcomepage_guidetext1 = FindViewById<TextView>(Resource.Id.welcomepage_guidetext1);
                 welcomepage_guidetext1.Text = "만약 '다시 묻지 않음' 을 체크하셨다면,\n어플리케이션 옵션에서 직접 권한을 승인해주셔야 합니다!";
                 return;
             }
@@ -179,6 +179,7 @@ namespace LettreForAndroid
 
             //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯
             welcomepage_guidetext1.Text = "잠시만 기다려주세요.";
+            mBtnContinue.Enabled = false;
             Finish();
         }
     }

@@ -10,6 +10,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using LettreForAndroid.Class;
+
 namespace LettreForAndroid
 {
     [Activity(Label = "dialogue_page")]
@@ -25,8 +27,12 @@ namespace LettreForAndroid
 
             button1.Click += (obj, sender) =>
             {
+                int position = Intent.GetIntExtra("position", -1);
+                int category = Intent.GetIntExtra("category", -1);
                 Finish();
             };
+
+            
         }
     }
 }

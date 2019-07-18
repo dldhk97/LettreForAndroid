@@ -19,7 +19,7 @@ namespace LettreForAndroid
 
         RecyclerView mRecyclerView;
         RecyclerView.LayoutManager mLayoutManager;
-        DialogueListAdpater mAdapter;
+        DialogueSetAdpater mAdapter;
 
         public static PageFragment newInstance(int iCategory)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
@@ -42,18 +42,19 @@ namespace LettreForAndroid
             TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
             mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
-            //현재페이지의 카테고리 번호가 담긴 전역변수에서 값 가져옴.
-
             //여기부턴 리사이클 뷰
 
-
             //데이터 준비 : messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
-            List<Dialogue> dialogueList = MessageManager.Get().getAllMessages(mCurrentCategory);
+            DialogueSet dialogueSet;
+            if (mCurrentCategory == (int)TabFrag.CATEGORY.ALL)
+                dialogueSet = MessageManager.Get().getAllMessages();
+            else
+                dialogueSet = MessageManager.Get().getMessagesByCategory(mCurrentCategory);
 
             //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if(dialogueList.Count > 0)
+            if (dialogueSet.Count > 0)
             {
                 //어뎁터 준비
                 //mAdapter = new DialogueListAdpater(dialogueList);
@@ -65,7 +66,7 @@ namespace LettreForAndroid
                 mRecyclerView.SetLayoutManager(mLayoutManager);
 
                 //내 어댑터 Plug In
-                mAdapter = new DialogueListAdpater(dialogueList);
+                mAdapter = new DialogueSetAdpater(dialogueSet);
                 mRecyclerView.SetAdapter(mAdapter);
             }
             else
@@ -111,18 +112,18 @@ namespace LettreForAndroid
             }
         }
 
-        public class DialogueListAdpater : RecyclerView.Adapter
+        public class DialogueSetAdpater : RecyclerView.Adapter
         {
-
             // Event handler for item clicks:
             public event System.EventHandler<int> mItemClick;
-            // 대화 목록
-            public List<Dialogue> mDialogueList;
+
+            // 현 페이지 대화 목록
+            public DialogueSet mDialogueSet;
 
             // Load the adapter with the data set (photo album) at construction time:
-            public DialogueListAdpater(List<Dialogue> iDialogueList)
+            public DialogueSetAdpater(DialogueSet iDialogueSet)
             {
-                mDialogueList = iDialogueList;
+                mDialogueSet = iDialogueSet;
             }
 
             // 뷰 홀더 생성
@@ -144,7 +145,7 @@ namespace LettreForAndroid
                 DialogueViewHolder vh = iHolder as DialogueViewHolder;
 
                 //해당 대화와 가장 첫번째 메세지
-                Dialogue currentDialogue = mDialogueList[iPosition];
+                Dialogue currentDialogue = mDialogueSet[iPosition];
                 TextMessage currentMsg = currentDialogue[0];
 
                 //연락처에 있는 사람이면
@@ -176,7 +177,7 @@ namespace LettreForAndroid
             // Return the number of photos available in the photo album:
             public override int ItemCount
             {
-                get { return mDialogueList.Count; }
+                get { return mDialogueSet.Count; }
             }
 
             // Raise an event when the item-click takes place:
@@ -184,7 +185,12 @@ namespace LettreForAndroid
             {
                 if (mItemClick != null)
                     mItemClick(this, iPosition);
-                Console.WriteLine(mDialogueList[iPosition][0].Msg);
+                //Console.WriteLine(mDialogueList[iPosition][0].Msg);
+
+                Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(dialogue_page));
+                intent.PutExtra("position", iPosition);
+                intent.PutExtra("category", mDialogueSet.Category);
+                Android.App.Application.Context.StartActivity(intent);
             }
         }
     }
