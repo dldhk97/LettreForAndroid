@@ -47,6 +47,7 @@ namespace LettreForAndroid.Utility
         }
     };
 
+    //Singleton
     class ContactManager
     {
 

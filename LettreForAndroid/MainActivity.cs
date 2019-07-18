@@ -13,6 +13,7 @@ using LettreForAndroid.Page;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Content;
 using Android.Runtime;
+using System.Collections.Generic;
 
 namespace LettreForAndroid
 {
@@ -97,13 +98,25 @@ namespace LettreForAndroid
             //Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-                string str = DataStorageManager.loadStringData(this,"temp", "NULL");
-                Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
-                StartActivity(typeof(dialogue_page));
+                //string str = DataStorageManager.loadStringData(this,"temp", "NULL");
+                //Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
+                //StartActivity(typeof(dialogue_page));
+                //string[] header = new string[] { "0", "1" };
+                string[] data1 = new string[] { "010-1234-1234", "하나만 보냄, 문자내용이 들어감1" };
+                List<string[]> dataList = new List<string[]>() { data1};
+                NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             else
             {
-                DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
+                //DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
+                //string[] header = new string[] { "0", "5" };
+                string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
+                string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
+                string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
+                string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
+                string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
+                List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
+                NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             return base.OnOptionsItemSelected(item);
         }

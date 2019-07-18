@@ -25,7 +25,7 @@ namespace LettreForAndroid
 
             button1.Click += (obj, sender) =>
             {
-                StartActivity(typeof(MainActivity));
+                Finish();
             };
         }
     }
