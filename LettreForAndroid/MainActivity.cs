@@ -61,19 +61,16 @@ namespace LettreForAndroid
 
         }
 
-        private void FirstMeetDialog_onWelcomeComplete(object sender, welcome_page.OnWelcomeEventArgs e)
-        {
-            OnWelcomeComplete();
-        }
-
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
         public void OnWelcomeComplete()
         {
-            //탭 레이아웃 세팅
-            tfm.SetupTabLayout();
             //메세지 매니저(싱글톤)세팅
             ContactManager.Get().Initialization(this);
             MessageManager.Get().Initialization(this);
+
+            //탭 레이아웃 세팅
+            tfm.SetupTabLayout();
+
             //이게 끝나면 각 리사이클뷰 내용 표시 처리함.
         }
         
@@ -102,21 +99,21 @@ namespace LettreForAndroid
                 //Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
                 //StartActivity(typeof(dialogue_page));
                 //string[] header = new string[] { "0", "1" };
-                string[] data1 = new string[] { "010-1234-1234", "하나만 보냄, 문자내용이 들어감1" };
-                List<string[]> dataList = new List<string[]>() { data1};
-                NetworkManager.Get().sendAndReceiveData(dataList, 0);
+                //string[] data1 = new string[] { "010-1234-1234", "하나만 보냄, 문자내용이 들어감1" };
+                //List<string[]> dataList = new List<string[]>() { data1};
+                //NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             else
             {
                 //DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
                 //string[] header = new string[] { "0", "5" };
-                string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
-                string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
-                string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
-                string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
-                string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
-                List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
-                NetworkManager.Get().sendAndReceiveData(dataList, 0);
+                //string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
+                //string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
+                //string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
+                //string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
+                //string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
+                //List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
+                //NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             return base.OnOptionsItemSelected(item);
         }

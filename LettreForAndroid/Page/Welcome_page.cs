@@ -38,18 +38,11 @@ namespace LettreForAndroid
         const int REQUEST_ESSENTIAL_CALLBACK = 1;         //onRequestPermissionsResult에서 이 요청값으로 권한 획득 구분가능. INT형가능.
         const int REQUEST_DEFAULT_CALLBACK = 0;
 
-        const string permission = Android.Manifest.Permission.ReadSms;
+        const string permission_readSms = Android.Manifest.Permission.ReadSms;
+        const string permission_readContacts = Android.Manifest.Permission.ReadContacts;
 
-        public event EventHandler<OnWelcomeEventArgs> onWelcomeComplete;
-
-        //이벤트 핸들러, mainAcitivity에서 WelcomePage의 역할이 끝난것을 알아차리기 위함.
-        public class OnWelcomeEventArgs : EventArgs
-        {
-            public OnWelcomeEventArgs()
-            {
-
-            }
-        }
+        Button mBtnContinue;
+        TextView welcomepage_guidetext1;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,7 +50,7 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.welcome_page);
 
-            Button mBtnContinue = FindViewById<Button>(Resource.Id.welcomepage_button1);
+            mBtnContinue = FindViewById<Button>(Resource.Id.welcomepage_button1);
 
             mBtnContinue.Click += async (sender, e) =>
             {
@@ -66,12 +59,19 @@ namespace LettreForAndroid
             };
         }
 
+        public override void OnBackPressed()
+        {
+            //뒤로가기를 눌렀을때 아무 반응 하지 않음.
+        }
+
+
+
+
         async Task GetEsentialPermissionAsync()
         {
             if (PermissionManager.HasEssentialPermission(this))
             {
                 //권한이 이미 있으면 기본앱 체크
-                Toast.MakeText(this, "권한이 이미 승인되어 있습니다.", ToastLength.Short).Show();
                 DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
 
                 //기본앱 체크
@@ -80,14 +80,14 @@ namespace LettreForAndroid
             }
 
             //이미 한번 거절당한 경우.
-            if (ShouldShowRequestPermissionRationale(permission))
+            if (ShouldShowRequestPermissionRationale(permission_readSms) || ShouldShowRequestPermissionRationale(permission_readContacts))
             {
                 //권한이 필요한 이유를 말해주고, OK누르면 요청 후 반환
                 Snackbar.Make(Window.DecorView.RootView, "레뜨레 사용을 위해 승인을 눌러주세요.", Snackbar.LengthShort)
                         .SetAction("승인", v => RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK))
                         .Show();
-                TextView hiddenGuideText = FindViewById<TextView>(Resource.Id.welcomepage_hiddenGuideText1);
-                hiddenGuideText.Visibility = ViewStates.Visible;
+                welcomepage_guidetext1 = FindViewById<TextView>(Resource.Id.welcomepage_guidetext1);
+                welcomepage_guidetext1.Text = "만약 '다시 묻지 않음' 을 체크하셨다면,\n어플리케이션 옵션에서 직접 권한을 승인해주셔야 합니다!";
                 return;
             }
             //권한 요청
@@ -101,7 +101,17 @@ namespace LettreForAndroid
             {
                 case REQUEST_ESSENTIAL_CALLBACK:
                     {
-                        if (grantResults[0] == Permission.Granted)
+                        bool isAllGranted = true;
+                        foreach(Permission elem in grantResults)
+                        {
+                            if(elem == Permission.Denied)
+                            {
+                                isAllGranted = false;
+                                break;
+                            }
+                        }
+
+                        if (isAllGranted)
                         {
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
                             DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
@@ -162,20 +172,14 @@ namespace LettreForAndroid
         private void backToTheMain()
         {
             //isDefaultPackage와 isPermissionGranted는 데이터스토리지 매니저가 관리하는게 아닌, 여기서 체크해야될듯.
+            
             DataStorageManager.saveBoolData(this, "isDefaultPackage", true);
             DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
             DataStorageManager.saveBoolData(this, "isFirst", false);
+
+            //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯
+            welcomepage_guidetext1.Text = "잠시만 기다려주세요.";
             Finish();
         }
-
-        //public override void OnActivityCreated(Bundle savedInstanceState)
-        //{
-        //    if (Dialog != null)
-        //    {
-        //        Dialog.Window.RequestFeature(WindowFeatures.NoTitle);       //title bar을 투명으로
-        //        base.OnActivityCreated(savedInstanceState);
-        //        Dialog.Window.Attributes.WindowAnimations = Resource.Style.dialog_animation;    //animation 세팅
-        //    }
-        //}
     }
 }
