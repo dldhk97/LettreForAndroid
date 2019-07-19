@@ -37,6 +37,9 @@ namespace LettreForAndroid
             //툴바 세팅
             SetupToolBar();
 
+            //하단 바 설정
+            SetupBottomBar();
+
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
             {
@@ -116,6 +119,12 @@ namespace LettreForAndroid
                 //NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             return base.OnOptionsItemSelected(item);
+        }
+
+        public void SetupBottomBar()
+        {
+            var dialogueViewBtn = FindViewById<Button>(Resource.Id.mp_bottomBtn1);
+            var contactViewBtn = FindViewById<Button>(Resource.Id.mp_bottomBtn2);
         }
     }
 }

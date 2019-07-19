@@ -14,41 +14,83 @@
       app:blurOverlayColor="#00000000">
 
         <!--아래부터 내용물 들어있음.-->
-        <LinearLayout
+        <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include
-        android:id="@+id/my_toolbar"
-        layout="@layout/toolbar"/>
+            <include
+                android:id="@+id/my_toolbar"
+                layout="@layout/toolbar"
+                android:layout_alignParentTop="true" />
 
-          <android.support.design.widget.TabLayout
-               android:id="@+id/sliding_tabs"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               app:tabMaxWidth="0dp"
-               app:tabGravity="fill"
-               app:tabMode="scrollable"/>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/sliding_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabMaxWidth="0dp"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                android:layout_below="@+id/my_toolbar" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="match_parent"
                 android:background="#50000000"
-                android:foregroundGravity="center" />
+                android:foregroundGravity="center"
+                android:layout_below="@+id/sliding_tabs"
+                android:layout_above="@+id/mp_bottomBarLayout" />
 
-            <ImageButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/sendButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="bottom|right"
-                android:layout_marginBottom="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/design_fab_background"
-                android:src="@drawable/dd9_send_256"
-                android:scaleType="centerCrop"  />
-        </LinearLayout>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/dd9_send_36dp_2x_2"
+                android:layout_alignParentRight="true"
+                android:layout_above="@+id/mp_bottomBarLayout"
+                android:backgroundTint="#FFFFFF"
+                app:fabSize="normal"
+                android:scaleType="centerCrop"
+                android:clickable="true" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:id="@+id/mp_bottomBarLayout"
+                android:layout_alignParentBottom="true"
+                android:background="#30FFFFFF"
+                android:orientation="horizontal"
+                android:weightSum="2">
+                <Button
+                    android:text="메시지"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/mp_bottomBtn1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/bottomSpliter"
+                    android:background="#80FFFFFF"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="10dp"  />
+
+                <Button
+                    android:text="연락처"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/mp_bottomBtn2"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_weight="1"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+        </RelativeLayout>
     </eightbitlab.com.blurview.BlurView>
 </LinearLayout>
