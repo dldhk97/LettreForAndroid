@@ -12,40 +12,13 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using LettreForAndroid.Class;
+
 using Uri = Android.Net.Uri;
 
 namespace LettreForAndroid.Utility
 {
-    public class Contact
-    {
-        private string id;
-        private string address;
-        private string name;
-        private string photo_uri;
-
-        public string Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
-        public string Address
-        {
-            get { return address; }
-            set { address = value; }
-        }
-
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
-        public string Photo_uri
-        {
-            get { return photo_uri; }
-            set { photo_uri = value; }
-        }
-    };
+    
 
     //Singleton
     class ContactManager
@@ -90,16 +63,19 @@ namespace LettreForAndroid.Utility
 
             Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
 
+            //string hipenAddress = Android.Telephony.PhoneNumberUtils.FormatNumber(address);    //하이픈 붙이기
+            address = address.Replace("-", "_");                                                 //하이픈을 _로 치환, _는 SQLite에서 임의의 값을 의미함.
+
             //SQLITE 조건문 설정
             string[] projection = {id_code, phoneNumber_code, name_code, photo_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
             string selectionClause = phoneNumber_code + " LIKE ?";                              //이 때 변수 탐색한 address_code행 값이
-            string[] selectionArgs = {"%" + address + "%"};                                     //address가 반드시 포함된 것을 찾는다.
+            string[] selectionArgs = { address };                                               //address가 반드시 포함된 것을 찾는다.
 
             ICursor cursor = cr.Query(uri, projection, selectionClause, selectionArgs, null);   //쿼리
 
             Contact result = null;
 
-            if (cursor == null)
+            if (cursor == null || cursor.Count == 0)
             {
                 return result;
             }
