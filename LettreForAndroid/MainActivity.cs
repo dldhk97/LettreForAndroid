@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace LettreForAndroid
 {
-    [Activity(Label = "@string/app_name", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/BasicTheme")]
     public class MainActivity : AppCompatActivity
     {
         TabFragManager tfm;
@@ -85,7 +85,7 @@ namespace LettreForAndroid
         //툴바에 메뉴 추가
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.toolbar, menu);
+            MenuInflater.Inflate(Resource.Menu.toolbar_main, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 

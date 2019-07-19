@@ -25,19 +25,35 @@
       <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <!-- 애니메이션 스타일 -->
-    <style name="dialog_animation">
-      <item name="android:windowEnterAnimation">
-        @anim/abc_fade_in
-      </item>
-      <item name="android:windowExitAnimation">
-        @anim/abc_fade_out
-      </item>
+    <style name="FadeInOutActivity" parent="BasicTheme">
+      <item name="android:windowAnimationStyle">@style/FadeAnimation.Activity</item>
     </style>
+
+    <style name="NulltActivity" parent="BasicTheme">
+      <item name="android:windowAnimationStyle">@style/NullAnimation.Activity</item>
+    </style>
+
+    <!-- Activity Animation -->
+    <style name="FadeAnimation.Activity" parent="@android:style/Animation.Activity">
+      <item name="android:activityOpenEnterAnimation">@android:anim/fade_in</item>
+      <item name="android:activityOpenExitAnimation">@android:anim/fade_out</item>
+      <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
+      <item name="android:activityCloseExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <style name="NullAnimation.Activity" parent="@android:style/Animation.Activity">
+      <item name="android:activityOpenEnterAnimation">@null</item>
+      <item name="android:activityOpenExitAnimation">@null</item>
+      <item name="android:activityCloseEnterAnimation">@null</item>
+      <item name="android:activityCloseExitAnimation">@null</item>
+    </style>
+
 
     <style name="BasicButtonStyle" parent="Widget.AppCompat.Button.Colored">
       <item name="colorAccent">@android:color/black</item>
       <item name="android:colorBackground">@android:color/holo_orange_dark</item>
     </style>
+
+    
 
 </resources>

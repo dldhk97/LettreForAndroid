@@ -33,6 +33,11 @@ namespace LettreForAndroid.Utility
             return mInstance;
         }
 
+        public List<DialogueSet> DialogueSets
+        {
+            get { return mDialogueSets; }
+        }
+
         //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
         public void Initialization(Activity iActivity)
         {
@@ -45,7 +50,6 @@ namespace LettreForAndroid.Utility
                 mDialogueSets[i].Category = i;
             }
                 
-
             refreshMessages();
         }
 
@@ -90,14 +94,18 @@ namespace LettreForAndroid.Utility
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
                         objDialogue.Contact = ContactManager.Get().getContactIdByPhoneNumber(objSms.Address); //연락처 가져와 저장
 
-                        int curCategory;
                         if (objDialogue.Contact != null)                                                      //연락처가 존재하면, 카테고리 1로 분류
-                            curCategory = 1;
+                        {
+                            objDialogue.Category = 1;
+                            objDialogue.DisplayName = objDialogue.Contact.Name;
+                        }
                         else
-                            curCategory = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
-
-                        objDialogue.Category = curCategory;
-                        mDialogueSets[curCategory].Add(objDialogue);                                                     //대화리스트에 추가
+                        {
+                            objDialogue.Category = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
+                            objDialogue.DisplayName = objSms.Address;
+                        }
+                            
+                        mDialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 맞는 리스트에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
@@ -111,9 +119,15 @@ namespace LettreForAndroid.Utility
             mActivity.StopManagingCursor(cursor);
             cursor.Close();
 
+            //0번 카테고리 생성, 생성된 카테고리들 정렬
+            createAllCategory();
+            for(int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
+            {
+                sortDialogueSet(i);
+            }
         }
 
-        public DialogueSet getAllMessages()
+        public void createAllCategory()
         {
             DialogueSet resultDialogueSet = new DialogueSet();
             resultDialogueSet.Category = (int)TabFrag.CATEGORY.ALL;
@@ -122,44 +136,20 @@ namespace LettreForAndroid.Utility
             {
                 resultDialogueSet.DialogueList.AddRange(mDialogueSets[i].DialogueList);
             }
-
-            if (resultDialogueSet.Count > 0)
-            {
-                resultDialogueSet.DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
-                {
-                    if (A[0].Time < B[0].Time) return 1;
-                    else if (A[0].Time > B[0].Time) return -1;
-                    return 0;
-                });
-            }
-
-            return resultDialogueSet;
+            mDialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
 
-        //카테고리별 대화내역 가져옴
-        public DialogueSet getMessagesByCategory(int category)
+        private void sortDialogueSet(int category)
         {
-            DialogueSet resultDialogueSet = new DialogueSet();
-            resultDialogueSet.Category = category;
-
-            int dialogueCnt = mDialogueSets[category].Count;        //현재 카테고리의 총 대화 수
-
-            for (int i = 0; i < dialogueCnt; i++)
+            if (mDialogueSets[category].Count > 0)
             {
-                resultDialogueSet.Add(mDialogueSets[category][i]);
-            }
-
-            if(dialogueCnt > 0)
-            {
-                resultDialogueSet.DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
+                mDialogueSets[category].DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
                 {
                     if (A[0].Time < B[0].Time) return 1;
                     else if (A[0].Time > B[0].Time) return -1;
                     return 0;
                 });
             }
-
-            return resultDialogueSet;
         }
 
     }

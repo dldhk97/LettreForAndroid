@@ -19,14 +19,9 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-          <android.support.v7.widget.Toolbar
-               android:id="@+id/my_toolbar"
-               android:layout_width="match_parent"
-               android:layout_height="?attr/actionBarSize"
-               android:background="@android:color/transparent"
-               android:elevation="4dp"
-               android:theme="@style/BasicToolBarStyle"
-               app:popupTheme="@style/BasicPopupMenuStyle"/>
+        <include
+        android:id="@+id/my_toolbar"
+        layout="@layout/toolbar"/>
 
           <android.support.design.widget.TabLayout
                android:id="@+id/sliding_tabs"
@@ -41,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@android:color/transparent"
+                android:background="#50000000"
                 android:foregroundGravity="center" />
 
             <ImageButton

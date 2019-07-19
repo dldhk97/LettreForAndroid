@@ -59,7 +59,8 @@ namespace LettreForAndroid.Class
     public class Dialogue
     {
         private Contact contact;
-        private int category;       //카테고리
+        private int category;          //카테고리
+        private string displayName;    //화면상 표시되는 전화번호 혹은 이름
 
         //메세지들의 배열, 대화를 구성함.
         private List<TextMessage> textMessageList;
@@ -90,6 +91,12 @@ namespace LettreForAndroid.Class
         {
             set { category = value; }
             get { return category; }
+        }
+
+        public string DisplayName
+        {
+            set { displayName = value; }
+            get { return displayName; }
         }
 
         //인덱서

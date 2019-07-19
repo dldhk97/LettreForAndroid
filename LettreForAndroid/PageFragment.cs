@@ -15,7 +15,7 @@ namespace LettreForAndroid
     public class PageFragment : Fragment
     {
         const string ARG_CATEGORY = "ARG_CATEGORY";
-        private int mCurrentCategory;
+        private int mCategory;
 
         RecyclerView mRecyclerView;
         RecyclerView.LayoutManager mLayoutManager;
@@ -33,7 +33,7 @@ namespace LettreForAndroid
         public override void OnCreate(Bundle iSavedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
             base.OnCreate(iSavedInstanceState);
-            mCurrentCategory = Arguments.GetInt(ARG_CATEGORY);
+            mCategory = Arguments.GetInt(ARG_CATEGORY);
         }
 
         public override View OnCreateView(LayoutInflater iInflater, ViewGroup iContainer, Bundle iSavedInstanceState)
@@ -46,10 +46,7 @@ namespace LettreForAndroid
 
             //데이터 준비 : messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
             DialogueSet dialogueSet;
-            if (mCurrentCategory == (int)TabFrag.CATEGORY.ALL)
-                dialogueSet = MessageManager.Get().getAllMessages();
-            else
-                dialogueSet = MessageManager.Get().getMessagesByCategory(mCurrentCategory);
+            dialogueSet = MessageManager.Get().DialogueSets[mCategory];
 
             //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
 
@@ -155,14 +152,12 @@ namespace LettreForAndroid
                         vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(currentDialogue.Contact.Photo_uri));
                     else
                         vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-                    vh.mAddress.Text = currentDialogue.Contact.Name;
                 }
                 else
                 {
                     vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-                    vh.mAddress.Text = currentMsg.Address;
                 }
-
+                vh.mAddress.Text = currentDialogue.DisplayName;
                 vh.mMsg.Text = currentMsg.Msg;
 
                 long milTime = currentMsg.Time;
@@ -180,7 +175,7 @@ namespace LettreForAndroid
                 get { return mDialogueSet.Count; }
             }
 
-            // Raise an event when the item-click takes place:
+            // 대화를 클릭했을 때 발생하는 메소드
             void OnClick(int iPosition)
             {
                 if (mItemClick != null)
@@ -190,6 +185,7 @@ namespace LettreForAndroid
                 Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(dialogue_page));
                 intent.PutExtra("position", iPosition);
                 intent.PutExtra("category", mDialogueSet.Category);
+
                 Android.App.Application.Context.StartActivity(intent);
             }
         }

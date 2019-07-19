@@ -139,7 +139,7 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\menu\toolbar.axml">
+    <AndroidResource Include="Resources\menu\toolbar_main.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -221,6 +221,16 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\drawable_main_icon.png">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\toolbar.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\menu\toolbar_dialogue.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
