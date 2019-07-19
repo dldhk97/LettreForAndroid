@@ -58,7 +58,7 @@ namespace LettreForAndroid.Utility
 
         private bool isConnected = false;
 
-        private Socket m_CurrentSocket = null;
+        private Socket mCurrentSocket = null;
 
         /// <summary>
         /// 여기부터는 동기 메소드
@@ -66,16 +66,22 @@ namespace LettreForAndroid.Utility
 
         public void makeConnection()
         {
-            if (m_CurrentSocket != null)
-                m_CurrentSocket.Close();
-            m_CurrentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            if (mCurrentSocket != null)
+                mCurrentSocket.Close();
+            mCurrentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            //타임아웃 설정
+            //mCurrentSocket.SendTimeout = 5000;
+            //mCurrentSocket.ReceiveTimeout = 5000;
+            //mCurrentSocket.LingerState = new LingerOption(true, 0);
+
             // (2) 서버에 연결
             try
             {
                 // 연결 시도
                 //m_CurrentSocket.Connect(mServerIP, mPort);    //타임아웃이 긴 기존의 연결메소드
                 var ep = new IPEndPoint(IPAddress.Parse(mServerIP), mPort);
-                m_CurrentSocket.connect(ep, mTimeout);
+                mCurrentSocket.connect(ep, mTimeout);
 
                 // 연결 성공
                 isConnected = true;
@@ -120,46 +126,49 @@ namespace LettreForAndroid.Utility
             if (!isConnected)
                 makeConnection();
 
+            
+
             if (isConnected)
             {
                 //타입 전송
                 byte[] typeBuffer = Encoding.UTF8.GetBytes(type.ToString());
-                m_CurrentSocket.Send(typeBuffer, SocketFlags.None);
+                mCurrentSocket.Send(typeBuffer, SocketFlags.None);
 
                 //개수 전송
                 byte[] cntBuffer = Encoding.UTF8.GetBytes(dataList.Count.ToString());
-                m_CurrentSocket.Send(cntBuffer, SocketFlags.None);
+                mCurrentSocket.Send(cntBuffer, SocketFlags.None);
 
 
                 //실 데이터 전송
                 for (int i = 0; i < dataList.Count; i++)
                 {
                     byte[] contactBuffer = Encoding.UTF8.GetBytes(dataList[i][0]);
-                    m_CurrentSocket.Send(contactBuffer, SocketFlags.None);
+                    mCurrentSocket.Send(contactBuffer, SocketFlags.None);
 
                     byte[] msgBuffer = Encoding.UTF8.GetBytes(dataList[i][1]);
-                    m_CurrentSocket.Send(msgBuffer, SocketFlags.None);
+                    mCurrentSocket.Send(msgBuffer, SocketFlags.None);
                 }
 
                 for(int i = 0; i < dataList.Count; i++)
                 {
                     //서버에서 연락처 데이터 수신
                     byte[] contactBuffer = new byte[mMaxBuffer];
-                    int numberOfByte = m_CurrentSocket.Receive(contactBuffer);
+                    int numberOfByte = mCurrentSocket.Receive(contactBuffer);
                     string contactData = Encoding.UTF8.GetString(contactBuffer, 0, numberOfByte);
 
                     //서버에서 카테고리(lable) 데이터 수신
                     byte[] cateogryBuffer = new byte[mMaxBuffer];
-                    int numbOfByte2 = m_CurrentSocket.Receive(cateogryBuffer);
+                    int numbOfByte2 = mCurrentSocket.Receive(cateogryBuffer);
                     string categoryData = Encoding.UTF8.GetString(cateogryBuffer, 0, numbOfByte2);
 
                     Console.WriteLine("수신) 연락처 : " + contactData);
+                    Console.WriteLine("수신) 카테고리 : " + categoryData);
                 }
                 
             }
 
             // (4) 소켓 닫기
-            m_CurrentSocket.Close();
+            mCurrentSocket.Close();
         }
 
 

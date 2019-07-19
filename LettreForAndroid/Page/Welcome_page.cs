@@ -18,7 +18,7 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid
 {
-    [Activity(Label = "welcome_page")]
+    [Activity(Label = "welcome_page", Theme = "@style/FadeInOutActivity")]
     public class welcome_page : Activity
     {
         //필수 퍼미션들
