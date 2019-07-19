@@ -68,7 +68,7 @@ namespace LettreForAndroid.Utility
 
             //SQLITE 조건문 설정
             string[] projection = {id_code, phoneNumber_code, name_code, photo_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
-            string selectionClause = phoneNumber_code + " LIKE REPLACE(? ,'-' ,'')";                              //이 때 변수 탐색한 address_code행 값이
+            string selectionClause = "? LIKE REPLACE( " + phoneNumber_code + ",'-' ,'')";                              //이 때 변수 탐색한 address_code행 값이
             string[] selectionArgs = { address };                                               //address가 반드시 포함된 것을 찾는다.
 
             ICursor cursor = cr.Query(uri, projection, selectionClause, selectionArgs, null);   //쿼리

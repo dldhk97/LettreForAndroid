@@ -169,7 +169,7 @@ namespace LettreForAndroid
         {
             // Inflate the CardView for the photo:
             View itemView = LayoutInflater.From(iParent.Context).
-                        Inflate(Resource.Layout.message_view, iParent, false);          //message_view 말고 다른거 만들어서 넣어야됨! DEBUG!
+                        Inflate(Resource.Layout.dialogue_frag, iParent, false);          //dialogue_frag 말고 다른거 만들어서 넣어야됨! DEBUG!
 
             // Create a ViewHolder to find and hold these view references, and 
             // register OnClick with the view holder:

@@ -2689,20 +2689,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f09001f
 			public const int disableHome = 2131296287;
 			
-			// aapt resource value: 0x7f0900a3
-			public const int dp_attachBtn = 2131296419;
+			// aapt resource value: 0x7f0900aa
+			public const int dp_attachBtn = 2131296426;
 			
-			// aapt resource value: 0x7f0900a2
-			public const int dp_bottomLayout = 2131296418;
+			// aapt resource value: 0x7f0900a9
+			public const int dp_bottomLayout = 2131296425;
 			
-			// aapt resource value: 0x7f0900a5
-			public const int dp_msgBox = 2131296421;
+			// aapt resource value: 0x7f0900ac
+			public const int dp_msgBox = 2131296428;
 			
-			// aapt resource value: 0x7f0900a1
-			public const int dp_recyclerView1 = 2131296417;
+			// aapt resource value: 0x7f0900a8
+			public const int dp_recyclerView1 = 2131296424;
 			
-			// aapt resource value: 0x7f0900a4
-			public const int dp_sendBtn = 2131296420;
+			// aapt resource value: 0x7f0900ab
+			public const int dp_sendBtn = 2131296427;
 			
 			// aapt resource value: 0x7f09007d
 			public const int edit_query = 2131296381;
@@ -2743,14 +2743,14 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f090057
 			public const int forever = 2131296343;
 			
-			// aapt resource value: 0x7f0900a6
-			public const int fragPage_linearLayout1 = 2131296422;
+			// aapt resource value: 0x7f0900ad
+			public const int fragPage_linearLayout1 = 2131296429;
 			
-			// aapt resource value: 0x7f0900a7
-			public const int fragPage_recyclerView1 = 2131296423;
+			// aapt resource value: 0x7f0900ae
+			public const int fragPage_recyclerView1 = 2131296430;
 			
-			// aapt resource value: 0x7f0900a8
-			public const int fragPage_textView1 = 2131296424;
+			// aapt resource value: 0x7f0900af
+			public const int fragPage_textView1 = 2131296431;
 			
 			// aapt resource value: 0x7f09000a
 			public const int ghost_view = 2131296266;
@@ -2797,11 +2797,11 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f090018
 			public const int line3 = 2131296280;
 			
-			// aapt resource value: 0x7f0900aa
-			public const int linearLayout1 = 2131296426;
+			// aapt resource value: 0x7f0900a2
+			public const int linearLayout1 = 2131296418;
 			
-			// aapt resource value: 0x7f0900ad
-			public const int linearLayout2 = 2131296429;
+			// aapt resource value: 0x7f0900a5
+			public const int linearLayout2 = 2131296421;
 			
 			// aapt resource value: 0x7f09001c
 			public const int listMode = 2131296284;
@@ -2830,20 +2830,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f090026
 			public const int multiply = 2131296294;
 			
-			// aapt resource value: 0x7f0900ab
-			public const int mv_address = 2131296427;
+			// aapt resource value: 0x7f0900a3
+			public const int mv_address = 2131296419;
 			
-			// aapt resource value: 0x7f0900ae
-			public const int mv_msg = 2131296430;
+			// aapt resource value: 0x7f0900a6
+			public const int mv_msg = 2131296422;
 			
-			// aapt resource value: 0x7f0900a9
-			public const int mv_profileImage = 2131296425;
+			// aapt resource value: 0x7f0900a1
+			public const int mv_profileImage = 2131296417;
 			
-			// aapt resource value: 0x7f0900ac
-			public const int mv_readStateIndicator = 2131296428;
+			// aapt resource value: 0x7f0900a4
+			public const int mv_readStateIndicator = 2131296420;
 			
-			// aapt resource value: 0x7f0900af
-			public const int mv_time = 2131296431;
+			// aapt resource value: 0x7f0900a7
+			public const int mv_time = 2131296423;
 			
 			// aapt resource value: 0x7f09008c
 			public const int my_toolbar = 2131296396;
@@ -3316,79 +3316,82 @@ namespace LettreForAndroid
 			public const int design_text_input_password_icon = 2130968618;
 			
 			// aapt resource value: 0x7f04002b
-			public const int dialogue_page = 2130968619;
+			public const int dialogue_frag = 2130968619;
 			
 			// aapt resource value: 0x7f04002c
-			public const int fragment_page = 2130968620;
+			public const int dialogue_page = 2130968620;
 			
 			// aapt resource value: 0x7f04002d
-			public const int message_view = 2130968621;
+			public const int fragment_page = 2130968621;
 			
 			// aapt resource value: 0x7f04002e
-			public const int notification_action = 2130968622;
+			public const int message_frag = 2130968622;
 			
 			// aapt resource value: 0x7f04002f
-			public const int notification_action_tombstone = 2130968623;
+			public const int notification_action = 2130968623;
 			
 			// aapt resource value: 0x7f040030
-			public const int notification_media_action = 2130968624;
+			public const int notification_action_tombstone = 2130968624;
 			
 			// aapt resource value: 0x7f040031
-			public const int notification_media_cancel_action = 2130968625;
+			public const int notification_media_action = 2130968625;
 			
 			// aapt resource value: 0x7f040032
-			public const int notification_template_big_media = 2130968626;
+			public const int notification_media_cancel_action = 2130968626;
 			
 			// aapt resource value: 0x7f040033
-			public const int notification_template_big_media_custom = 2130968627;
+			public const int notification_template_big_media = 2130968627;
 			
 			// aapt resource value: 0x7f040034
-			public const int notification_template_big_media_narrow = 2130968628;
+			public const int notification_template_big_media_custom = 2130968628;
 			
 			// aapt resource value: 0x7f040035
-			public const int notification_template_big_media_narrow_custom = 2130968629;
+			public const int notification_template_big_media_narrow = 2130968629;
 			
 			// aapt resource value: 0x7f040036
-			public const int notification_template_custom_big = 2130968630;
+			public const int notification_template_big_media_narrow_custom = 2130968630;
 			
 			// aapt resource value: 0x7f040037
-			public const int notification_template_icon_group = 2130968631;
+			public const int notification_template_custom_big = 2130968631;
 			
 			// aapt resource value: 0x7f040038
-			public const int notification_template_lines_media = 2130968632;
+			public const int notification_template_icon_group = 2130968632;
 			
 			// aapt resource value: 0x7f040039
-			public const int notification_template_media = 2130968633;
+			public const int notification_template_lines_media = 2130968633;
 			
 			// aapt resource value: 0x7f04003a
-			public const int notification_template_media_custom = 2130968634;
+			public const int notification_template_media = 2130968634;
 			
 			// aapt resource value: 0x7f04003b
-			public const int notification_template_part_chronometer = 2130968635;
+			public const int notification_template_media_custom = 2130968635;
 			
 			// aapt resource value: 0x7f04003c
-			public const int notification_template_part_time = 2130968636;
+			public const int notification_template_part_chronometer = 2130968636;
 			
 			// aapt resource value: 0x7f04003d
-			public const int select_dialog_item_material = 2130968637;
+			public const int notification_template_part_time = 2130968637;
 			
 			// aapt resource value: 0x7f04003e
-			public const int select_dialog_multichoice_material = 2130968638;
+			public const int select_dialog_item_material = 2130968638;
 			
 			// aapt resource value: 0x7f04003f
-			public const int select_dialog_singlechoice_material = 2130968639;
+			public const int select_dialog_multichoice_material = 2130968639;
 			
 			// aapt resource value: 0x7f040040
-			public const int support_simple_spinner_dropdown_item = 2130968640;
+			public const int select_dialog_singlechoice_material = 2130968640;
 			
 			// aapt resource value: 0x7f040041
-			public const int toolbar = 2130968641;
+			public const int support_simple_spinner_dropdown_item = 2130968641;
 			
 			// aapt resource value: 0x7f040042
-			public const int tooltip = 2130968642;
+			public const int toolbar = 2130968642;
 			
 			// aapt resource value: 0x7f040043
-			public const int welcome_page = 2130968643;
+			public const int tooltip = 2130968643;
+			
+			// aapt resource value: 0x7f040044
+			public const int welcome_page = 2130968644;
 			
 			static Layout()
 			{

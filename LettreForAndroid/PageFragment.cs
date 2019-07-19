@@ -89,7 +89,7 @@ namespace LettreForAndroid
             public TextView mTime { get; private set; }
             public ImageView mReadStateIndicator { get; private set; }
 
-            // 카드뷰 레이아웃(message_view) 내 객체들 참조.
+            // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
             public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 // Locate and cache view references:
@@ -128,7 +128,7 @@ namespace LettreForAndroid
             {
                 // Inflate the CardView for the photo:
                 View itemView = LayoutInflater.From(iParent.Context).
-                            Inflate(Resource.Layout.message_view, iParent, false);
+                            Inflate(Resource.Layout.dialogue_frag, iParent, false);
 
                 // Create a ViewHolder to find and hold these view references, and 
                 // register OnClick with the view holder:

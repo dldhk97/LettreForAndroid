@@ -210,7 +210,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\main_icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\message_view.axml">
+    <AndroidResource Include="Resources\layout\dialogue_frag.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -232,6 +232,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\menu\toolbar_dialogue.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\message_frag.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
