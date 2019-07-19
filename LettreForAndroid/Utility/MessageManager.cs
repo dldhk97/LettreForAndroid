@@ -82,6 +82,8 @@ namespace LettreForAndroid.Utility
                     objSms = new TextMessage();
                     objSms.Id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
                     objSms.Address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                    if (objSms.Address == "")
+                        objSms.Address = "Unknown";
                     objSms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
                     objSms.ReadState = cursor.GetString(cursor.GetColumnIndex("read"));
                     objSms.Time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
@@ -92,7 +94,7 @@ namespace LettreForAndroid.Utility
                     if(objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
-                        objDialogue.Contact = ContactManager.Get().getContactIdByPhoneNumber(objSms.Address); //연락처 가져와 저장
+                        objDialogue.Contact = ContactManager.Get().getContactIdByAddress(objSms.Address);    //연락처 가져와 저장
 
                         if (objDialogue.Contact != null)                                                      //연락처가 존재하면, 카테고리 1로 분류
                         {

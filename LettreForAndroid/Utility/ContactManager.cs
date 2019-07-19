@@ -52,7 +52,7 @@ namespace LettreForAndroid.Utility
         }
 
         //연락처 DB에서 번호로 탐색함.
-        public Contact getContactIdByPhoneNumber(string address)
+        public Contact getContactIdByAddress(string address)
         {
             ContentResolver cr = mActivity.BaseContext.ContentResolver;
 
@@ -64,11 +64,11 @@ namespace LettreForAndroid.Utility
             Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
 
             //string hipenAddress = Android.Telephony.PhoneNumberUtils.FormatNumber(address);    //하이픈 붙이기
-            address = address.Replace("-", "_");                                                 //하이픈을 _로 치환, _는 SQLite에서 임의의 값을 의미함.
+            address = address.Replace("-", "");                                                 //하이픈을 제거
 
             //SQLITE 조건문 설정
             string[] projection = {id_code, phoneNumber_code, name_code, photo_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
-            string selectionClause = phoneNumber_code + " LIKE ?";                              //이 때 변수 탐색한 address_code행 값이
+            string selectionClause = phoneNumber_code + " LIKE REPLACE(? ,'-' ,'')";                              //이 때 변수 탐색한 address_code행 값이
             string[] selectionArgs = { address };                                               //address가 반드시 포함된 것을 찾는다.
 
             ICursor cursor = cr.Query(uri, projection, selectionClause, selectionArgs, null);   //쿼리
@@ -101,6 +101,30 @@ namespace LettreForAndroid.Utility
             }
         }
 
+
+        ////하이픈 없을때 잘찾음, 있을땐 모르겠음.
+        //public Contact getContactIdByAddress(string address)
+        //{
+        //    string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
+        //    string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
+        //    string name_code = ContactsContract.Contacts.InterfaceConsts.DisplayName;
+        //    string photo_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoUri;
+
+        //    Uri personUri = Uri.WithAppendedPath(ContactsContract.PhoneLookup.ContentFilterUri, address);
+        //    ContentResolver cr = mActivity.BaseContext.ContentResolver;
+        //    ICursor cur = cr.Query(personUri, null, null, null, null);
+        //    if (cur.MoveToFirst())
+        //    {
+        //        Contact resultContact = new Contact();
+        //        resultContact.Id = cur.GetString(cur.GetColumnIndex(id_code));
+        //        //resultContact.Address = cur.GetString(cur.GetColumnIndex(phoneNumber_code));
+        //        resultContact.Name = cur.GetString(cur.GetColumnIndex(name_code));
+        //        resultContact.Photo_uri = cur.GetString(cur.GetColumnIndex(photo_uri_code));
+        //        cur.Close();
+        //        return resultContact;
+        //    }
+        //    return null;
+        //}
 
         //public void refreshContact()
         //{
