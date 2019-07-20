@@ -75,6 +75,7 @@
     <Compile Include="Utility\BlurViewManager.cs" />
     <Compile Include="Utility\ContactManager.cs" />
     <Compile Include="Utility\DataStorageManager.cs" />
+    <Compile Include="Utility\DateTimeUtillity.cs" />
     <Compile Include="Utility\MessageManager.cs" />
     <Compile Include="Utility\NetworkManager.cs" />
     <Compile Include="Utility\PermissionManager.cs" />

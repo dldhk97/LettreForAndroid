@@ -6,24 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="8dp">
-  
-    <ImageView
-        android:id="@+id/mf_profileIV"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/dd9_send_256"
-        android:layout_marginLeft="8dp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/mf_profileIV"
         android:orientation="vertical"
         android:background="@drawable/message_frag_rec"
         android:layout_margin="8dp"
+        android:layout_alignParentRight="true"
         >
 
         <TextView
-            android:id="@+id/mf_msgTV"
+            android:id="@+id/mfs_msgTV"
             android:text="hi man, how are you?"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,13 +28,13 @@
         />
 
         <TextView
-            android:id="@+id/mf_timeTV"
+            android:id="@+id/mfs_timeTV"
             android:text="11:40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:layout_marginLeft="4dp"
-            android:layout_gravity="right"   />
+            android:layout_gravity="right"
+            android:padding="3dp"    />
 
     </LinearLayout>
 

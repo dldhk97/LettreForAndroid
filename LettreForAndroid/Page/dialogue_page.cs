@@ -122,23 +122,19 @@ namespace LettreForAndroid
 
     // 뷰홀더 패턴 적용 : 각각의 뷰홀더가 CardView 안에 있는 UI 컴포넨트(이미지뷰와 텍스트뷰)를 참조한다.
     // 그것들은 리사이클러뷰 안의 행으로써 표시됨.
-    public class DialogueViewHolder : RecyclerView.ViewHolder
+    public class ReceivedMessageHolder : RecyclerView.ViewHolder
     {
-        //public ImageButton mProfileImage { get; private set; }
-        //public TextView mAddress { get; private set; }
-        //public TextView mMsg { get; private set; }
-        //public TextView mTime { get; private set; }
-        //public ImageView mReadStateIndicator { get; private set; }
+        public ImageButton mProfileImage { get; private set; }
+        public TextView mMsg { get; private set; }
+        public TextView mTime { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
-        public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
+        public ReceivedMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
         {
             // Locate and cache view references:
-            //mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.df_profileIB);
-            //mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.df_readstateIV);
-            //mAddress = iItemView.FindViewById<TextView>(Resource.Id.df_addressTV);
-            //mMsg = iItemView.FindViewById<TextView>(Resource.Id.df_msgTV);
-            //mTime = iItemView.FindViewById<TextView>(Resource.Id.df_timeTV);
+            mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mfr_profileIB);
+            mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfr_msgTV);
+            mTime = iItemView.FindViewById<TextView>(Resource.Id.mfr_timeTV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -146,12 +142,58 @@ namespace LettreForAndroid
             {
                 iListener(base.LayoutPosition);
             };
+        }
 
+        public void bind(TextMessage message)
+        {
+            //mProfileImage.SetImageURI(Android.Net.Uri.Parse(mDialogue.Contact.Photo_uri));
+            mMsg.Text = message.Msg;
+            DateTimeUtillity dtu = new DateTimeUtillity();
+            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
         }
     }
 
+    //----------------------------------------------------------------------
+    // VIEW HOLDER
+
+    public class SentMessageHolder : RecyclerView.ViewHolder
+    {
+        public TextView mMsg { get; private set; }
+        public TextView mTime { get; private set; }
+
+        // 카드뷰 레이아웃(message_view) 내 객체들 참조.
+        public SentMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
+        {
+            // Locate and cache view references:
+            mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfs_msgTV);
+            mTime = iItemView.FindViewById<TextView>(Resource.Id.mfs_timeTV);
+
+            // Detect user clicks on the item view and report which item
+            // was clicked (by layout position) to the listener:
+            iItemView.Click += (sender, e) =>
+            {
+                iListener(base.LayoutPosition);
+            };
+        }
+
+        public void bind(TextMessage message)
+        {
+            mMsg.Text = message.Msg;
+            DateTimeUtillity dtu = new DateTimeUtillity();
+            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
+        }
+    }
+
+
+    //----------------------------------------------------------------------
+    // ADPATER
+
     public class DialogueAdpater : RecyclerView.Adapter
     {
+        private const int VIEW_TYPE_MESSAGE_RECEIVED = 1;
+        private const int VIEW_TYPE_MESSAGE_SENT = 2;
+        
+
         // Event handler for item clicks:
         public event System.EventHandler<int> mItemClick;
 
@@ -164,23 +206,60 @@ namespace LettreForAndroid
             mDialogue = iDialogue;
         }
 
+        public override int GetItemViewType(int position)
+        {
+            TextMessage message = mDialogue[position];
+            switch(Convert.ToInt32(message.Type))
+            {
+                case (int)TextMessage.MESSAGE_FOLDER.RECEIVED:
+                    return VIEW_TYPE_MESSAGE_RECEIVED;
+                case (int)TextMessage.MESSAGE_FOLDER.SENT:
+                    return VIEW_TYPE_MESSAGE_SENT;
+                default:
+                    return -1;        //에러 체크해야됨
+            }
+        }
+
         // 뷰 홀더 생성
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup iParent, int iViewType)
         {
             // Inflate the CardView for the photo:
-            View itemView = LayoutInflater.From(iParent.Context).
-                        Inflate(Resource.Layout.message_frag_received, iParent, false);
+            //View itemView = LayoutInflater.From(iParent.Context).
+            //            Inflate(Resource.Layout.message_frag_received, iParent, false);
 
-            // Create a ViewHolder to find and hold these view references, and 
-            // register OnClick with the view holder:
-            DialogueViewHolder vh = new DialogueViewHolder(itemView, OnClick);
-            return vh;
+            View itemView;
+
+            if(iViewType == VIEW_TYPE_MESSAGE_RECEIVED)
+            {
+                itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_received, iParent, false);
+                return new ReceivedMessageHolder(itemView, OnClick);
+            }
+            else if(iViewType == VIEW_TYPE_MESSAGE_SENT)
+            {
+                itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_sent, iParent, false);
+                return new SentMessageHolder(itemView, OnClick);
+            }
+            return null;
         }
 
         // 뷰 홀더에 데이터를 설정하는 부분
         public override void OnBindViewHolder(RecyclerView.ViewHolder iHolder, int iPosition)
         {
-            DialogueViewHolder vh = iHolder as DialogueViewHolder;
+            
+            switch (GetItemViewType(iPosition))
+            {
+                case VIEW_TYPE_MESSAGE_RECEIVED:
+                    ReceivedMessageHolder a = iHolder as ReceivedMessageHolder;
+                    a.bind(mDialogue[iPosition]);
+                    break;
+                case VIEW_TYPE_MESSAGE_SENT:
+                    SentMessageHolder b = iHolder as SentMessageHolder;
+                    b.bind(mDialogue[iPosition]);
+                    break;
+            }
+
+
+            
 
             ////해당 대화와 가장 첫번째 메세지
             //TextMessage currentMsg = mDialogue[iPosition];
@@ -220,13 +299,6 @@ namespace LettreForAndroid
         {
             if (mItemClick != null)
                 mItemClick(this, iPosition);
-            //Console.WriteLine(mDialogueList[iPosition][0].Msg);
-
-            //Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(dialogue_page));
-            //intent.PutExtra("position", iPosition);
-            //intent.PutExtra("category", mDialogue.Category);
-
-            //Android.App.Application.Context.StartActivity(intent);
         }
     }
 }

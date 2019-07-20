@@ -41,7 +41,6 @@
             android:layout_centerInParent="true"
             android:layout_toRightOf="@+id/dp_attachBtn"
             android:layout_toLeftOf="@+id/dp_sendBtn"
-            android:text="택배는 언제오나요?"
             android:layout_marginLeft="3dp" 
             
         />

@@ -115,6 +115,8 @@ namespace LettreForAndroid.Class
     //일반적인 SMS를 저장하는 객체
     public class TextMessage
     {
+        public enum MESSAGE_FOLDER { RECEIVED = 1, SENT = 2 };
+
         private string id;          //ID
         private string address;     //보낸사람, MMS 메세지는 여기서 번호 안나옴.
         private string msg;         //메세지(body)

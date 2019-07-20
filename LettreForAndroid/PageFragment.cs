@@ -192,11 +192,16 @@ namespace LettreForAndroid
                 vh.mMsg.Text = currentMsg.Msg;
 
                 //날짜 표시
-                long milTime = currentMsg.Time;
-                string pattern = "yyyy-MM-dd HH:mm:ss";
-                Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat(pattern);
-                string date = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
-                vh.mTime.Text = date;
+                DateTimeUtillity dtu = new DateTimeUtillity();
+                if(dtu.getCurrentYear() > dtu.getYear(currentMsg.Time))         //올해 메세지가 아니면
+                {
+                    vh.mTime.Text = dtu.milisecondToDateTimeStr(currentMsg.Time, "yyyy년 MM월 dd일");
+                }
+                else
+                {
+                    vh.mTime.Text = dtu.milisecondToDateTimeStr(currentMsg.Time, "MM월 dd일");
+                }
+                
 
                 //문자 읽음 여부에 따른 상태표시기 끄고 켜기
                 vh.mReadStateIndicator.Visibility = currentMsg.ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
