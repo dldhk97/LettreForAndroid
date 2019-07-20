@@ -27,22 +27,12 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/dp_attachBtn"
-            android:background="@android:color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:scaleType="centerCrop"
             android:layout_alignParentLeft="true"
             android:layout_centerInParent="true" 
         />
 
-        <Button
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/dp_sendBtn"
-            android:background="@android:color/transparent"
-            android:scaleType="centerCrop"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:text="전송" 
-        />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -54,6 +44,18 @@
             android:text="택배는 언제오나요?"
             android:layout_marginLeft="3dp" 
             
+        />
+        <Button
+            android:layout_width="55dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/dp_sendBtn"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="centerCrop"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:text="전송"
+            android:textSize="17sp"
+            android:textStyle="bold" 
         />
     </RelativeLayout>
 

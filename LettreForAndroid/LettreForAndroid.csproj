@@ -225,7 +225,7 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\message_frag.axml">
+    <AndroidResource Include="Resources\layout\message_frag_received.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -237,6 +237,19 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\dialogue_frag.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\message_frag_rec.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\transparent_btn.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\message_frag_sent.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

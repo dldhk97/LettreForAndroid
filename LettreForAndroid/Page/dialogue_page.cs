@@ -124,21 +124,21 @@ namespace LettreForAndroid
     // 그것들은 리사이클러뷰 안의 행으로써 표시됨.
     public class DialogueViewHolder : RecyclerView.ViewHolder
     {
-        public ImageButton mProfileImage { get; private set; }
-        public TextView mAddress { get; private set; }
-        public TextView mMsg { get; private set; }
-        public TextView mTime { get; private set; }
-        public ImageView mReadStateIndicator { get; private set; }
+        //public ImageButton mProfileImage { get; private set; }
+        //public TextView mAddress { get; private set; }
+        //public TextView mMsg { get; private set; }
+        //public TextView mTime { get; private set; }
+        //public ImageView mReadStateIndicator { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
         {
             // Locate and cache view references:
-            mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.df_profileIB);
-            mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.df_readstateIV);
-            mAddress = iItemView.FindViewById<TextView>(Resource.Id.df_addressTV);
-            mMsg = iItemView.FindViewById<TextView>(Resource.Id.df_msgTV);
-            mTime = iItemView.FindViewById<TextView>(Resource.Id.df_timeTV);
+            //mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.df_profileIB);
+            //mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.df_readstateIV);
+            //mAddress = iItemView.FindViewById<TextView>(Resource.Id.df_addressTV);
+            //mMsg = iItemView.FindViewById<TextView>(Resource.Id.df_msgTV);
+            //mTime = iItemView.FindViewById<TextView>(Resource.Id.df_timeTV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -169,7 +169,7 @@ namespace LettreForAndroid
         {
             // Inflate the CardView for the photo:
             View itemView = LayoutInflater.From(iParent.Context).
-                        Inflate(Resource.Layout.dialogue_frag, iParent, false);          //dialogue_frag2 말고 다른거 만들어서 넣어야됨! DEBUG!
+                        Inflate(Resource.Layout.message_frag_received, iParent, false);
 
             // Create a ViewHolder to find and hold these view references, and 
             // register OnClick with the view holder:
@@ -182,31 +182,31 @@ namespace LettreForAndroid
         {
             DialogueViewHolder vh = iHolder as DialogueViewHolder;
 
-            //해당 대화와 가장 첫번째 메세지
-            TextMessage currentMsg = mDialogue[iPosition];
+            ////해당 대화와 가장 첫번째 메세지
+            //TextMessage currentMsg = mDialogue[iPosition];
 
-            //연락처에 있는 사람이면
-            if (mDialogue.Contact != null)
-            {
-                if (mDialogue.Contact.Photo_uri != null)
-                    vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(mDialogue.Contact.Photo_uri));
-                else
-                    vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-            }
-            else
-            {
-                vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-            }
-            vh.mAddress.Text = mDialogue.DisplayName;
-            vh.mMsg.Text = currentMsg.Msg;
+            ////연락처에 있는 사람이면
+            //if (mDialogue.Contact != null)
+            //{
+            //    if (mDialogue.Contact.Photo_uri != null)
+            //        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(mDialogue.Contact.Photo_uri));
+            //    else
+            //        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            //}
+            //else
+            //{
+            //    vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            //}
+            //vh.mAddress.Text = mDialogue.DisplayName;
+            //vh.mMsg.Text = currentMsg.Msg;
 
-            long milTime = currentMsg.Time;
-            string pattern = "yyyy-MM-dd HH:mm:ss";
-            Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat(pattern);
-            string date = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
-            vh.mTime.Text = date;
+            //long milTime = currentMsg.Time;
+            //string pattern = "yyyy-MM-dd HH:mm:ss";
+            //Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat(pattern);
+            //string date = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
+            //vh.mTime.Text = date;
 
-            vh.mReadStateIndicator.Visibility = currentMsg.ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
+            //vh.mReadStateIndicator.Visibility = currentMsg.ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
         }
 
         // Return the number of photos available in the photo album:

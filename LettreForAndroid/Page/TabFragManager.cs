@@ -32,7 +32,6 @@ namespace LettreForAndroid.Page
             new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.PUBLIC], (int)TabFrag.CATEGORY.PUBLIC, 5, 0),                   //공공기관
             new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.AGENCY], (int)TabFrag.CATEGORY.AGENCY, 6, 0),                   //통신사
             new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.SPAM], (int)TabFrag.CATEGORY.SPAM, 7, 0),                       //스팸
-            
         };
 
         readonly Activity activity;
