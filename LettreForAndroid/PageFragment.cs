@@ -84,20 +84,34 @@ namespace LettreForAndroid
         public class DialogueViewHolder : RecyclerView.ViewHolder
         {
             public ImageButton mProfileImage { get; private set; }
+            public TextView mCategoryText { get; private set; }
+            public View mSpliter { get; private set; }
             public TextView mAddress { get; private set; }
             public TextView mMsg { get; private set; }
             public TextView mTime { get; private set; }
             public ImageView mReadStateIndicator { get; private set; }
 
+            private int mCategory;
+            public int Category
+            {
+                set { mCategory = value; }
+            }
+
             // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
             public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 // Locate and cache view references:
-                mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
-                mAddress = iItemView.FindViewById<TextView>(Resource.Id.mv_address);
-                mMsg = iItemView.FindViewById<TextView>(Resource.Id.mv_msg);
-                mTime = iItemView.FindViewById<TextView>(Resource.Id.mv_time);
-                mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.mv_readStateIndicator);
+                if(mCategory == (int)TabFrag.CATEGORY.ALL)
+                {
+                    mCategoryText = iItemView.FindViewById<TextView>(Resource.Id.df_categoryTV);
+                    mSpliter = iItemView.FindViewById<View>(Resource.Id.df_splitterV);
+                }
+                mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.df_profileIB);
+                mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.df_readstateIV);
+                mAddress = iItemView.FindViewById<TextView>(Resource.Id.df_addressTV);
+                mMsg = iItemView.FindViewById<TextView>(Resource.Id.df_msgTV);
+                mTime = iItemView.FindViewById<TextView>(Resource.Id.df_timeTV);
+                
 
                 // Detect user clicks on the item view and report which item
                 // was clicked (by layout position) to the listener:
@@ -126,13 +140,14 @@ namespace LettreForAndroid
             // 뷰 홀더 생성
             public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup iParent, int iViewType)
             {
-                // Inflate the CardView for the photo:
+                // 대화 frag 배치
                 View itemView = LayoutInflater.From(iParent.Context).
                             Inflate(Resource.Layout.dialogue_frag, iParent, false);
 
                 // Create a ViewHolder to find and hold these view references, and 
                 // register OnClick with the view holder:
                 DialogueViewHolder vh = new DialogueViewHolder(itemView, OnClick);
+                vh.Category = mDialogueSet.Category;
                 return vh;
             }
 
@@ -145,27 +160,45 @@ namespace LettreForAndroid
                 Dialogue currentDialogue = mDialogueSet[iPosition];
                 TextMessage currentMsg = currentDialogue[0];
 
-                //연락처에 있는 사람이면
-                if(currentDialogue.Contact != null)
+                //전체 탭인 경우
+                if(mDialogueSet.Category == (int)TabFrag.CATEGORY.ALL)
                 {
-                    if(currentDialogue.Contact.Photo_uri != null)
-                        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(currentDialogue.Contact.Photo_uri));
-                    else
-                        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    vh.mCategoryText.Visibility = ViewStates.Visible;       //카테고리 텍스트와 구분자를 표시
+                    vh.mSpliter.Visibility = ViewStates.Visible;
+                    vh.mProfileImage.Visibility = ViewStates.Invisible;     //프로필사진은 숨김
+                    vh.mCategoryText.Text = TabFrag.mCategory_Str[(int)currentDialogue.Category];   //카테고리 설정
                 }
                 else
                 {
-                    vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    //전체 탭이 아닌 경우
+                    //연락처에 있는 사람이면
+                    if (currentDialogue.Contact != null)
+                    {
+                        //연락처에 사진이 있다면 사진으로 대체
+                        if (currentDialogue.Contact.Photo_uri != null)
+                            vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse(currentDialogue.Contact.Photo_uri));
+                        else
+                            vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    }
+                    else
+                    {
+                        //연락처에 사진이 없으면 기본사진으로 설정
+                        vh.mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    }
                 }
+
+                //이름 혹은 연락처 표시, 문자 내용 표시
                 vh.mAddress.Text = currentDialogue.DisplayName;
                 vh.mMsg.Text = currentMsg.Msg;
 
+                //날짜 표시
                 long milTime = currentMsg.Time;
                 string pattern = "yyyy-MM-dd HH:mm:ss";
                 Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat(pattern);
                 string date = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
                 vh.mTime.Text = date;
 
+                //문자 읽음 여부에 따른 상태표시기 끄고 켜기
                 vh.mReadStateIndicator.Visibility = currentMsg.ReadState.Equals("0") ? ViewStates.Visible : ViewStates.Invisible;
             }
 

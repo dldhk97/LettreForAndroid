@@ -134,11 +134,11 @@ namespace LettreForAndroid
         public DialogueViewHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
         {
             // Locate and cache view references:
-            mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mv_profileImage);
-            mAddress = iItemView.FindViewById<TextView>(Resource.Id.mv_address);
-            mMsg = iItemView.FindViewById<TextView>(Resource.Id.mv_msg);
-            mTime = iItemView.FindViewById<TextView>(Resource.Id.mv_time);
-            mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.mv_readStateIndicator);
+            mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.df_profileIB);
+            mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.df_readstateIV);
+            mAddress = iItemView.FindViewById<TextView>(Resource.Id.df_addressTV);
+            mMsg = iItemView.FindViewById<TextView>(Resource.Id.df_msgTV);
+            mTime = iItemView.FindViewById<TextView>(Resource.Id.df_timeTV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -169,7 +169,7 @@ namespace LettreForAndroid
         {
             // Inflate the CardView for the photo:
             View itemView = LayoutInflater.From(iParent.Context).
-                        Inflate(Resource.Layout.dialogue_frag, iParent, false);          //dialogue_frag 말고 다른거 만들어서 넣어야됨! DEBUG!
+                        Inflate(Resource.Layout.dialogue_frag, iParent, false);          //dialogue_frag2 말고 다른거 만들어서 넣어야됨! DEBUG!
 
             // Create a ViewHolder to find and hold these view references, and 
             // register OnClick with the view holder:

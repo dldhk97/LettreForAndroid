@@ -20,7 +20,7 @@
         android:id="@+id/dp_bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#50FFFFFF"
+        android:background="#30FFFFFF"
         android:layout_alignParentBottom="true">
         <ImageButton
             android:src="@drawable/dp_add_36_2x"

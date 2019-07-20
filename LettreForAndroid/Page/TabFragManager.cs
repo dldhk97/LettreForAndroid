@@ -24,14 +24,14 @@ namespace LettreForAndroid.Page
     {
         TabFrag[] tabFrags = 
         {
-            new TabFrag("전체", (int)TabFrag.CATEGORY.ALL, 0, 0),
-            new TabFrag("대화", (int)TabFrag.CATEGORY.COMMON, 1, 0),
-            new TabFrag("택배", (int)TabFrag.CATEGORY.DELIVERY, 2, 0),
-            new TabFrag("카드", (int)TabFrag.CATEGORY.CARD, 3, 0),
-            new TabFrag("인증", (int)TabFrag.CATEGORY.IDENTIFICATION, 4, 0),
-            new TabFrag("공공기관", (int)TabFrag.CATEGORY.PUBLIC, 5, 0),
-            new TabFrag("통신사", (int)TabFrag.CATEGORY.AGENCY, 6, 0),
-            new TabFrag("스팸", (int)TabFrag.CATEGORY.SPAM, 7, 0),
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.ALL], (int)TabFrag.CATEGORY.ALL, 0, 0),                         //전체
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.COMMON], (int)TabFrag.CATEGORY.COMMON, 1, 0),                   //대화
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.DELIVERY], (int)TabFrag.CATEGORY.DELIVERY, 2, 0),               //택배
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.CARD], (int)TabFrag.CATEGORY.CARD, 3, 0),                       //카드
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.IDENTIFICATION], (int)TabFrag.CATEGORY.IDENTIFICATION, 4, 0),   //인증
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.PUBLIC], (int)TabFrag.CATEGORY.PUBLIC, 5, 0),                   //공공기관
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.AGENCY], (int)TabFrag.CATEGORY.AGENCY, 6, 0),                   //통신사
+            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.SPAM], (int)TabFrag.CATEGORY.SPAM, 7, 0),                       //스팸
             
         };
 
