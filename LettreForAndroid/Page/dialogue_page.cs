@@ -44,10 +44,8 @@ namespace LettreForAndroid
 
             mRecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
 
-            //데이터 준비 : messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
+            //데이터 준비 : curDialogue에 해당되는 대화를 불러옴
             curDialogue = MessageManager.Get().DialogueSets[curCategory][curPosition];
-
-            //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (curDialogue.Count > 0)
@@ -72,9 +70,11 @@ namespace LettreForAndroid
             }
             else
             {
-                //문자가 없으면 없다고 알려준다.
+                //문자가 없으면 없다고 알려준다. 여긴 버그 영역임...
+                //문자가 없는데 어케 대화페이지 들어옴
                 //textView1.Visibility = ViewStates.Visible;
                 //mRecyclerView.Visibility = ViewStates.Gone;
+                throw new InvalidProgramException("어케들어왔노");
             }
 
         }
@@ -144,10 +144,26 @@ namespace LettreForAndroid
             };
         }
 
-        public void bind(TextMessage message)
+        public void bind(Dialogue dialogue, int iPosition)
         {
-            //mProfileImage.SetImageURI(Android.Net.Uri.Parse(mDialogue.Contact.Photo_uri));
+            TextMessage message = dialogue[iPosition];
+
+            //연락처에 있는 사람이면
+            if (dialogue.Contact != null)
+            {
+                //연락처에 사진이 있다면 사진으로 대체
+                if (dialogue.Contact.Photo_uri != null)
+                    mProfileImage.SetImageURI(Android.Net.Uri.Parse(dialogue.Contact.Photo_uri));
+                else
+                    mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            }
+            else
+            {
+                //연락처에 사진이 없으면 기본사진으로 설정
+                mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            }
             mMsg.Text = message.Msg;
+
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
         }
@@ -176,9 +192,12 @@ namespace LettreForAndroid
             };
         }
 
-        public void bind(TextMessage message)
+        public void bind(Dialogue dialogue, int iPosition)
         {
+            TextMessage message = dialogue[iPosition];
+
             mMsg.Text = message.Msg;
+
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
         }
@@ -250,11 +269,11 @@ namespace LettreForAndroid
             {
                 case VIEW_TYPE_MESSAGE_RECEIVED:
                     ReceivedMessageHolder a = iHolder as ReceivedMessageHolder;
-                    a.bind(mDialogue[iPosition]);
+                    a.bind(mDialogue, iPosition);
                     break;
                 case VIEW_TYPE_MESSAGE_SENT:
                     SentMessageHolder b = iHolder as SentMessageHolder;
-                    b.bind(mDialogue[iPosition]);
+                    b.bind(mDialogue, iPosition);
                     break;
             }
 
