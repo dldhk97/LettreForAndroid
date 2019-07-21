@@ -14,6 +14,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Content;
 using Android.Runtime;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace LettreForAndroid
 {
@@ -30,15 +31,6 @@ namespace LettreForAndroid
             base.OnCreate(bundle);
 
             SetContentView(Resource.Layout.activity_main);
-
-            //Tab Fragment Manger 초기화
-            tfm = new TabFragManager(this, SupportFragmentManager);
-
-            //툴바 세팅
-            SetupToolBar();
-
-            //하단 바 설정
-            SetupBottomBar();
 
             //처음 사용자면 welcompage 표시
             if (DataStorageManager.loadBoolData(this, "isFirst", true))
@@ -70,6 +62,16 @@ namespace LettreForAndroid
             //메세지 매니저(싱글톤)세팅
             ContactManager.Get().Initialization(this);
             MessageManager.Get().Initialization(this);
+            //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
+
+            //Tab Fragment Manger 초기화
+            tfm = new TabFragManager(this, SupportFragmentManager);
+
+            //툴바 세팅
+            SetupToolBar();
+
+            //하단 바 설정
+            SetupBottomBar();
 
             //탭 레이아웃 세팅
             tfm.SetupTabLayout();

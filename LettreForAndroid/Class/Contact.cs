@@ -17,7 +17,7 @@ namespace LettreForAndroid.Class
         private string id;
         private string address;
         private string name;
-        private string photo_uri;
+        private string photoThumbnail_uri;
 
         public string Id
         {
@@ -36,10 +36,10 @@ namespace LettreForAndroid.Class
             set { name = value; }
         }
 
-        public string Photo_uri
+        public string PhotoThumnail_uri
         {
-            get { return photo_uri; }
-            set { photo_uri = value; }
+            get { return photoThumbnail_uri; }
+            set { photoThumbnail_uri = value; }
         }
     };
 }

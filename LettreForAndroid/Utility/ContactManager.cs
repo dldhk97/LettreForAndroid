@@ -59,17 +59,17 @@ namespace LettreForAndroid.Utility
             string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
             string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
             string name_code = ContactsContract.Contacts.InterfaceConsts.DisplayName;
-            string photo_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoUri;
+            string photoThumbnail_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoThumbnailUri;
 
             Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
 
             //string hipenAddress = Android.Telephony.PhoneNumberUtils.FormatNumber(address);    //하이픈 붙이기
-            address = address.Replace("-", "");                                                 //하이픈을 제거
+            address = address.Replace("-", "");                                                  //하이픈을 제거
 
             //SQLITE 조건문 설정
-            string[] projection = {id_code, phoneNumber_code, name_code, photo_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
-            string selectionClause = "? LIKE REPLACE( " + phoneNumber_code + ",'-' ,'')";                              //이 때 변수 탐색한 address_code행 값이
-            string[] selectionArgs = { address };                                               //address가 반드시 포함된 것을 찾는다.
+            string[] projection = {id_code, phoneNumber_code, name_code, photoThumbnail_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
+            string selectionClause = "? LIKE REPLACE( " + phoneNumber_code + ",'-' ,'')";       //?는 현재 찾고자 하는 값, phoneNumber_code에는 DB값이 들어간다.
+            string[] selectionArgs = { address };
 
             ICursor cursor = cr.Query(uri, projection, selectionClause, selectionArgs, null);   //쿼리
 
@@ -89,7 +89,7 @@ namespace LettreForAndroid.Utility
                         result.Id = cursor.GetString(cursor.GetColumnIndex(projection[0]));
                         result.Address = cursor.GetString(cursor.GetColumnIndex(projection[1]));
                         result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
-                        result.Photo_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
+                        result.PhotoThumnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
                     }
                 }
                 finally
@@ -101,64 +101,5 @@ namespace LettreForAndroid.Utility
             }
         }
 
-
-        ////하이픈 없을때 잘찾음, 있을땐 모르겠음.
-        //public Contact getContactIdByAddress(string address)
-        //{
-        //    string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
-        //    string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
-        //    string name_code = ContactsContract.Contacts.InterfaceConsts.DisplayName;
-        //    string photo_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoUri;
-
-        //    Uri personUri = Uri.WithAppendedPath(ContactsContract.PhoneLookup.ContentFilterUri, address);
-        //    ContentResolver cr = mActivity.BaseContext.ContentResolver;
-        //    ICursor cur = cr.Query(personUri, null, null, null, null);
-        //    if (cur.MoveToFirst())
-        //    {
-        //        Contact resultContact = new Contact();
-        //        resultContact.Id = cur.GetString(cur.GetColumnIndex(id_code));
-        //        //resultContact.Address = cur.GetString(cur.GetColumnIndex(phoneNumber_code));
-        //        resultContact.Name = cur.GetString(cur.GetColumnIndex(name_code));
-        //        resultContact.Photo_uri = cur.GetString(cur.GetColumnIndex(photo_uri_code));
-        //        cur.Close();
-        //        return resultContact;
-        //    }
-        //    return null;
-        //}
-
-        //public void refreshContact()
-        //{
-        //    Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
-
-        //    string[] projection = new string[] {
-        //        ContactsContract.Contacts.InterfaceConsts.Id,            // 연락처 ID -> 사진 정보 가져오는데 사용
-        //        ContactsContract.CommonDataKinds.Phone.Number,           // 번호
-        //        ContactsContract.Contacts.InterfaceConsts.DisplayName,   // 이름.
-        //        ContactsContract.Contacts.InterfaceConsts.PhotoId };     // 사진
-
-        //    string[] selectionArgs = null;
-
-        //    string sortOrder = ContactsContract.Contacts.InterfaceConsts.DisplayName
-        //            + " COLLATE LOCALIZED ASC";
-
-        //    ContentResolver cr = mActivity.BaseContext.ContentResolver;
-        //    ICursor cursor = cr.Query(uri, projection, "DISTINCT", selectionArgs, sortOrder);
-
-        //    contactList = new List<Contact>();
-
-        //    if (cursor.MoveToFirst())
-        //    {
-        //        do
-        //        {
-        //            Contact contact = new Contact();
-        //            contact.Id = cursor.GetString(0);
-        //            contact.PhoneNumber = cursor.GetString(1);
-        //            contact.Name = cursor.GetString(2);
-        //            contact.Photo_id = cursor.GetString(3);
-        //            contactList.Add(contact);
-
-        //        } while (cursor.MoveToNext());
-        //    }
-        //}
     }
 }

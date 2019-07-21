@@ -149,8 +149,8 @@ namespace LettreForAndroid.UI
             if (dialogue.Contact != null)
             {
                 //연락처에 사진이 있다면 사진으로 대체
-                if (dialogue.Contact.Photo_uri != null)
-                    mProfileImage.SetImageURI(Android.Net.Uri.Parse(dialogue.Contact.Photo_uri));
+                if (dialogue.Contact.PhotoThumnail_uri != null)
+                    mProfileImage.SetImageURI(Android.Net.Uri.Parse(dialogue.Contact.PhotoThumnail_uri));
                 else
                     mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
             }
