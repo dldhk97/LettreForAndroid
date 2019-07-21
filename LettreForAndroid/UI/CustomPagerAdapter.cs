@@ -7,7 +7,9 @@ using Android.Widget;
 using Java.Lang;
 
 using System.Collections.Generic;
+
 using LettreForAndroid.Class;
+using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.UI
 {
@@ -41,7 +43,16 @@ namespace LettreForAndroid.UI
             ImageView notiBackground = view.FindViewById<ImageView>(Resource.Id.custTab_count_background);
 
             tabTitle.Text = tabs[position].TabTitle;
-            if(tabs[position].NotiCount > 0)
+
+            DialogueSet curDialogueSet = MessageManager.Get().DialogueSets[position];
+            int totalUnreadCnt = 0;
+            for (int i = 0; i < curDialogueSet.Count; i++)
+            {
+                totalUnreadCnt += curDialogueSet[i].UnreadCnt;
+            }
+            tabs[position].NotiCount = totalUnreadCnt;
+
+            if (tabs[position].NotiCount > 0)
             {
                 notiCount.Text = tabs[position].NotiCount.ToString();
                 notiCount.Visibility = ViewStates.Visible;
