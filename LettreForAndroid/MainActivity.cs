@@ -8,7 +8,7 @@ using Android.Widget;
 
 using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
-using LettreForAndroid.Page;
+using LettreForAndroid.UI;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Content;

@@ -9,16 +9,12 @@ using Java.Lang;
 using System.Collections.Generic;
 using LettreForAndroid.Class;
 
-namespace LettreForAndroid
+namespace LettreForAndroid.UI
 {
     public class CustomPagerAdapter : FragmentPagerAdapter
     {
         private List<TabFrag> tabs = new List<TabFrag>();
         readonly Context context;
-
-        //public CustomPagerAdapter(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        //{
-        //}
 
         public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
         {
@@ -33,7 +29,7 @@ namespace LettreForAndroid
         //메인문이 모두 끝났을때와, 페이지 넘길때 이 메소드가 호출되어 newInstance가 각 FragmentPage의 내용물을 채움
         public override Fragment GetItem(int position)
         {
-            return PageFragment.newInstance(tabs[position].Category);
+            return main_page.newInstance(tabs[position].Category);
         }
 
         public View GetTabView(int position)

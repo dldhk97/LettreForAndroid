@@ -13,51 +13,29 @@
             android:padding="4dp"
             android:weightSum="5">
 
-            <TextView
-                android:text="카테고리"
-                android:textColor="#FFFFFFFF"
-                android:layout_width="55dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/df_categoryTV"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
-                android:textSize="14dp"
-                android:singleLine="true"
-                android:visibility="invisible"
-                android:textAlignment="center" />
             <ImageButton
                 android:src="@drawable/dd9_send_256"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
-                android:id="@+id/df_profileIB"
+                android:id="@+id/dfc_profileIB"
                 android:layout_alignParentLeft="true"
                 android:layout_centerInParent="true"
                 android:background="@drawable/design_fab_background"
-                android:scaleType="centerCrop"
-                android:visibility="visible" />
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:id="@+id/df_splitterV"
-                android:background="#80FFFFFF"
-                android:layout_gravity="center"
-                android:layout_toRightOf="@+id/df_categoryTV"
-                android:layout_margin="2dp"
-                android:visibility="invisible"/>
+                android:scaleType="centerCrop" />
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/df_contentLL"
+                android:id="@+id/dfc_contentLL"
                 android:layout_marginLeft="4dp"
                 android:minWidth="150dp"
-                android:layout_toRightOf="@+id/df_splitterV">
+                android:layout_toRightOf="@+id/dfc_profileIB">
 
                 <RelativeLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/df_upperRL1"
+                    android:id="@+id/dfc_upperRL1"
                     android:minWidth="150dp">
 
                     <TextView
@@ -67,7 +45,7 @@
                         android:textSize="12dp"
                         android:textColor="#FFFFFFFF"
                         android:text="010-XXXX-XXXX"
-                        android:id="@+id/df_addressTV"
+                        android:id="@+id/dfc_addressTV"
                         android:textStyle="bold"
                         android:singleLine="true"
                         android:layout_alignParentTop="true"
@@ -77,7 +55,7 @@
                         android:src="@drawable/noti_background_64"
                         android:layout_width="7dp"
                         android:layout_height="7dp"
-                        android:id="@+id/df_readstateIV"
+                        android:id="@+id/dfc_readstateIV"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentTop="true" />
 
@@ -87,7 +65,7 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/df_lowerRL">
+                    android:id="@+id/dfc_lowerRL">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -95,7 +73,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="#FFFFFFFF"
                         android:text="this is text messages. Do a barrel roll. adsasdasdasdasd"
-                        android:id="@+id/df_msgTV"
+                        android:id="@+id/dfc_msgTV"
                         android:layout_marginLeft="4dp"
                         android:layout_marginRight="4dp"
                         android:singleLine="true"
@@ -108,7 +86,7 @@
                         android:textSize="10dp"
                         android:textColor="#FFFFFFFF"
                         android:text="6월 24일 오전 00:00"
-                        android:id="@+id/df_timeTV"
+                        android:id="@+id/dfc_timeTV"
                         android:layout_gravity="right|bottom"
                         android:singleLine="true"
                         android:layout_alignParentBottom="true"

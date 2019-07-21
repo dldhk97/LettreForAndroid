@@ -17,7 +17,7 @@ using LettreForAndroid.Utility;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
-namespace LettreForAndroid
+namespace LettreForAndroid.UI
 {
     [Activity(Label = "dialogue_page", Theme = "@style/NulltActivity")]
     public class dialogue_page : AppCompatActivity
@@ -65,15 +65,12 @@ namespace LettreForAndroid
                 //내 어댑터 Plug In
                 mAdapter = new DialogueAdpater(curDialogue);
                 mRecyclerView.SetAdapter(mAdapter);
-                //mRecyclerView.ScrollToPosition(curDialogue.Count - 1);
                 mRecyclerView.ScrollToPosition(0);
             }
             else
             {
                 //문자가 없으면 없다고 알려준다. 여긴 버그 영역임...
                 //문자가 없는데 어케 대화페이지 들어옴
-                //textView1.Visibility = ViewStates.Visible;
-                //mRecyclerView.Visibility = ViewStates.Gone;
                 throw new InvalidProgramException("어케들어왔노");
             }
 
@@ -118,7 +115,7 @@ namespace LettreForAndroid
     }
 
     //----------------------------------------------------------------------
-    // VIEW HOLDER
+    // ReceivedMessage VIEW HOLDER
 
     // 뷰홀더 패턴 적용 : 각각의 뷰홀더가 CardView 안에 있는 UI 컴포넨트(이미지뷰와 텍스트뷰)를 참조한다.
     // 그것들은 리사이클러뷰 안의 행으로써 표시됨.
@@ -170,7 +167,7 @@ namespace LettreForAndroid
     }
 
     //----------------------------------------------------------------------
-    // VIEW HOLDER
+    // SetnMessage VIEW HOLDER
 
     public class SentMessageHolder : RecyclerView.ViewHolder
     {

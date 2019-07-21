@@ -18,7 +18,7 @@ using LettreForAndroid.Class;
 
 using FragmentManager = Android.Support.V4.App.FragmentManager;
 
-namespace LettreForAndroid.Page
+namespace LettreForAndroid.UI
 {
     public class TabFragManager
     {

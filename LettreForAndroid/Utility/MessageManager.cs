@@ -90,13 +90,14 @@ namespace LettreForAndroid.Utility
                     objSms.Thread_id = cursor.GetString(cursor.GetColumnIndexOrThrow("thread_id"));
                     objSms.Type = cursor.GetString(cursor.GetColumnIndexOrThrow("type"));
 
-                    //탐색한 메세지의 Thread_id가 이전과 다르다면
+                    //탐색한 메세지의 Thread_id가 이전과 다르다면 새 대화임.
                     if(objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
                         objDialogue.Contact = ContactManager.Get().getContactIdByAddress(objSms.Address);    //연락처 가져와 저장
 
-                        if (objDialogue.Contact != null)                                                      //연락처가 존재하면, 카테고리 1로 분류
+                        //카테고리 분류
+                        if (objDialogue.Contact != null)                            //연락처에 있으면 대화로 분류
                         {
                             objDialogue.Category = 1;
                             objDialogue.DisplayName = objDialogue.Contact.Name;
@@ -105,9 +106,14 @@ namespace LettreForAndroid.Utility
                         {
                             objDialogue.Category = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
                             objDialogue.DisplayName = objSms.Address;
+                            if (objSms.Address == "#CMAS#CMASALL")
+                                objDialogue.DisplayName = "긴급 재난 문자";
                         }
-                            
-                        mDialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 맞는 리스트에 추가
+
+                        if (objSms.ReadState == "0")                               //읽지 않은 문자면, 대화에 읽지않은 문자가 존재한다고 체크함.
+                            objDialogue.IsUnreadExist = true;
+
+                        mDialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 알맞게 대화 집합에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }

@@ -16,7 +16,7 @@ using Android.Widget;
 
 using LettreForAndroid.Utility;
 
-namespace LettreForAndroid
+namespace LettreForAndroid.UI
 {
     [Activity(Label = "welcome_page", Theme = "@style/FadeInOutActivity")]
     public class welcome_page : Activity

@@ -65,11 +65,11 @@
     <Compile Include="Class\Contact.cs" />
     <Compile Include="Class\Dialogue.cs" />
     <Compile Include="Class\TabFrag.cs" />
-    <Compile Include="CustomPagerAdapter.cs" />
-    <Compile Include="Page\dialogue_page.cs" />
+    <Compile Include="UI\CustomPagerAdapter.cs" />
+    <Compile Include="UI\dialogue_page.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="PageFragment.cs" />
-    <Compile Include="Page\TabFragManager.cs" />
+    <Compile Include="UI\main_page.cs" />
+    <Compile Include="UI\TabFragManager.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BlurViewManager.cs" />
@@ -79,7 +79,7 @@
     <Compile Include="Utility\MessageManager.cs" />
     <Compile Include="Utility\NetworkManager.cs" />
     <Compile Include="Utility\PermissionManager.cs" />
-    <Compile Include="Page\welcome_page.cs" />
+    <Compile Include="UI\welcome_page.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -237,7 +237,7 @@
     <AndroidResource Include="Resources\drawable\dp_add_36_2x.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\dialogue_frag.axml">
+    <AndroidResource Include="Resources\layout\dialogue_frag_category.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -251,6 +251,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\message_frag_sent.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\dialogue_frag_all.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
