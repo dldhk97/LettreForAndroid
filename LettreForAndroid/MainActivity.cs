@@ -109,14 +109,14 @@ namespace LettreForAndroid
             else
             {
                 //DataStorageManager.saveStringData(this,"temp", item.TitleFormatted.ToString());
-                //string[] header = new string[] { "0", "5" };
-                //string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
-                //string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
-                //string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
-                //string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
-                //string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
-                //List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
-                //NetworkManager.Get().sendAndReceiveData(dataList, 0);
+                string[] header = new string[] { "0", "5" };
+                string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
+                string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
+                string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
+                string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
+                string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
+                List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
+                NetworkManager.Get().sendAndReceiveData(dataList, 0);
             }
             return base.OnOptionsItemSelected(item);
         }

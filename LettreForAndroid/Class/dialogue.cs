@@ -61,7 +61,7 @@ namespace LettreForAndroid.Class
         private Contact contact;
         private int category;          //카테고리
         private string displayName;    //화면상 표시되는 전화번호 혹은 이름
-        private bool isUnreadExist;
+        private int unreadCnt = 0;
 
         //메세지들의 배열, 대화를 구성함.
         private List<TextMessage> textMessageList;
@@ -100,10 +100,10 @@ namespace LettreForAndroid.Class
             get { return displayName; }
         }
 
-        public bool IsUnreadExist
+        public int UnreadCnt
         {
-            set { isUnreadExist = value; }
-            get { return isUnreadExist; }
+            set { unreadCnt = value; }
+            get { return unreadCnt; }
         }
 
 

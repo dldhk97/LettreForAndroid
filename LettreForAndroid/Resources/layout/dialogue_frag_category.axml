@@ -51,13 +51,33 @@
                         android:layout_alignParentTop="true"
                         android:layout_alignParentLeft="true" />
 
-                    <ImageView
-                        android:src="@drawable/noti_background_64"
-                        android:layout_width="7dp"
-                        android:layout_height="7dp"
-                        android:id="@+id/dfc_readstateIV"
+                    <RelativeLayout
+                        android:id="@+id/dfc_readstateRL"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
                         android:layout_alignParentRight="true"
-                        android:layout_alignParentTop="true" />
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="2dp">
+
+                        <ImageView
+                            android:src="@drawable/noti_background_64"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/dfc_readstateIV"
+                            android:layout_centerInParent="true"  />
+                        <TextView
+                            android:text="99"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/dfc_readstateCntTV"
+                            android:layout_centerInParent="true"
+                            android:textStyle="bold"
+                            android:textSize="10dp"
+                            android:textColor="@android:color/white"
+                            android:textAlignment="center"
+                            android:paddingBottom="2dp"/>
+                    </RelativeLayout>
 
                 </RelativeLayout>
 

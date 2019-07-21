@@ -53,8 +53,6 @@ namespace LettreForAndroid.UI
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (dialogueSet.Count > 0)
             {
-                //어뎁터 준비
-                //mAdapter = new DialogueListAdpater(dialogueList);
 
                 //RecyclerView에 어댑터 Plug
                 mRecyclerView.SetAdapter(mAdapter);
@@ -86,23 +84,19 @@ namespace LettreForAndroid.UI
             public TextView mAddress { get; private set; }
             public TextView mMsg { get; private set; }
             public TextView mTime { get; private set; }
-            public ImageView mReadStateIndicator { get; private set; }
-
-            //private int mCategory;
-            //public int Category
-            //{
-            //    set { mCategory = value; }
-            //}
+            public RelativeLayout mReadStateRL { get; private set; }
+            public TextView mReadStateCnt { get; private set; }
 
             // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
             public DialogueFragAllHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 mCategoryText = iItemView.FindViewById<TextView>(Resource.Id.dfa_categoryTV);
                 mSpliter = iItemView.FindViewById<View>(Resource.Id.dfa_splitterV);
-                mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.dfa_readstateIV);
                 mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfa_addressTV);
                 mMsg = iItemView.FindViewById<TextView>(Resource.Id.dfa_msgTV);
                 mTime = iItemView.FindViewById<TextView>(Resource.Id.dfa_timeTV);
+                mReadStateRL = iItemView.FindViewById<RelativeLayout>(Resource.Id.dfa_readstateRL);
+                mReadStateCnt = iItemView.FindViewById<TextView>(Resource.Id.dfa_readstateCntTV);
 
                 iItemView.Click += (sender, e) =>
                 {
@@ -131,8 +125,16 @@ namespace LettreForAndroid.UI
                     mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");
                 }
 
-                //문자 읽음 여부에 따른 상태표시기 끄고 켜기
-                mReadStateIndicator.Visibility = dialogue.IsUnreadExist ? ViewStates.Visible : ViewStates.Invisible;
+                //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
+                if (dialogue.UnreadCnt > 0)
+                {
+                    mReadStateRL.Visibility = ViewStates.Visible;
+                    mReadStateCnt.Text = dialogue.UnreadCnt.ToString();
+                }
+                else
+                {
+                    mReadStateRL.Visibility = ViewStates.Invisible;
+                }
             }
         }
 
@@ -145,7 +147,8 @@ namespace LettreForAndroid.UI
             public TextView mAddress { get; private set; }
             public TextView mMsg { get; private set; }
             public TextView mTime { get; private set; }
-            public ImageView mReadStateIndicator { get; private set; }
+            public RelativeLayout mReadStateRL { get; private set; }
+            public TextView mReadStateCnt { get; private set; }
 
             private int mCategory;
             public int Category
@@ -157,11 +160,12 @@ namespace LettreForAndroid.UI
             public DialogueFragCategoryHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.dfc_profileIB);
-                mReadStateIndicator = iItemView.FindViewById<ImageView>(Resource.Id.dfc_readstateIV);
                 mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfc_addressTV);
                 mMsg = iItemView.FindViewById<TextView>(Resource.Id.dfc_msgTV);
                 mTime = iItemView.FindViewById<TextView>(Resource.Id.dfc_timeTV);
-                
+                mReadStateRL = iItemView.FindViewById<RelativeLayout>(Resource.Id.dfc_readstateRL);
+                mReadStateCnt = iItemView.FindViewById<TextView>(Resource.Id.dfc_readstateCntTV);
+
                 iItemView.Click += (sender, e) =>
                 {
                     iListener(base.LayoutPosition);
@@ -203,8 +207,16 @@ namespace LettreForAndroid.UI
                     mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");
                 }
 
-                //문자 읽음 여부에 따른 상태표시기 끄고 켜기
-                mReadStateIndicator.Visibility = dialogue.IsUnreadExist ? ViewStates.Visible : ViewStates.Invisible;
+                //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
+                if(dialogue.UnreadCnt > 0)
+                {
+                    mReadStateRL.Visibility = ViewStates.Visible;
+                    mReadStateCnt.Text = dialogue.UnreadCnt.ToString();
+                }
+                else
+                {
+                    mReadStateRL.Visibility = ViewStates.Invisible;
+                }
             }
         }
 

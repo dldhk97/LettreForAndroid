@@ -51,7 +51,8 @@ namespace LettreForAndroid.Utility
             return mInstance;
         }
 
-        private const string mServerIP = "192.168.0.5";
+        //private const string mServerIP = "192.168.0.5";
+        private const string mServerIP = "59.151.215.129";
         private const int mPort = 8081;
         private const int mMaxBuffer = 1024;
         private TimeSpan mTimeout = new TimeSpan(0,0,2);
@@ -120,7 +121,7 @@ namespace LettreForAndroid.Utility
         //    m_CurrentSocket.Close();
         //}
 
-        //데이터를 여러개 보낼 때
+        //데이터를 여러개 보낼 때(어플 -> 서버)
         public void sendAndReceiveData(List<string[]> dataList, int type)
         {
             if (!isConnected)
@@ -131,39 +132,59 @@ namespace LettreForAndroid.Utility
             if (isConnected)
             {
                 //타입 전송
-                byte[] typeBuffer = Encoding.UTF8.GetBytes(type.ToString());
-                mCurrentSocket.Send(typeBuffer, SocketFlags.None);
+                string hType = type.ToString();
+                string hCnt = dataList.Count.ToString();
 
-                //개수 전송
-                byte[] cntBuffer = Encoding.UTF8.GetBytes(dataList.Count.ToString());
-                mCurrentSocket.Send(cntBuffer, SocketFlags.None);
+                byte[] hTypeByte = new byte[1];
+                hTypeByte = Encoding.UTF8.GetBytes(hType);
+
+                byte[] hCntByte = new byte[4];
+                hCntByte = Encoding.UTF8.GetBytes(hCnt);
+
+                mCurrentSocket.Send(hTypeByte, SocketFlags.None);
+                mCurrentSocket.Send(hCntByte, SocketFlags.None);
 
 
                 //실 데이터 전송
                 for (int i = 0; i < dataList.Count; i++)
                 {
-                    byte[] contactBuffer = Encoding.UTF8.GetBytes(dataList[i][0]);
-                    mCurrentSocket.Send(contactBuffer, SocketFlags.None);
+                    //byte[] byteDAdressLength = new byte[4];
+                    //byteDAdressLength = Encoding.UTF8.GetBytes(dataList[i][0].Length.ToString());       //이게 스트링의 길이를 byte로 바꾼 것.
 
-                    byte[] msgBuffer = Encoding.UTF8.GetBytes(dataList[i][1]);
-                    mCurrentSocket.Send(msgBuffer, SocketFlags.None);
+                    //byte[] byetDAddress = Encoding.UTF8.GetBytes(dataList[i][0].ToString());
+                    //int a = byetDAddress.Length;        //이게 스트링->byte의 길이
+
+                    //string address = dataList[i][0];
+
+                    //string msgLength = dataList[i][1].Length.ToString();
+                    //string msg = dataList[i][1];
+
+                    //byte[] contactBuffer = Encoding.UTF8.GetBytes(dataList[i][0]);
+
+                    //string addressLength = dataList[i][0].Length.ToString();
+                    //string address = dataList[i][0];
+
+                    //string msgLength = dataList[i][1].Length.ToString();
+                    //string msg = dataList[i][1];
+
+                    //byte[] byteAddress = new byte[4];
                 }
 
-                for(int i = 0; i < dataList.Count; i++)
-                {
-                    //서버에서 연락처 데이터 수신
-                    byte[] contactBuffer = new byte[mMaxBuffer];
-                    int numberOfByte = mCurrentSocket.Receive(contactBuffer);
-                    string contactData = Encoding.UTF8.GetString(contactBuffer, 0, numberOfByte);
+                //for(int i = 0; i < dataList.Count; i++)
+                //{
+                //    //서버에서 연락처 데이터 수신
+                //    byte[] contactBuffer = new byte[mMaxBuffer];
+                //    int numberOfByte = mCurrentSocket.Receive(contactBuffer);
+                //    string contactData = Encoding.UTF8.GetString(contactBuffer, 0, numberOfByte);
 
-                    //서버에서 카테고리(lable) 데이터 수신
-                    byte[] cateogryBuffer = new byte[mMaxBuffer];
-                    int numbOfByte2 = mCurrentSocket.Receive(cateogryBuffer);
-                    string categoryData = Encoding.UTF8.GetString(cateogryBuffer, 0, numbOfByte2);
+                //    //서버에서 카테고리(lable) 데이터 수신
+                //    byte[] cateogryBuffer = new byte[mMaxBuffer];
+                //    int numbOfByte2 = mCurrentSocket.Receive(cateogryBuffer);
+                //    string categoryData = Encoding.UTF8.GetString(cateogryBuffer, 0, numbOfByte2);
 
-                    Console.WriteLine("수신) 연락처 : " + contactData);
-                    Console.WriteLine("수신) 카테고리 : " + categoryData);
-                }
+                //    Console.WriteLine("수신) 연락처 : " + contactData);
+                //    Console.WriteLine("수신) 카테고리 : " + categoryData);
+                //}
                 
             }
 
