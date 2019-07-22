@@ -77,6 +77,7 @@ namespace LettreForAndroid.Utility
             {
                 string prevThreadId = "NULL";
                 Dialogue objDialogue = new Dialogue();
+
                 for (int i = 0; i < totalSMS; i++)
                 {
                     objSms = new TextMessage();
@@ -94,7 +95,8 @@ namespace LettreForAndroid.Utility
                     if(objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
-                        objDialogue.Contact = ContactManager.Get().getContactIdByAddress(objSms.Address);    //연락처 가져와 저장
+                        //objDialogue.Contact = ContactManager.Get().getContactIdByAddress(objSms.Address);    //연락처 가져와 저장
+                        objDialogue.Contact = ContactManager.Get().getContactByAddress(objSms.Address);
 
                         //카테고리 분류
                         if (objDialogue.Contact != null)                            //연락처에 있으면 대화로 분류
