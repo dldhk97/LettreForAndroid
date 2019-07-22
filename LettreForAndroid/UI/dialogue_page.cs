@@ -29,9 +29,9 @@ namespace LettreForAndroid.UI
         Toolbar mToolbar;
 
         RecyclerView mRecyclerView;
-        HeaderModelAdpater mAdapter;
+        RecyclerItemAdpater mAdapter;
 
-        List<HeaderModel> recyclerViewItems;
+        List<RecyclerItem> recyclerItems;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -52,10 +52,10 @@ namespace LettreForAndroid.UI
             initItem();
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if (recyclerViewItems.Count > 0)
+            if (recyclerItems.Count > 0)
             {
                 //어뎁터 준비
-                mAdapter = new HeaderModelAdpater(recyclerViewItems);
+                mAdapter = new RecyclerItemAdpater(recyclerItems, curDialogue.Contact);
 
                 //RecyclerView에 어댑터 Plug
                 mRecyclerView.SetAdapter(mAdapter);
@@ -67,7 +67,7 @@ namespace LettreForAndroid.UI
                 mRecyclerView.SetLayoutManager(mLayoutManager);
 
                 //내 어댑터 Plug In
-                mAdapter = new HeaderModelAdpater(recyclerViewItems);
+                mAdapter = new RecyclerItemAdpater(recyclerItems, curDialogue.Contact);
                 mRecyclerView.SetAdapter(mAdapter);
                 mRecyclerView.ScrollToPosition(0);
             }
@@ -83,36 +83,24 @@ namespace LettreForAndroid.UI
         public void initItem()
         {
             string prevTime = "NULL";
-            recyclerViewItems = new List<HeaderModel>();
+            recyclerItems = new List<RecyclerItem>();
 
             for (int i = 0; i < curDialogue.Count; i++)
             {
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                string objTime = dtu.milisecondToDateTimeStr(curDialogue[i].Time, "yyyy-MM-dd");
+                string objTime = dtu.milisecondToDateTimeStr(curDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
+
                 if (prevTime != objTime)
                 {
                     if (prevTime != "NULL")
                     {
-                        HeaderModel a = new HeaderModel();
-                        a.Header = prevTime;
-                        recyclerViewItems.Add(a);
+                        recyclerItems.Add(new HeaderItem(prevTime));
                     }
-
-                    ChildModel c = new ChildModel();
-                    c.TextMessage = curDialogue[i];
-                    recyclerViewItems.Add(c);
                     prevTime = objTime;
                 }
-                else
-                {
-                    ChildModel b = new ChildModel();
-                    b.TextMessage = curDialogue[i];
-                    recyclerViewItems.Add(b);
-                }
+                recyclerItems.Add(new MessageItem(curDialogue[i]));
             }
-            HeaderModel d = new HeaderModel();
-            d.Header = prevTime;
-            recyclerViewItems.Add(d);
+            recyclerItems.Add(new HeaderItem(prevTime));
         }
 
 
@@ -172,9 +160,9 @@ namespace LettreForAndroid.UI
             };
         }
 
-        public void bind(List<HeaderModel> list, int iPosition)
+        public void bind(List<RecyclerItem> list, int iPosition)
         {
-            HeaderModel headerObj = list[iPosition];
+            HeaderItem headerObj = list[iPosition] as HeaderItem;
 
             mTime.Text = headerObj.Header;
         }
@@ -205,25 +193,25 @@ namespace LettreForAndroid.UI
             };
         }
 
-        public void bind(List<HeaderModel> list, int iPosition)
+        public void bind(List<RecyclerItem> list, int iPosition, Contact iContact)
         {
-            ChildModel obj = list[iPosition] as ChildModel;
+            MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
 
             //연락처에 있는 사람이면
-            //if (list.Contact != null)
-            //{
-            //    //연락처에 사진이 있다면 사진으로 대체
-            //    if (list.Contact.PhotoThumnail_uri != null)
-            //        mProfileImage.SetImageURI(Android.Net.Uri.Parse(list.Contact.PhotoThumnail_uri));
-            //    else
-            //        mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-            //}
-            //else
-            //{
-            //    //연락처에 사진이 없으면 기본사진으로 설정
-            //    mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
-            //}
+            if (iContact != null)
+            {
+                //연락처에 사진이 있다면 사진으로 대체
+                if (iContact.PhotoThumnail_uri != null)
+                    mProfileImage.SetImageURI(Android.Net.Uri.Parse(iContact.PhotoThumnail_uri));
+                else
+                    mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            }
+            else
+            {
+                //연락처에 사진이 없으면 기본사진으로 설정
+                mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+            }
             mMsg.Text = message.Msg;
 
             DateTimeUtillity dtu = new DateTimeUtillity();
@@ -254,9 +242,9 @@ namespace LettreForAndroid.UI
             };
         }
 
-        public void bind(List<HeaderModel> list, int iPosition)
+        public void bind(List<RecyclerItem> list, int iPosition)
         {
-            ChildModel obj = list[iPosition] as ChildModel;
+            MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
 
             mMsg.Text = message.Msg;
@@ -272,7 +260,7 @@ namespace LettreForAndroid.UI
     //----------------------------------------------------------------------
     // ADPATER
 
-    public class HeaderModelAdpater : RecyclerView.Adapter
+    public class RecyclerItemAdpater : RecyclerView.Adapter
     {
         private const int VIEW_TYPE_HEADER = 0;
         private const int VIEW_TYPE_MESSAGE_RECEIVED = 1;
@@ -283,23 +271,26 @@ namespace LettreForAndroid.UI
         public event System.EventHandler<int> mItemClick;
 
         // 현 페이지 대화 목록
-        public List<HeaderModel> mHeaderModel;
+        public List<RecyclerItem> mRecyclerItem;
+
+        Contact mContact;
 
         // Load the adapter with the data set (photo album) at construction time:
-        public HeaderModelAdpater(List<HeaderModel> iHeaderModel)
+        public RecyclerItemAdpater(List<RecyclerItem> iRecyclerItem, Contact iContact)
         {
-            mHeaderModel = iHeaderModel;
+            mRecyclerItem = iRecyclerItem;
+            mContact = iContact;
         }
 
         public override int GetItemViewType(int position)
         {
-            if (mHeaderModel[position].isHeader())
+            if (mRecyclerItem[position].Type == (int)RecyclerItem.TYPE.HEADER)
             {
                 return VIEW_TYPE_HEADER;
             }
             else
             {
-                ChildModel ch = mHeaderModel[position] as ChildModel;
+                MessageItem ch = mRecyclerItem[position] as MessageItem;
                 TextMessage tm = ch.TextMessage;
 
                 switch (Convert.ToInt32(tm.Type))
@@ -346,15 +337,15 @@ namespace LettreForAndroid.UI
             {
                 case VIEW_TYPE_HEADER:
                     HeaderHolder a = iHolder as HeaderHolder;
-                    a.bind(mHeaderModel, iPosition);
+                    a.bind(mRecyclerItem, iPosition);
                     break;
                 case VIEW_TYPE_MESSAGE_RECEIVED:
                     ReceivedMessageHolder b = iHolder as ReceivedMessageHolder;
-                    b.bind(mHeaderModel, iPosition);
+                    b.bind(mRecyclerItem, iPosition, mContact);
                     break;
                 case VIEW_TYPE_MESSAGE_SENT:
                     SentMessageHolder c = iHolder as SentMessageHolder;
-                    c.bind(mHeaderModel, iPosition);
+                    c.bind(mRecyclerItem, iPosition);
                     break;
             }
 
@@ -364,7 +355,7 @@ namespace LettreForAndroid.UI
         // Return the number of photos available in the photo album:
         public override int ItemCount
         {
-            get { return mHeaderModel.Count; }
+            get { return mRecyclerItem.Count; }
         }
 
         // 메세지를 클릭했을 때 발생하는 메소드

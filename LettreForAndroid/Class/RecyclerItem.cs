@@ -13,9 +13,24 @@ using Android.Widget;
 namespace LettreForAndroid.Class
 {
 
-    public class HeaderModel
+    public class RecyclerItem
+    {
+        public enum TYPE { HEADER = 1, MESSAGE }
+        public virtual int Type
+        {
+            get { return -1; }
+        }
+    }
+
+
+    public class HeaderItem : RecyclerItem
     {
         string header;
+
+        public HeaderItem(string iHeader)
+        {
+            header = iHeader;
+        }
 
         public string Header
         {
@@ -23,15 +38,20 @@ namespace LettreForAndroid.Class
             set { header = value; }
         }
 
-        public virtual bool isHeader()
+        public override int Type
         {
-            return true;
+            get { return (int)TYPE.HEADER; }
         }
     }
 
-    public class ChildModel : HeaderModel
+    public class MessageItem : RecyclerItem
     {
         TextMessage textMessage;
+
+        public MessageItem(TextMessage iTextmessage)
+        {
+            textMessage = iTextmessage;
+        }
 
         public TextMessage TextMessage
         {
@@ -39,9 +59,9 @@ namespace LettreForAndroid.Class
             set { textMessage = value; }
         }
 
-        public override bool isHeader()
+        public override int Type
         {
-            return false;
+            get { return (int)TYPE.MESSAGE; }
         }
     }
 

@@ -64,7 +64,7 @@
   <ItemGroup>
     <Compile Include="Class\Contact.cs" />
     <Compile Include="Class\Dialogue.cs" />
-    <Compile Include="Class\RecyclerViewItem.cs" />
+    <Compile Include="Class\RecyclerItem.cs" />
     <Compile Include="Class\TabFrag.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\dialogue_page.cs" />
