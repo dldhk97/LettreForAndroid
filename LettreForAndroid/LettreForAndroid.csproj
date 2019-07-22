@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Class\Contact.cs" />
     <Compile Include="Class\Dialogue.cs" />
+    <Compile Include="Class\RecyclerViewItem.cs" />
     <Compile Include="Class\TabFrag.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\dialogue_page.cs" />
@@ -256,6 +257,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\dialogue_frag_all.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\message_frag_header.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
