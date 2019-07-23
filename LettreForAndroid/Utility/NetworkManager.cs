@@ -51,7 +51,7 @@ namespace LettreForAndroid.Utility
             return mInstance;
         }
 
-        private const string mServerIP = "192.168.0.5";
+        private const string mServerIP = "192.168.0.5";                                  //아이피는 서버에 맞게 설정하시오.
         //private const string mServerIP = "59.151.215.129";
         private const int mPort = 10101;
         private const int mMaxBuffer = 1024;
@@ -150,8 +150,8 @@ namespace LettreForAndroid.Utility
                 for(int i = 0; i < receive_amount; i++)
                 {
                     //레이블 수신
-                    byte[] receive_lable_byte = new byte[1];
-                    mCurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
+                    byte[] receive_lable_byte = new byte[2];
+                    mCurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
 
                     //받은 바이트를 int로 변환
                     string receive_lable_str = Encoding.UTF8.GetString(receive_lable_byte);
@@ -159,7 +159,7 @@ namespace LettreForAndroid.Utility
 
                     //-------------------------------------------------------
 
-                    //전화번호 길이 수신
+                    //연락처 길이 수신
                     byte[] receive_addr_length_byte = new byte[2];
                     mCurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
 
@@ -169,7 +169,7 @@ namespace LettreForAndroid.Utility
 
                     //-------------------------------------------------------
 
-                    //전화번호 수신
+                    //연락처 수신
                     byte[] receive_addr_byte = new byte[receive_addr_length];
                     mCurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
 
@@ -179,11 +179,12 @@ namespace LettreForAndroid.Utility
                     //-------------------------------------------------------
 
                     //DEBUG : 출력 창에 표시함.
+                    Console.WriteLine("---------------------------[" + (i + 1) + "] 번째 데이터----------------------");
                     Console.WriteLine("레이블 : " + receive_lable_str);
-                    Console.WriteLine("전화번호 길이 : " + receive_addr_length_str);
-                    Console.WriteLine("전화번호 : " + receive_addr_str);
+                    Console.WriteLine("연락처 길이 : " + receive_addr_length_str);
+                    Console.WriteLine("연락처 : " + receive_addr_str);
                 }
-
+                Console.WriteLine("수신 완료!!!");
 
             }
 
