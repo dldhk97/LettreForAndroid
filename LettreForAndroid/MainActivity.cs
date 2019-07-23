@@ -22,7 +22,6 @@ namespace LettreForAndroid
     public class MainActivity : AppCompatActivity
     {
         TabFragManager tfm;
-        Toolbar mToolbar;
 
         const int mWelcomeActivityCallback = 1;
 
@@ -64,9 +63,6 @@ namespace LettreForAndroid
             MessageManager.Get().Initialization(this);
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
-            //Tab Fragment Manger 초기화
-            tfm = new TabFragManager(this, SupportFragmentManager);
-
             //툴바 세팅
             SetupToolBar();
 
@@ -74,17 +70,20 @@ namespace LettreForAndroid
             SetupBottomBar();
 
             //탭 레이아웃 세팅
+            tfm = new TabFragManager(this, SupportFragmentManager);
             tfm.SetupTabLayout();
 
-            //이게 끝나면 각 리사이클뷰 내용 표시 처리함.
         }
+
+        //-------------------------------------------------------------
+        //툴바 세팅
         
          //툴바 적용
         public void SetupToolBar()
         {
-            mToolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
+            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
 
-            SetSupportActionBar(mToolbar);
+            SetSupportActionBar(toolbar);
             SupportActionBar.Title = "Lettre";
         }
         //툴바에 메뉴 추가
@@ -122,6 +121,9 @@ namespace LettreForAndroid
             }
             return base.OnOptionsItemSelected(item);
         }
+
+        //---------------------------------------------------------------------
+        //하단 버튼 세팅
 
         public void SetupBottomBar()
         {

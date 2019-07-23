@@ -17,10 +17,6 @@ namespace LettreForAndroid.UI
         const string ARG_CATEGORY = "ARG_CATEGORY";
         private int mCategory;
 
-        RecyclerView mRecyclerView;
-        RecyclerView.LayoutManager mLayoutManager;
-        DialogueSetAdpater mAdapter;
-
         public static main_page newInstance(int iCategory)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
             var args = new Bundle();
@@ -40,35 +36,26 @@ namespace LettreForAndroid.UI
         {
             var view = iInflater.Inflate(Resource.Layout.fragment_page, iContainer, false);
             TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
-            mRecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+            RecyclerView recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
-            //여기부턴 리사이클 뷰
+            //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
+            DialogueSet dialogueSet = MessageManager.Get().DialogueSets[mCategory];
 
-            //데이터 준비 : messageList에 카테고리에 해당되는 메세지를 모두 불러온다.
-            DialogueSet dialogueSet;
-            dialogueSet = MessageManager.Get().DialogueSets[mCategory];
-
-            //카테고리에 해당되는 메세지가 담긴 messageList를 mDialogue안에 담는다.
-
-            //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
+            //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (dialogueSet.Count > 0)
             {
-
                 //RecyclerView에 어댑터 Plug
-                mRecyclerView.SetAdapter(mAdapter);
+                RecyclerView.LayoutManager LayoutManager = new LinearLayoutManager(Context);
+                recyclerView.SetLayoutManager(LayoutManager);
 
-                mLayoutManager = new LinearLayoutManager(Context);
-                mRecyclerView.SetLayoutManager(mLayoutManager);
-
-                //내 어댑터 Plug In
-                mAdapter = new DialogueSetAdpater(dialogueSet);
-                mRecyclerView.SetAdapter(mAdapter);
+                DialogueSetAdpater adapter = new DialogueSetAdpater(dialogueSet);
+                recyclerView.SetAdapter(adapter);
             }
             else
             {
                 //문자가 없으면 없다고 알려준다.
                 textView1.Visibility = ViewStates.Visible;
-                mRecyclerView.Visibility = ViewStates.Gone;
+                recyclerView.Visibility = ViewStates.Gone;
             }
 
             return view;
@@ -219,10 +206,6 @@ namespace LettreForAndroid.UI
                 }
             }
         }
-
-        
-
-
 
         public class DialogueSetAdpater : RecyclerView.Adapter
         {

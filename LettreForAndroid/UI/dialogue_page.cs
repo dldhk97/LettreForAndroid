@@ -24,14 +24,10 @@ namespace LettreForAndroid.UI
     {
         private int curPosition;
         private int curCategory;
-        Dialogue curDialogue;
 
-        Toolbar mToolbar;
-
-        RecyclerView mRecyclerView;
-        RecyclerItemAdpater mAdapter;
-
-        List<RecyclerItem> recyclerItems;
+        
+        
+        List<RecyclerItem> mRecyclerItems;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -39,37 +35,27 @@ namespace LettreForAndroid.UI
 
             SetContentView(Resource.Layout.dialogue_page);
 
-            mToolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
             SetupToolbar();
 
             //여기부턴 리사이클 뷰
+            RecyclerView RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
 
-            mRecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
+            //데이터 준비 : 해당되는 대화를 불러옴
+            Dialogue currentDialogue = MessageManager.Get().DialogueSets[curCategory][curPosition];
 
-            //데이터 준비 : curDialogue에 해당되는 대화를 불러옴
-            curDialogue = MessageManager.Get().DialogueSets[curCategory][curPosition];
-
-            initItem();
+            mRecyclerItems = groupByDate(currentDialogue);
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if (recyclerItems.Count > 0)
+            if (mRecyclerItems.Count > 0)
             {
-                //어뎁터 준비
-                mAdapter = new RecyclerItemAdpater(recyclerItems, curDialogue.Contact);
-
-                //RecyclerView에 어댑터 Plug
-                mRecyclerView.SetAdapter(mAdapter);
-
                 LinearLayoutManager mLayoutManager = new LinearLayoutManager(Application.Context);
                 mLayoutManager.ReverseLayout = true;
                 mLayoutManager.StackFromEnd = true;
 
-                mRecyclerView.SetLayoutManager(mLayoutManager);
-
-                //내 어댑터 Plug In
-                mAdapter = new RecyclerItemAdpater(recyclerItems, curDialogue.Contact);
-                mRecyclerView.SetAdapter(mAdapter);
-                mRecyclerView.ScrollToPosition(0);
+                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(mRecyclerItems, currentDialogue.Contact);
+                RecyclerView.SetAdapter(Adapter);
+                RecyclerView.SetLayoutManager(mLayoutManager);
+                RecyclerView.ScrollToPosition(0);
             }
             else
             {
@@ -80,15 +66,16 @@ namespace LettreForAndroid.UI
 
         }
 
-        public void initItem()
+        //대화(메세지 목록)을 리사이클러뷰에 넣기 알맞은 형태로 변환하고, 날짜별로 그룹화 및 헤더추가함.
+        public List<RecyclerItem> groupByDate(Dialogue iDialogue)
         {
             string prevTime = "NULL";
-            recyclerItems = new List<RecyclerItem>();
+            List<RecyclerItem>  recyclerItems = new List<RecyclerItem>();
 
-            for (int i = 0; i < curDialogue.Count; i++)
+            for (int i = 0; i < iDialogue.Count; i++)
             {
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                string objTime = dtu.milisecondToDateTimeStr(curDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
+                string objTime = dtu.milisecondToDateTimeStr(iDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
 
                 if (prevTime != objTime)
                 {
@@ -98,9 +85,11 @@ namespace LettreForAndroid.UI
                     }
                     prevTime = objTime;
                 }
-                recyclerItems.Add(new MessageItem(curDialogue[i]));
+                recyclerItems.Add(new MessageItem(iDialogue[i]));
             }
             recyclerItems.Add(new HeaderItem(prevTime));
+
+            return recyclerItems;
         }
 
 
@@ -127,8 +116,9 @@ namespace LettreForAndroid.UI
 
         private void SetupToolbar()
         {
+            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
             //Toolbar will now take on default actionbar characteristics
-            SetSupportActionBar(mToolbar);
+            SetSupportActionBar(toolbar);
 
             curPosition = Intent.GetIntExtra("position", -1);
             curCategory = Intent.GetIntExtra("category", -1);
@@ -288,7 +278,7 @@ namespace LettreForAndroid.UI
             {
                 return VIEW_TYPE_HEADER;
             }
-            else
+            else if (mRecyclerItem[position].Type == (int)RecyclerItem.TYPE.MESSAGE)
             {
                 MessageItem ch = mRecyclerItem[position] as MessageItem;
                 TextMessage tm = ch.TextMessage;
@@ -302,6 +292,10 @@ namespace LettreForAndroid.UI
                     default:
                         return -1;        //에러 체크해야됨
                 }
+            }
+            else
+            {
+                return -1;
             }
 
         }
@@ -326,6 +320,7 @@ namespace LettreForAndroid.UI
                 itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_sent, iParent, false);
                 return new SentMessageHolder(itemView, OnClick);
             }
+            throw new InvalidProgramException("존재하지 않는 뷰홀더 타입입니다!");
             return null;
         }
 
