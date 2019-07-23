@@ -236,7 +236,7 @@ namespace LettreForAndroid.UI
                 }
                 else
                 {
-                    return -1;  //error 체크하셈
+                    throw new InvalidProgramException("지정되지 않은 탭 타입!");
                 }
             }
 
@@ -255,7 +255,7 @@ namespace LettreForAndroid.UI
                     itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.dialogue_frag_category, iParent, false);
                     return new DialogueFragCategoryHolder(itemView, OnClick);
                 }
-                return null;
+                throw new InvalidProgramException("지정되지 않은 홀더 타입!");
             }
 
             // 뷰 홀더에 데이터를 설정하는 부분
@@ -290,9 +290,10 @@ namespace LettreForAndroid.UI
                 if (mItemClick != null)
                     mItemClick(this, iPosition);
                 //Console.WriteLine(mDialogueList[iPosition][0].Msg);
+                
 
                 Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(dialogue_page));
-                intent.PutExtra("position", iPosition);
+                intent.PutExtra("thread_id", mDialogueSet[iPosition].Thread_id);
                 intent.PutExtra("category", mDialogueSet.Category);
 
                 Android.App.Application.Context.StartActivity(intent);

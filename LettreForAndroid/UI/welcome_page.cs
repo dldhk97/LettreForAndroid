@@ -72,9 +72,6 @@ namespace LettreForAndroid.UI
         {
             if (PermissionManager.HasEssentialPermission(this))
             {
-                //권한이 이미 있으면 기본앱 체크
-                DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
-
                 //기본앱 체크
                 await RequestSetAsDefaultAsync();
                 return;
@@ -114,7 +111,6 @@ namespace LettreForAndroid.UI
                         if (isAllGranted)
                         {
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
-                            DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
 
                             //기본앱 체크
                             await RequestSetAsDefaultAsync();
@@ -122,7 +118,6 @@ namespace LettreForAndroid.UI
                         else
                         {
                             Toast.MakeText(this, "권한이 거절당했습니다. 레뜨레를 사용하시려면 버튼을 다시 눌러주세요!", ToastLength.Short).Show();
-                            DataStorageManager.saveBoolData(this, "isPermissionGranted", false);
                         }
                     }
                     break;
@@ -151,7 +146,6 @@ namespace LettreForAndroid.UI
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
         {
-            //base.OnActivityResult(requestCode, resultCode, data);
             switch (requestCode)
             {
                 case REQUEST_DEFAULT_CALLBACK:
@@ -163,7 +157,6 @@ namespace LettreForAndroid.UI
                     else
                     {
                         Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다. 기본 앱으로 지정해야 레뜨레를 사용할 수 있습니다.", ToastLength.Short).Show();
-                        DataStorageManager.saveBoolData(this, "isDefaultPackage", false);
                     }
                     break;
             }
@@ -171,10 +164,6 @@ namespace LettreForAndroid.UI
 
         private void backToTheMain()
         {
-            //isDefaultPackage와 isPermissionGranted는 데이터스토리지 매니저가 관리하는게 아닌, 여기서 체크해야될듯.
-            
-            DataStorageManager.saveBoolData(this, "isDefaultPackage", true);
-            DataStorageManager.saveBoolData(this, "isPermissionGranted", true);
             DataStorageManager.saveBoolData(this, "isFirst", false);
 
             //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯

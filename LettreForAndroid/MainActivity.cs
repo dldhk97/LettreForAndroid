@@ -58,7 +58,7 @@ namespace LettreForAndroid
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
         public void OnWelcomeComplete()
         {
-            //메세지 매니저(싱글톤)세팅
+            //연락처 및 메세지 매니저 세팅
             ContactManager.Get().Initialization(this);
             MessageManager.Get().Initialization(this);
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용

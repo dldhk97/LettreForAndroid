@@ -18,17 +18,18 @@ namespace LettreForAndroid.Class
     //DialogueSetList = 전체, DialogueSet(dialogueList) = 한 탭, Dialgoue = 한 사람과의 대화, TextMessage = 한 문자
     public class DialogueSet
     {
-        private List<Dialogue> dialogueList;
+        private Dictionary<string, Dialogue> dialogueList;
         int category;
 
         public DialogueSet()
         {
-            dialogueList = new List<Dialogue>();
+            dialogueList = new Dictionary<string, Dialogue>();
         }
 
-        public List<Dialogue> DialogueList
+        public Dictionary<string, Dialogue> DialogueList
         {
             get { return dialogueList; }
+            set { dialogueList = value; }
         }
 
         //탭 내 대화(채팅방)의 개수
@@ -37,9 +38,16 @@ namespace LettreForAndroid.Class
             get { return dialogueList.Count; }
         }
 
-        public Dialogue this[int i]
+        //Thread_id로 접근
+        public Dialogue this[string thread_id]
         {
-            get { return dialogueList[i]; }
+            get { return dialogueList[thread_id]; }
+        }
+
+        //인덱스로 접근
+        public Dialogue this[int index]
+        {
+            get { return dialogueList.Values.ToList()[index]; }
         }
 
         public int Category
@@ -50,7 +58,12 @@ namespace LettreForAndroid.Class
 
         public void Add(Dialogue dialogue)
         {
-            dialogueList.Add(dialogue);
+            dialogueList.Add(dialogue.Thread_id, dialogue);
+        }
+
+        public void SortByLastMessageTime()
+        {
+            dialogueList = dialogueList.OrderByDescending(i => i.Value[0].Time).ToDictionary(pair => pair.Key, pair => pair.Value);
         }
     }
 
@@ -62,6 +75,7 @@ namespace LettreForAndroid.Class
         private int category;          //카테고리
         private string displayName;    //화면상 표시되는 전화번호 혹은 이름
         private int unreadCnt = 0;
+        private string thread_id;
 
         //메세지들의 배열, 대화를 구성함.
         private List<TextMessage> textMessageList;
@@ -106,6 +120,11 @@ namespace LettreForAndroid.Class
             get { return unreadCnt; }
         }
 
+        public string Thread_id
+        {
+            set { thread_id = value; }
+            get { return thread_id; }
+        }
 
 
         //인덱서

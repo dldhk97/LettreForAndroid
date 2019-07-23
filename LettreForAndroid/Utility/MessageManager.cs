@@ -95,8 +95,8 @@ namespace LettreForAndroid.Utility
                     if(objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
-                        //objDialogue.Contact = ContactManager.Get().getContactIdByAddress(objSms.Address);    //연락처 가져와 저장
                         objDialogue.Contact = ContactManager.Get().getContactByAddress(objSms.Address);
+                        objDialogue.Thread_id = objSms.Thread_id;
 
                         //카테고리 분류
                         if (objDialogue.Contact != null)                            //연락처에 있으면 대화로 분류
@@ -133,7 +133,7 @@ namespace LettreForAndroid.Utility
             createAllCategory();
             for(int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                sortDialogueSet(i);
+                mDialogueSets[i].SortByLastMessageTime();
             }
         }
 
@@ -141,26 +141,16 @@ namespace LettreForAndroid.Utility
         {
             DialogueSet resultDialogueSet = new DialogueSet();
             resultDialogueSet.Category = (int)TabFrag.CATEGORY.ALL;
+
             //카테고리 0~7까지 병합
             for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                resultDialogueSet.DialogueList.AddRange(mDialogueSets[i].DialogueList);
+                foreach(Dialogue elem in mDialogueSets[i].DialogueList.Values)
+                {
+                    resultDialogueSet.Add(elem);
+                }
             }
             mDialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
-
-        private void sortDialogueSet(int category)
-        {
-            if (mDialogueSets[category].Count > 0)
-            {
-                mDialogueSets[category].DialogueList.Sort(delegate (Dialogue A, Dialogue B)    //각 대화별로, 가장 최신 문자의 날짜별로 정렬
-                {
-                    if (A[0].Time < B[0].Time) return 1;
-                    else if (A[0].Time > B[0].Time) return -1;
-                    return 0;
-                });
-            }
-        }
-
     }
 }

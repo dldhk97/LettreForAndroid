@@ -22,7 +22,7 @@ namespace LettreForAndroid.UI
     [Activity(Label = "dialogue_page", Theme = "@style/NulltActivity")]
     public class dialogue_page : AppCompatActivity
     {
-        private int curPosition;
+        private string curThread_id;
         private int curCategory;
 
         
@@ -41,7 +41,7 @@ namespace LettreForAndroid.UI
             RecyclerView RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
 
             //데이터 준비 : 해당되는 대화를 불러옴
-            Dialogue currentDialogue = MessageManager.Get().DialogueSets[curCategory][curPosition];
+            Dialogue currentDialogue = MessageManager.Get().DialogueSets[curCategory][curThread_id];
 
             mRecyclerItems = groupByDate(currentDialogue);
 
@@ -120,11 +120,11 @@ namespace LettreForAndroid.UI
             //Toolbar will now take on default actionbar characteristics
             SetSupportActionBar(toolbar);
 
-            curPosition = Intent.GetIntExtra("position", -1);
+            curThread_id = Intent.GetStringExtra("thread_id");
             curCategory = Intent.GetIntExtra("category", -1);
 
             DialogueSet a = MessageManager.Get().DialogueSets[curCategory];
-            Dialogue b = a[curPosition];
+            Dialogue b = a[curThread_id];
             SupportActionBar.Title = b.DisplayName;
 
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
