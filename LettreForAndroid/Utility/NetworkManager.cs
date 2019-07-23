@@ -51,9 +51,9 @@ namespace LettreForAndroid.Utility
             return mInstance;
         }
 
-        //private const string mServerIP = "192.168.0.5";
-        private const string mServerIP = "59.151.215.129";
-        private const int mPort = 8081;
+        private const string mServerIP = "192.168.0.5";
+        //private const string mServerIP = "59.151.215.129";
+        private const int mPort = 10101;
         private const int mMaxBuffer = 1024;
         private TimeSpan mTimeout = new TimeSpan(0,0,2);
 
@@ -94,105 +94,108 @@ namespace LettreForAndroid.Utility
             }
         }
 
-        ////데이터를 하나만 보낸다. 하나의 데이터 안에 데이터수, 전화번호, 문자내용으록 구성됨/
-        //public void sendAndReceiveData(string[] data)
-        //{
-        //    if (!isConnected)
-        //        makeConnection();
-
-        //    if (isConnected)
-        //    {
-        //        // (3) 서버에 데이터 전송
-        //        for (int i = 0; i < protocolElemCnt; i++)        //차례대로 보냄
-        //        {
-        //            byte[] dataBuffer = Encoding.UTF8.GetBytes(data[i]);
-        //            m_CurrentSocket.Send(dataBuffer, SocketFlags.None);
-        //        }
-
-        //        //서버에서 데이터 수신
-        //        byte[] receivedBuffer = new byte[mMaxBuffer];
-        //        int numberOfByte = m_CurrentSocket.Receive(receivedBuffer);
-        //        string receivedData = Encoding.UTF8.GetString(receivedBuffer, 0, numberOfByte);
-
-        //        Console.WriteLine("서버로부터 받음 : " + receivedData);
-        //    }
-
-        //    // (4) 소켓 닫기
-        //    m_CurrentSocket.Close();
-        //}
-
         //데이터를 여러개 보낼 때(어플 -> 서버)
         public void sendAndReceiveData(List<string[]> dataList, int type)
         {
             if (!isConnected)
                 makeConnection();
 
-            
-
             if (isConnected)
             {
-                //타입 전송
-                string hType = type.ToString();
-                string hCnt = dataList.Count.ToString();
-
-                byte[] hTypeByte = new byte[1];
-                hTypeByte = Encoding.UTF8.GetBytes(hType);
-
-                byte[] hCntByte = new byte[4];
-                hCntByte = Encoding.UTF8.GetBytes(hCnt);
-
-                mCurrentSocket.Send(hTypeByte, SocketFlags.None);
-                mCurrentSocket.Send(hCntByte, SocketFlags.None);
-
+                //타입 전송 (기본 0이라 상정하고 아래 코드 작성함)
+                byte[] typeByte = stringToByteArray(type.ToString(), 1);
+                mCurrentSocket.Send(typeByte, SocketFlags.None);
+                
+                //데이터 수량 전송
+                byte[] amountByte = stringToByteArray(dataList.Count.ToString(), 2);
+                mCurrentSocket.Send(amountByte, SocketFlags.None);
 
                 //실 데이터 전송
                 for (int i = 0; i < dataList.Count; i++)
                 {
-                    //byte[] byteDAdressLength = new byte[4];
-                    //byteDAdressLength = Encoding.UTF8.GetBytes(dataList[i][0].Length.ToString());       //이게 스트링의 길이를 byte로 바꾼 것.
+                    //변수 명시
+                    string addr = dataList[i][0];
+                    string msg = dataList[i][1];
 
-                    //byte[] byetDAddress = Encoding.UTF8.GetBytes(dataList[i][0].ToString());
-                    //int a = byetDAddress.Length;        //이게 스트링->byte의 길이
+                    //미리 바이트 배열로 변환
+                    byte[] addrByte = stringToByteArray(addr, addr.Length);                     //연락처를 바이트로 바꾼 값
+                    byte[] addr_lengthByte = stringToByteArray(addrByte.Length.ToString(), 2);  //연락처를 바이트로 바꾼 값의 길이
 
-                    //string address = dataList[i][0];
+                    byte[] msgByte = stringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
+                    byte[] msg_lengthByte = stringToByteArray(msgByte.Length.ToString(), 2);    //문자내용을 바이트로 바꾼 값의 길이
 
-                    //string msgLength = dataList[i][1].Length.ToString();
-                    //string msg = dataList[i][1];
+                    //연락처 길이 전송
+                    mCurrentSocket.Send(addr_lengthByte, SocketFlags.None);
 
-                    //byte[] contactBuffer = Encoding.UTF8.GetBytes(dataList[i][0]);
+                    //연락처 전송
+                    mCurrentSocket.Send(addrByte, SocketFlags.None);
 
-                    //string addressLength = dataList[i][0].Length.ToString();
-                    //string address = dataList[i][0];
+                    //메세지 길이 전송
+                    mCurrentSocket.Send(msg_lengthByte, SocketFlags.None);
 
-                    //string msgLength = dataList[i][1].Length.ToString();
-                    //string msg = dataList[i][1];
-
-                    //byte[] byteAddress = new byte[4];
+                    //메세지 전송
+                    mCurrentSocket.Send(msgByte, SocketFlags.None);
                 }
 
-                //for(int i = 0; i < dataList.Count; i++)
-                //{
-                //    //서버에서 연락처 데이터 수신
-                //    byte[] contactBuffer = new byte[mMaxBuffer];
-                //    int numberOfByte = mCurrentSocket.Receive(contactBuffer);
-                //    string contactData = Encoding.UTF8.GetString(contactBuffer, 0, numberOfByte);
+                //---------------------------------------------------------------------------
 
-                //    //서버에서 카테고리(lable) 데이터 수신
-                //    byte[] cateogryBuffer = new byte[mMaxBuffer];
-                //    int numbOfByte2 = mCurrentSocket.Receive(cateogryBuffer);
-                //    string categoryData = Encoding.UTF8.GetString(cateogryBuffer, 0, numbOfByte2);
+                //데이터 수량 수신
+                byte[] receive_amount_byte = new byte[2];
+                mCurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
 
-                //    Console.WriteLine("수신) 연락처 : " + contactData);
-                //    Console.WriteLine("수신) 카테고리 : " + categoryData);
-                //}
-                
+                //받은 바이트 배열을 string으로 바꾼 뒤 int로 변환
+                string receive_amount_str = Encoding.UTF8.GetString(receive_amount_byte);
+                int receive_amount = Convert.ToInt32(receive_amount_str);
+
+                for(int i = 0; i < receive_amount; i++)
+                {
+                    //레이블 수신
+                    byte[] receive_lable_byte = new byte[1];
+                    mCurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
+
+                    //받은 바이트를 int로 변환
+                    string receive_lable_str = Encoding.UTF8.GetString(receive_lable_byte);
+                    int receive_lable = Convert.ToInt32(receive_lable_str);
+
+                    //-------------------------------------------------------
+
+                    //전화번호 길이 수신
+                    byte[] receive_addr_length_byte = new byte[2];
+                    mCurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
+
+                    //받은 바이트를 int로 변환
+                    string receive_addr_length_str = Encoding.UTF8.GetString(receive_addr_length_byte);
+                    int receive_addr_length = Convert.ToInt32(receive_addr_length_str);
+
+                    //-------------------------------------------------------
+
+                    //전화번호 수신
+                    byte[] receive_addr_byte = new byte[receive_addr_length];
+                    mCurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
+
+                    //받은 바이트를 string으로 변환
+                    string receive_addr_str = Encoding.UTF8.GetString(receive_addr_byte);
+
+                    //-------------------------------------------------------
+
+                    //DEBUG : 출력 창에 표시함.
+                    Console.WriteLine("레이블 : " + receive_lable_str);
+                    Console.WriteLine("전화번호 길이 : " + receive_addr_length_str);
+                    Console.WriteLine("전화번호 : " + receive_addr_str);
+                }
+
+
             }
 
             // (4) 소켓 닫기
             mCurrentSocket.Close();
         }
 
-
+        //str을 고정길이 length만큼 바이트 배열로 변환함.
+        static byte[] stringToByteArray(string str, int length)
+        {
+            return Encoding.UTF8.GetBytes(str.PadRight(length, ' '));       //빈공간을 공백으로 채운다
+        }
 
 
 
