@@ -103,11 +103,11 @@ namespace LettreForAndroid.Utility
             if (isConnected)
             {
                 //타입 전송 (기본 0이라 상정하고 아래 코드 작성함)
-                byte[] typeByte = stringToByteArray(type.ToString(), 1);
+                byte[] typeByte = intToByteArray(type, 1);
                 mCurrentSocket.Send(typeByte, SocketFlags.None);
-                
+
                 //데이터 수량 전송
-                byte[] amountByte = stringToByteArray(dataList.Count.ToString(), 2);
+                byte[] amountByte = intToByteArray(dataList.Count, 2);
                 mCurrentSocket.Send(amountByte, SocketFlags.None);
 
                 //실 데이터 전송
@@ -119,10 +119,10 @@ namespace LettreForAndroid.Utility
 
                     //미리 바이트 배열로 변환
                     byte[] addrByte = stringToByteArray(addr, addr.Length);                     //연락처를 바이트로 바꾼 값
-                    byte[] addr_lengthByte = stringToByteArray(addrByte.Length.ToString(), 2);  //연락처를 바이트로 바꾼 값의 길이
+                    byte[] addr_lengthByte = intToByteArray(addrByte.Length, 2);                //연락처를 바이트로 바꾼 값의 길이
 
                     byte[] msgByte = stringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
-                    byte[] msg_lengthByte = stringToByteArray(msgByte.Length.ToString(), 2);    //문자내용을 바이트로 바꾼 값의 길이
+                    byte[] msg_lengthByte = intToByteArray(msgByte.Length, 2);    //문자내용을 바이트로 바꾼 값의 길이
 
                     //연락처 길이 전송
                     mCurrentSocket.Send(addr_lengthByte, SocketFlags.None);
@@ -144,18 +144,16 @@ namespace LettreForAndroid.Utility
                 mCurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
 
                 //받은 바이트 배열을 string으로 바꾼 뒤 int로 변환
-                string receive_amount_str = Encoding.UTF8.GetString(receive_amount_byte);
-                int receive_amount = Convert.ToInt32(receive_amount_str);
+                int receive_amount = byteToInt(receive_amount_byte);
 
-                for(int i = 0; i < receive_amount; i++)
+                for (int i = 0; i < receive_amount; i++)
                 {
                     //레이블 수신
-                    byte[] receive_lable_byte = new byte[2];
-                    mCurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
+                    byte[] receive_lable_byte = new byte[1];
+                    mCurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
 
                     //받은 바이트를 int로 변환
-                    string receive_lable_str = Encoding.UTF8.GetString(receive_lable_byte);
-                    int receive_lable = Convert.ToInt32(receive_lable_str);
+                    int receive_lable = byteToInt(receive_lable_byte);
 
                     //-------------------------------------------------------
 
@@ -164,8 +162,7 @@ namespace LettreForAndroid.Utility
                     mCurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
 
                     //받은 바이트를 int로 변환
-                    string receive_addr_length_str = Encoding.UTF8.GetString(receive_addr_length_byte);
-                    int receive_addr_length = Convert.ToInt32(receive_addr_length_str);
+                    int receive_addr_length = byteToInt(receive_addr_length_byte);
 
                     //-------------------------------------------------------
 
@@ -180,8 +177,8 @@ namespace LettreForAndroid.Utility
 
                     //DEBUG : 출력 창에 표시함.
                     Console.WriteLine("---------------------------[" + (i + 1) + "] 번째 데이터----------------------");
-                    Console.WriteLine("레이블 : " + receive_lable_str);
-                    Console.WriteLine("연락처 길이 : " + receive_addr_length_str);
+                    Console.WriteLine("레이블 : " + receive_lable.ToString());
+                    Console.WriteLine("연락처 길이 : " + receive_addr_length.ToString());
                     Console.WriteLine("연락처 : " + receive_addr_str);
                 }
                 Console.WriteLine("수신 완료!!!");
@@ -198,8 +195,23 @@ namespace LettreForAndroid.Utility
             return Encoding.UTF8.GetBytes(str.PadRight(length, ' '));       //빈공간을 공백으로 채운다
         }
 
+        static byte[] intToByteArray(int integer, int length)
+        {
+            byte[] intBytes = BitConverter.GetBytes(integer);
+            byte[] result = new byte[length];
+            for (int i = 0; i < length; i++)
+                result[i] = intBytes[i];
+            return result;
+        }
 
-
+        static public int byteToInt(byte[] iByte)
+        {
+            byte[] intByte = new byte[4];
+            for (int i = 0; i < iByte.Length; i++)
+                intByte[i] = iByte[i];
+            int result = BitConverter.ToInt32(intByte);
+            return result;
+        }
 
 
 
