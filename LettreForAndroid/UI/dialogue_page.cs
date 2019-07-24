@@ -24,10 +24,12 @@ namespace LettreForAndroid.UI
     {
         private string curThread_id;
         private int curCategory;
+        Dialogue curDialogue;
 
-        
-        
         List<RecyclerItem> mRecyclerItems;
+
+        Button sendButton;
+        EditText msgBox;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -37,13 +39,23 @@ namespace LettreForAndroid.UI
 
             SetupToolbar();
 
-            //여기부턴 리사이클 뷰
+            //UI
+            sendButton = FindViewById<Button>(Resource.Id.dp_sendBtn);
+            msgBox = FindViewById<EditText>(Resource.Id.dp_msgBox);
             RecyclerView RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
 
             //데이터 준비 : 해당되는 대화를 불러옴
-            Dialogue currentDialogue = MessageManager.Get().DialogueSets[curCategory][curThread_id];
+            curDialogue = MessageManager.Get().DialogueSets[curCategory][curThread_id];
 
-            mRecyclerItems = groupByDate(currentDialogue);
+            sendButton.Click += (sender, e) =>
+            {
+                string msgBody = msgBox.Text;
+                if(msgBody != string.Empty)
+                    MessageManager.Get().sendTextMessage(this, curDialogue.Address, msgBox.Text);
+                msgBox.Text = string.Empty;
+            };
+
+            mRecyclerItems = groupByDate(curDialogue);
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (mRecyclerItems.Count > 0)
@@ -52,7 +64,7 @@ namespace LettreForAndroid.UI
                 mLayoutManager.ReverseLayout = true;
                 mLayoutManager.StackFromEnd = true;
 
-                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(mRecyclerItems, currentDialogue.Contact);
+                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(mRecyclerItems, curDialogue.Contact);
                 RecyclerView.SetAdapter(Adapter);
                 RecyclerView.SetLayoutManager(mLayoutManager);
                 RecyclerView.ScrollToPosition(0);
@@ -61,7 +73,7 @@ namespace LettreForAndroid.UI
             {
                 //문자가 없으면 없다고 알려준다. 여긴 버그 영역임...
                 //문자가 없는데 어케 대화페이지 들어옴
-                throw new InvalidProgramException("어케들어왔노");
+                throw new Exception("어케들어왔노");
             }
 
         }
@@ -129,6 +141,24 @@ namespace LettreForAndroid.UI
 
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.SetHomeButtonEnabled(true);
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            switch (requestCode)
+            {
+                case (int)PermissionManager.REQUESTS.SENDSMS:
+                    if (PermissionManager.HasPermission(this, PermissionManager.sendSMSPermission))
+                    {
+                        MessageManager.Get().sendTextMessage(this, curDialogue.Address, msgBox.Text);
+
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "권한이 없어 메세지 발송에 실패했습니다.", ToastLength.Short).Show();
+                    }
+                    break;
+            }
         }
     }
 
@@ -359,5 +389,6 @@ namespace LettreForAndroid.UI
             if (mItemClick != null)
                 mItemClick(this, iPosition);
         }
+
     }
 }

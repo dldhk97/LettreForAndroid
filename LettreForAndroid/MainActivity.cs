@@ -59,8 +59,10 @@ namespace LettreForAndroid
         public void OnWelcomeComplete()
         {
             //연락처 및 메세지 매니저 세팅
-            ContactManager.Get().Initialization(this);
-            MessageManager.Get().Initialization(this);
+            ContactManager.Get().Initialization();
+            ContactManager.Get().refreshContacts(this);
+            MessageManager.Get().Initialization();
+            MessageManager.Get().refreshMessages(this);
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
             //툴바 세팅

@@ -24,7 +24,6 @@ namespace LettreForAndroid.Utility
 
     public class MessageManager
     {
-        private static Activity mActivity;
         private SmsManager _smsManager;
 
         private static MessageManager mInstance = null;
@@ -42,10 +41,8 @@ namespace LettreForAndroid.Utility
             get { return mDialogueSets; }
         }
 
-        //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
-        public void Initialization(Activity iActivity)
+        public void Initialization()
         {
-            mActivity = iActivity;
             _smsManager = SmsManager.Default;
 
             mDialogueSets = new List<DialogueSet>();
@@ -55,15 +52,15 @@ namespace LettreForAndroid.Utility
                 mDialogueSets[i].Category = i;
             }
                 
-            refreshMessages();
+            //refreshMessages();
         }
 
         //모든 문자메세지를 thread_id별로 묶어 mAllDialgoues에 저장
-        public void refreshMessages()
+        public void refreshMessages(Activity activity)
         {
             TextMessage objSms = new TextMessage();
 
-            ContentResolver cr = mActivity.BaseContext.ContentResolver;
+            ContentResolver cr = activity.BaseContext.ContentResolver;
 
             //DB 탐색 SQL문 설정
             Uri uri = Uri.Parse("content://sms/");
@@ -73,7 +70,7 @@ namespace LettreForAndroid.Utility
             string sortOrder = "thread_id asc, date desc";                   //정렬조건
             ICursor cursor = cr.Query(uri, projection, null, null, sortOrder);
 
-            mActivity.StartManagingCursor(cursor);
+            activity.StartManagingCursor(cursor);
             int totalSMS = cursor.Count;
 
             //탐색 시작
@@ -101,6 +98,7 @@ namespace LettreForAndroid.Utility
                         objDialogue = new Dialogue();                                                         //대화를 새로 만듬.
                         objDialogue.Contact = ContactManager.Get().getContactByAddress(objSms.Address);
                         objDialogue.Thread_id = objSms.Thread_id;
+                        objDialogue.Address = objSms.Address;
 
                         //카테고리 분류
                         if (objDialogue.Contact != null)                            //연락처에 있으면 대화로 분류
@@ -130,7 +128,7 @@ namespace LettreForAndroid.Utility
             // else {
             // throw new RuntimeException("You have no SMS");
             // }
-            mActivity.StopManagingCursor(cursor);
+            activity.StopManagingCursor(cursor);
             cursor.Close();
 
             //0번 카테고리 생성, 생성된 카테고리들 정렬
@@ -157,7 +155,7 @@ namespace LettreForAndroid.Utility
             mDialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
 
-        public void sendTextMessage(string address, string msg)
+        public void sendTextMessage(Activity activity, string address, string msg)
         {
             var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_SENT"), 0);
             var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_DELIVERED"), 0);
@@ -170,13 +168,14 @@ namespace LettreForAndroid.Utility
             else
             {
                 //마시멜로우 이상이면 권한 체크
-                if(PermissionManager.HasPermission(Application.Context, Manifest.Permission.SendSms))
+                if(PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
                 {
+                    Toast.MakeText(activity, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
                     PermissionManager.RequestPermission(
-                        mActivity, 
-                        new string[] { Manifest.Permission.SendSms }, 
-                        "문자를 전송할 때 필요한 권한입니다. 승인을 눌러주세요.", 
-                        (int)PermissionManager.REQUESTS.REQUEST_SENDSMS
+                        activity,
+                        PermissionManager.sendSMSPermission, 
+                        "버튼을 눌러 권한을 승인해주세요.", 
+                        (int)PermissionManager.REQUESTS.SENDSMS
                         );
                 }
                 else

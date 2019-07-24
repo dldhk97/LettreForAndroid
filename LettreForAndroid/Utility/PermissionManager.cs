@@ -12,9 +12,9 @@ namespace LettreForAndroid.Utility
 {
     public class PermissionManager
     {
-        public enum REQUESTS { ESSENTIAL = 1, REQUEST_SENDSMS, }
+        public enum REQUESTS { ESSENTIAL = 1, SENDSMS, }
 
-        public static readonly string[] essentialPermissions= 
+        public static readonly string[] essentialPermissions = 
         {
             Manifest.Permission.SendSms,
             Manifest.Permission.ReceiveSms,
@@ -22,7 +22,14 @@ namespace LettreForAndroid.Utility
             Manifest.Permission.ReceiveWapPush,
             Manifest.Permission.ReceiveMms,
             Manifest.Permission.ReadContacts,
-            Manifest.Permission.WriteContacts
+            Manifest.Permission.WriteContacts,
+            Manifest.Permission.ReadPhoneState,
+        };
+
+        public static readonly string[] sendSMSPermission = 
+        {
+            Manifest.Permission.SendSms,
+            Manifest.Permission.ReadPhoneState,
         };
 
 
@@ -59,10 +66,11 @@ namespace LettreForAndroid.Utility
             //있다면 이유를 보여주고, 스낵바 표시
             if (isNeedRationale)
             {
-                Snackbar.Make(activity.Window.DecorView.FindViewById(Android.Resource.Id.Content), reasonSnackTxt, Snackbar.LengthShort)
+
+                Snackbar.Make(activity.Window.DecorView.FindViewById(Android.Resource.Id.Content), reasonSnackTxt, Snackbar.LengthLong)
                         .SetAction("승인", v => activity.RequestPermissions(permissions, callBackCode))
                         .Show();
-                Toast.MakeText(activity.ApplicationContext, "만약 '다시 묻지 않음' 을 체크하셨다면,\n어플리케이션 옵션에서 직접 권한을 승인해주셔야 합니다!", ToastLength.Long);
+                Toast.MakeText(activity, "만약 '다시 묻지 않음' 을 체크하셨다면,\n어플리케이션 옵션에서 직접 권한을 승인해주셔야 합니다!", ToastLength.Long).Show();
             }
             else
             {

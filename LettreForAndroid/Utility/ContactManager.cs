@@ -22,7 +22,6 @@ namespace LettreForAndroid.Utility
     class ContactManager
     {
 
-        private static Activity mActivity;
         private static ContactManager mInstance = null;
         private List<Contact> contactList = new List<Contact>();
 
@@ -38,10 +37,9 @@ namespace LettreForAndroid.Utility
         }
 
         //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
-        public void Initialization(Activity iActivity)
+        public void Initialization()
         {
-            mActivity = iActivity;
-            refreshContacts();
+            //refreshContacts();
         }
 
         public int Count
@@ -61,9 +59,9 @@ namespace LettreForAndroid.Utility
             return null;
         }
 
-        public void refreshContacts()
+        public void refreshContacts(Activity activity)
         {
-            ContentResolver cr = mActivity.BaseContext.ContentResolver;
+            ContentResolver cr = activity.BaseContext.ContentResolver;
 
             string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
             string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;

@@ -76,6 +76,7 @@ namespace LettreForAndroid.Class
         private string displayName;    //화면상 표시되는 전화번호 혹은 이름
         private int unreadCnt = 0;
         private string thread_id;
+        private string address;
 
         //메세지들의 배열, 대화를 구성함.
         private List<TextMessage> textMessageList;
@@ -124,6 +125,12 @@ namespace LettreForAndroid.Class
         {
             set { thread_id = value; }
             get { return thread_id; }
+        }
+
+        public string Address
+        {
+            set { address = value; }
+            get { return address; }
         }
 
 
