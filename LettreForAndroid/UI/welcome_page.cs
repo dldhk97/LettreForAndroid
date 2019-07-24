@@ -21,28 +21,10 @@ namespace LettreForAndroid.UI
     [Activity(Label = "welcome_page", Theme = "@style/FadeInOutActivity")]
     public class welcome_page : Activity
     {
-        //필수 퍼미션들
-        public readonly string[] essentailPermissions =
-            {
-            Manifest.Permission.ReadSms,
-            Manifest.Permission.ReceiveSms,
-            Manifest.Permission.SendSms,
-            Manifest.Permission.WriteSms,
-            Manifest.Permission.ReceiveMms,
-            Manifest.Permission.ReadContacts,
-            Manifest.Permission.WriteContacts,
-            Manifest.Permission.Internet,
-            Manifest.Permission.AccessNetworkState,
-            Manifest.Permission.ReceiveWapPush
-            };
-        const int REQUEST_ESSENTIAL_CALLBACK = 1;         //onRequestPermissionsResult에서 이 요청값으로 권한 획득 구분가능. INT형가능.
-        const int REQUEST_DEFAULT_CALLBACK = 0;
-
-        const string permission_readSms = Android.Manifest.Permission.ReadSms;
-        const string permission_readContacts = Android.Manifest.Permission.ReadContacts;
-
         Button mBtnContinue;
         TextView welcomepage_guidetext1;
+
+        const int REQUEST_DEFAULT_CALLBACK = 2;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -55,7 +37,6 @@ namespace LettreForAndroid.UI
 
             mBtnContinue.Click += async (sender, e) =>
             {
-                //권한 체크와 승인, 이후 기본앱 설정
                 await GetEsentialPermissionAsync();
             };
         }
@@ -67,41 +48,36 @@ namespace LettreForAndroid.UI
 
 
 
-
+        //권한 체크와 승인, 이후 기본앱 설정
         async Task GetEsentialPermissionAsync()
         {
-            if (PermissionManager.HasEssentialPermission(this))
+            if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
             {
                 //기본앱 체크
                 await RequestSetAsDefaultAsync();
                 return;
             }
 
-            //이미 한번 거절당한 경우.
-            if (ShouldShowRequestPermissionRationale(permission_readSms) || ShouldShowRequestPermissionRationale(permission_readContacts))
-            {
-                //권한이 필요한 이유를 말해주고, OK누르면 요청 후 반환
-                Snackbar.Make(Window.DecorView.RootView, "레뜨레 사용을 위해 승인을 눌러주세요.", Snackbar.LengthShort)
-                        .SetAction("승인", v => RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK))
-                        .Show();
-                welcomepage_guidetext1.Text = "만약 '다시 묻지 않음' 을 체크하셨다면,\n어플리케이션 옵션에서 직접 권한을 승인해주셔야 합니다!";
-                return;
-            }
-            //권한 요청
-            RequestPermissions(essentailPermissions, REQUEST_ESSENTIAL_CALLBACK);
+            PermissionManager.RequestPermission(
+                this, 
+                PermissionManager.essentialPermissions, 
+                "레뜨레 사용을 위해 승인을 눌러주세요.",
+                (int)PermissionManager.REQUESTS.ESSENTIAL
+                );
         }
 
-        //권한 요청 후 결과 받음.
+        //권한 요청 후 결과가 나왔을 때
         public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
             switch (requestCode)
             {
-                case REQUEST_ESSENTIAL_CALLBACK:
+                case (int)PermissionManager.REQUESTS.ESSENTIAL:
                     {
+                        //모두 승인이 되었는지 확인
                         bool isAllGranted = true;
-                        foreach(Permission elem in grantResults)
+                        foreach(Permission grantResult in grantResults)
                         {
-                            if(elem == Permission.Denied)
+                            if(grantResult == Permission.Denied)
                             {
                                 isAllGranted = false;
                                 break;
@@ -156,7 +132,7 @@ namespace LettreForAndroid.UI
                     }
                     else
                     {
-                        Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다. 기본 앱으로 지정해야 레뜨레를 사용할 수 있습니다.", ToastLength.Short).Show();
+                        Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다.\n기본 앱으로 지정해야 레뜨레를 사용할 수 있습니다.", ToastLength.Short).Show();
                     }
                     break;
             }

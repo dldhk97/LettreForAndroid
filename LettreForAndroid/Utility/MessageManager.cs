@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Database;
 using Android.OS;
+using Android.Provider;
 using Android.Runtime;
+using Android.Telephony;
 using Android.Views;
 using Android.Widget;
 using LettreForAndroid.Class;
@@ -23,6 +25,8 @@ namespace LettreForAndroid.Utility
     public class MessageManager
     {
         private static Activity mActivity;
+        private SmsManager _smsManager;
+
         private static MessageManager mInstance = null;
         private static List<DialogueSet> mDialogueSets;     //인덱스 = 카테고리인 총 문자 집합, 0번 인덱스는 비어있다.
 
@@ -42,6 +46,7 @@ namespace LettreForAndroid.Utility
         public void Initialization(Activity iActivity)
         {
             mActivity = iActivity;
+            _smsManager = SmsManager.Default;
 
             mDialogueSets = new List<DialogueSet>();
             for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
@@ -56,7 +61,6 @@ namespace LettreForAndroid.Utility
         //모든 문자메세지를 thread_id별로 묶어 mAllDialgoues에 저장
         public void refreshMessages()
         {
-
             TextMessage objSms = new TextMessage();
 
             ContentResolver cr = mActivity.BaseContext.ContentResolver;
@@ -137,7 +141,7 @@ namespace LettreForAndroid.Utility
             }
         }
 
-        public void createAllCategory()
+        private void createAllCategory()
         {
             DialogueSet resultDialogueSet = new DialogueSet();
             resultDialogueSet.Category = (int)TabFrag.CATEGORY.ALL;
@@ -152,5 +156,60 @@ namespace LettreForAndroid.Utility
             }
             mDialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
+
+        public void sendTextMessage(string address, string msg)
+        {
+            var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_SENT"), 0);
+            var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_DELIVERED"), 0);
+
+            //마시멜로우 이하인 경우 권한체크없이 발송 가능
+            if ((int)Build.VERSION.SdkInt < 23)
+            {
+                _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
+            }
+            else
+            {
+                //마시멜로우 이상이면 권한 체크
+                if(PermissionManager.HasPermission(Application.Context, Manifest.Permission.SendSms))
+                {
+                    PermissionManager.RequestPermission(
+                        mActivity, 
+                        new string[] { Manifest.Permission.SendSms }, 
+                        "문자를 전송할 때 필요한 권한입니다. 승인을 눌러주세요.", 
+                        (int)PermissionManager.REQUESTS.REQUEST_SENDSMS
+                        );
+                }
+                else
+                {
+                    //권한이 있다면 바로 발송
+                    _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
+                }
+            }
+        }
     }
+
+    [BroadcastReceiver(Enabled = true, Exported = true)]
+    [IntentFilter(new[] { "android.provider.Telephony.SMS_RECEIVED" })]
+    class SmsReceiver : BroadcastReceiver
+    {
+        private const string TAG = "AA:SmsReceiver";
+        public override void OnReceive(Context context, Intent intent)
+        {
+
+            if (intent.Action.Equals(Telephony.Sms.Intents.SmsReceivedAction))
+            {
+                var msgs = Telephony.Sms.Intents.GetMessagesFromIntent(intent);
+                foreach (var msg in msgs)
+                {
+                    Console.WriteLine("received");
+                    //Log.Debug(TAG, $" MessageBody {msg.MessageBody}");
+                    //Log.Debug(TAG, $"DisplayOriginatingAddress {msg.DisplayOriginatingAddress}");
+                    //Log.Debug(TAG, $"OriginatingAddress {msg.OriginatingAddress}");
+                }
+            }
+
+        }
+
+    }
+
 }
