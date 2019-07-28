@@ -6,24 +6,27 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 
-using LettreForAndroid.Class;
-using LettreForAndroid.Utility;
-using LettreForAndroid.UI;
-
-using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Content;
 using Android.Runtime;
 using System.Collections.Generic;
 using System.Threading;
+
+using LettreForAndroid.Class;
+using LettreForAndroid.Utility;
+using LettreForAndroid.UI;
+using LettreForAndroid.Receivers;
+
+using Toolbar = Android.Support.V7.Widget.Toolbar;
+
 
 namespace LettreForAndroid
 {
     [Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/BasicTheme")]
     public class MainActivity : AppCompatActivity
     {
-        TabFragManager tfm;
+        TabFragManager _TabFragManager;
 
-        const int mWelcomeActivityCallback = 1;
+        const int REQUEST_WELCOMECLOSED = 1;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -31,10 +34,13 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
+            string thisPackName = PackageName;
+            string defulatPackName = Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this);
+
             //기본앱이 아니면
-            if (!this.PackageName.Equals(Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this)))
+            if (!thisPackName.Equals(defulatPackName))
             {
-                StartActivityForResult(typeof(welcome_page), mWelcomeActivityCallback);
+                StartActivityForResult(typeof(welcome_page), REQUEST_WELCOMECLOSED);
             }
             else
             {
@@ -48,11 +54,22 @@ namespace LettreForAndroid
             base.OnActivityResult(requestCode, resultCode, data);
             switch (requestCode)
             {
-                case mWelcomeActivityCallback:
+                case REQUEST_WELCOMECLOSED:
                     OnWelcomeComplete();
                     break;
             }
 
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
         }
 
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
@@ -72,8 +89,8 @@ namespace LettreForAndroid
             SetupBottomBar();
 
             //탭 레이아웃 세팅
-            tfm = new TabFragManager(this, SupportFragmentManager);
-            tfm.SetupTabLayout();
+            _TabFragManager = new TabFragManager(this, SupportFragmentManager);
+            _TabFragManager.SetupTabLayout();
 
         }
 

@@ -18,15 +18,15 @@ namespace LettreForAndroid.Class
     //DialogueSetList = 전체, DialogueSet(dialogueList) = 한 탭, Dialgoue = 한 사람과의 대화, TextMessage = 한 문자
     public class DialogueSet
     {
-        private Dictionary<string, Dialogue> dialogueList;
+        private Dictionary<long, Dialogue> dialogueList;
         int category;
 
         public DialogueSet()
         {
-            dialogueList = new Dictionary<string, Dialogue>();
+            dialogueList = new Dictionary<long, Dialogue>();
         }
 
-        public Dictionary<string, Dialogue> DialogueList
+        public Dictionary<long, Dialogue> DialogueList
         {
             get { return dialogueList; }
             set { dialogueList = value; }
@@ -39,7 +39,7 @@ namespace LettreForAndroid.Class
         }
 
         //Thread_id로 접근
-        public Dialogue this[string thread_id]
+        public Dialogue this[long thread_id]
         {
             get { return dialogueList[thread_id]; }
         }
@@ -58,12 +58,25 @@ namespace LettreForAndroid.Class
 
         public void Add(Dialogue dialogue)
         {
-            dialogueList.Add(dialogue.Thread_id, dialogue);
+            if (dialogueList.ContainsKey(dialogue.Thread_id))
+                dialogueList[dialogue.Thread_id] = dialogue;
+            else
+                dialogueList.Add(dialogue.Thread_id, dialogue);
         }
 
         public void SortByLastMessageTime()
         {
             dialogueList = dialogueList.OrderByDescending(i => i.Value[0].Time).ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+
+        public void Clear()
+        {
+            foreach(Dialogue dialogue in dialogueList.Values)
+            {
+                dialogue.TextMessageList.Clear();
+            }
+            dialogueList.Clear();
+            dialogueList = new Dictionary<long, Dialogue>();
         }
     }
 
@@ -75,7 +88,7 @@ namespace LettreForAndroid.Class
         private int category;          //카테고리
         private string displayName;    //화면상 표시되는 전화번호 혹은 이름
         private int unreadCnt = 0;
-        private string thread_id;
+        private long thread_id;
         private string address;
 
         //메세지들의 배열, 대화를 구성함.
@@ -121,7 +134,7 @@ namespace LettreForAndroid.Class
             get { return unreadCnt; }
         }
 
-        public string Thread_id
+        public long Thread_id
         {
             set { thread_id = value; }
             get { return thread_id; }
@@ -132,6 +145,13 @@ namespace LettreForAndroid.Class
             set { address = value; }
             get { return address; }
         }
+
+        public List<TextMessage> TextMessageList
+        {
+            set { textMessageList = value; }
+            get { return textMessageList; }
+        }
+
 
 
         //인덱서
@@ -150,16 +170,15 @@ namespace LettreForAndroid.Class
     //일반적인 SMS를 저장하는 객체
     public class TextMessage
     {
-        public enum MESSAGE_FOLDER { RECEIVED = 1, SENT = 2 };
+        public enum MESSAGE_FOLDER { RECEIVED = 0, SENT = 1 };
 
         private string id;          //ID
         private string address;     //보낸사람, MMS 메세지는 여기서 번호 안나옴.
         private string msg;         //메세지(body)
-        private string person;      //누가 보냈는지 contact와 연관하는 것인데, 뭔지 모름.
         private string readState;   //0은 읽지않음, 1은 읽음.
         private long time;        //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
-        private string type;      //폴더, 수신(inbox)인지 발신(sent)인지? 0 혹은 1?
-        private string thread_id;   //대화방 고유 ID?
+        private int type;       //폴더, 수신(inbox)인지 발신(sent)인지? 0 혹은 1?
+        private long thread_id;   //대화방 고유 ID?
 
         public string Id
         {
@@ -176,11 +195,6 @@ namespace LettreForAndroid.Class
             get { return msg; }
             set { msg = value; }
         }
-        public string Person
-        {
-            get { return person; }
-            set { person = value; }
-        }
         public string ReadState
         {
             get { return readState; }
@@ -191,12 +205,12 @@ namespace LettreForAndroid.Class
             get { return time; }
             set { time = value; }
         }
-        public string Type
+        public int Type
         {
             get { return type; }
             set { type = value; }
         }
-        public string Thread_id
+        public long Thread_id
         {
             get { return thread_id; }
             set { thread_id = value; }

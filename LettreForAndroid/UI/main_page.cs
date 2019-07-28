@@ -9,46 +9,63 @@ using Android.Support.V7.Widget;
 using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
 using System.Collections.Generic;
+using Android.Content;
+
+using LettreForAndroid.Receivers;
 
 namespace LettreForAndroid.UI
 {
     public class main_page : Fragment
     {
-        const string ARG_CATEGORY = "ARG_CATEGORY";
-        private int mCategory;
+        const string INTENT_CATEGORY = "intentCategory";
+        private int _Category;
+
+        DialogueSet _DialogueSet;
+
+        TextView textView1;
+        RecyclerView recyclerView;
 
         public static main_page newInstance(int iCategory)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
         {
             var args = new Bundle();
-            args.PutInt(ARG_CATEGORY, iCategory);
+            args.PutInt(INTENT_CATEGORY, iCategory);
+
             var fragment = new main_page();
             fragment.Arguments = args;
+
             return fragment;
         }
 
         public override void OnCreate(Bundle iSavedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
             base.OnCreate(iSavedInstanceState);
-            mCategory = Arguments.GetInt(ARG_CATEGORY);
+            _Category = Arguments.GetInt(INTENT_CATEGORY);
         }
 
         public override View OnCreateView(LayoutInflater iInflater, ViewGroup iContainer, Bundle iSavedInstanceState)
         {
             var view = iInflater.Inflate(Resource.Layout.fragment_page, iContainer, false);
-            TextView textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
-            RecyclerView recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+            textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+
+            refreshRecyclerView();
+
+            return view;
+        }
+
+        private void refreshRecyclerView()
+        {
+            //RecyclerView에 어댑터 Plug
+            RecyclerView.LayoutManager LayoutManager = new LinearLayoutManager(Context);
+            recyclerView.SetLayoutManager(LayoutManager);
 
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
-            DialogueSet dialogueSet = MessageManager.Get().DialogueSets[mCategory];
+            _DialogueSet = MessageManager.Get().DialogueSets[_Category];
 
             //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if (dialogueSet.Count > 0)
+            if (_DialogueSet.Count > 0)
             {
-                //RecyclerView에 어댑터 Plug
-                RecyclerView.LayoutManager LayoutManager = new LinearLayoutManager(Context);
-                recyclerView.SetLayoutManager(LayoutManager);
-
-                DialogueSetAdpater adapter = new DialogueSetAdpater(dialogueSet);
+                DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet);
                 recyclerView.SetAdapter(adapter);
             }
             else
@@ -57,8 +74,6 @@ namespace LettreForAndroid.UI
                 textView1.Visibility = ViewStates.Visible;
                 recyclerView.Visibility = ViewStates.Gone;
             }
-
-            return view;
         }
 
         //----------------------------------------------------------------------
@@ -157,7 +172,6 @@ namespace LettreForAndroid.UI
                 {
                     iListener(base.LayoutPosition);
                 };
-
             }
 
             public void bind(Dialogue dialogue)
@@ -216,21 +230,26 @@ namespace LettreForAndroid.UI
             public event System.EventHandler<int> mItemClick;
 
             // 현 페이지 대화 목록
-            public DialogueSet mDialogueSet;
+            public DialogueSet _DialogueSet;
 
             // Load the adapter with the data set (photo album) at construction time:
             public DialogueSetAdpater(DialogueSet iDialogueSet)
             {
-                mDialogueSet = iDialogueSet;
+                _DialogueSet = iDialogueSet;
+            }
+
+            public void updateDialogueSet(DialogueSet iDialogueSet)
+            {
+                _DialogueSet = iDialogueSet;
             }
 
             public override int GetItemViewType(int iPosition)
             {
-                if (mDialogueSet.Category == (int)TabFrag.CATEGORY.ALL)
+                if (_DialogueSet.Category == (int)TabFrag.CATEGORY.ALL)
                 {
                     return VIEW_TYPE_ALL;
                 }
-                else if ((int)TabFrag.CATEGORY.ALL < mDialogueSet.Category && mDialogueSet.Category < TabFrag.CATEGORY_COUNT)
+                else if ((int)TabFrag.CATEGORY.ALL < _DialogueSet.Category && _DialogueSet.Category < TabFrag.CATEGORY_COUNT)
                 {
                     return VIEW_TYPE_CATEGORY;
                 }
@@ -268,20 +287,19 @@ namespace LettreForAndroid.UI
                 {
                     case VIEW_TYPE_ALL:
                         DialogueFragAllHolder a = iHolder as DialogueFragAllHolder;
-                        a.bind(mDialogueSet[iPosition]);
+                        a.bind(_DialogueSet[iPosition]);
                         break;
                     case VIEW_TYPE_CATEGORY:
                         DialogueFragCategoryHolder b = iHolder as DialogueFragCategoryHolder;
-                        b.bind(mDialogueSet[iPosition]);
+                        b.bind(_DialogueSet[iPosition]);
                         break;
                 }
-
             }
 
             // Return the number of photos available in the photo album:
             public override int ItemCount
             {
-                get { return mDialogueSet.Count; }
+                get { return _DialogueSet.Count; }
             }
 
             // 대화를 클릭했을 때 발생하는 메소드
@@ -289,14 +307,14 @@ namespace LettreForAndroid.UI
             {
                 if (mItemClick != null)
                     mItemClick(this, iPosition);
-                //Console.WriteLine(mDialogueList[iPosition][0].Msg);
-                
 
-                Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(dialogue_page));
-                intent.PutExtra("thread_id", mDialogueSet[iPosition].Thread_id);
-                intent.PutExtra("category", mDialogueSet.Category);
+                Android.Content.Context context = Android.App.Application.Context;
 
-                Android.App.Application.Context.StartActivity(intent);
+                Android.Content.Intent intent = new Android.Content.Intent(context, typeof(DialogueActivity));
+                intent.PutExtra("thread_id", _DialogueSet[iPosition].Thread_id);
+                intent.PutExtra("category", _DialogueSet.Category);
+
+                context.StartActivity(intent);
             }
         }
     }

@@ -22,6 +22,8 @@ namespace LettreForAndroid.Receivers
         {
             base.OnCreate();
             Toast.MakeText(this, "SmsSendService Created!", ToastLength.Short).Show();
+
+
         }
 
         public override IBinder OnBind(Intent intent)
@@ -37,11 +39,6 @@ namespace LettreForAndroid.Receivers
         public override void OnDestroy()
         {
             base.OnDestroy();
-        }
-
-        public string GetTimeStamp()
-        {
-            return "TIMESTAMP";
         }
     }
 }

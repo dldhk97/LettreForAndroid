@@ -13,7 +13,7 @@ using Android.Telephony;
 using Android.Views;
 using Android.Widget;
 using LettreForAndroid.Class;
-
+using LettreForAndroid.Receivers;
 using Uri = Android.Net.Uri;
 
 namespace LettreForAndroid.Utility
@@ -27,7 +27,7 @@ namespace LettreForAndroid.Utility
         private SmsManager _smsManager;
 
         private static MessageManager mInstance = null;
-        private static List<DialogueSet> mDialogueSets;     //인덱스 = 카테고리인 총 문자 집합, 0번 인덱스는 비어있다.
+        private static List<DialogueSet> _DialogueSets;     //인덱스 = 카테고리인 총 문자 집합, 0번 인덱스는 비어있다.
 
         public static MessageManager Get()
         {
@@ -38,18 +38,18 @@ namespace LettreForAndroid.Utility
 
         public List<DialogueSet> DialogueSets
         {
-            get { return mDialogueSets; }
+            get { return _DialogueSets; }
         }
 
         public void Initialization()
         {
             _smsManager = SmsManager.Default;
 
-            mDialogueSets = new List<DialogueSet>();
+            _DialogueSets = new List<DialogueSet>();
             for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                mDialogueSets.Add(new DialogueSet());
-                mDialogueSets[i].Category = i;
+                _DialogueSets.Add(new DialogueSet());
+                _DialogueSets[i].Category = i;
             }
                 
             //refreshMessages();
@@ -65,9 +65,7 @@ namespace LettreForAndroid.Utility
             //DB 탐색 SQL문 설정
             Uri uri = Uri.Parse("content://sms/");
             string[] projection = new string[] {"_id", "address", "thread_id", "person", "body", "read", "date", "type" };  //SELECT 절에 해당함. DISTINCT는 반드시 배열 앞부분에 등장해야함.
-            //string selectionClause = "address = ?";                //WHERE 절에 해당함
-            //string[] selectionArgs = {"114"};                     //Selection을 지정했을 때 Where절에 해당하는 값들을 배열로 적어야댐.
-            string sortOrder = "thread_id asc, date desc";                   //정렬조건
+            string sortOrder = "thread_id asc, date desc";                                                                  //정렬조건
             ICursor cursor = cr.Query(uri, projection, null, null, sortOrder);
 
             int totalSMS = cursor.Count;
@@ -75,7 +73,7 @@ namespace LettreForAndroid.Utility
             //탐색 시작
             if (cursor.MoveToFirst())
             {
-                string prevThreadId = "NULL";
+                long prevThreadId = -1;
                 Dialogue objDialogue = new Dialogue();
 
                 for (int i = 0; i < totalSMS; i++)
@@ -88,8 +86,8 @@ namespace LettreForAndroid.Utility
                     objSms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
                     objSms.ReadState = cursor.GetString(cursor.GetColumnIndex("read"));
                     objSms.Time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
-                    objSms.Thread_id = cursor.GetString(cursor.GetColumnIndexOrThrow("thread_id"));
-                    objSms.Type = cursor.GetString(cursor.GetColumnIndexOrThrow("type"));
+                    objSms.Thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                    objSms.Type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
 
                     //탐색한 메세지의 Thread_id가 이전과 다르다면 새 대화임.
                     if(objSms.Thread_id != prevThreadId)
@@ -116,7 +114,7 @@ namespace LettreForAndroid.Utility
                         if (objSms.ReadState == "0")                               //읽지 않은 문자면, 대화에 읽지않은 문자가 존재한다고 체크함.
                             objDialogue.UnreadCnt++;
 
-                        mDialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 알맞게 대화 집합에 추가
+                        _DialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 알맞게 대화 집합에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
@@ -130,7 +128,7 @@ namespace LettreForAndroid.Utility
             createAllCategory();
             for(int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                mDialogueSets[i].SortByLastMessageTime();
+                _DialogueSets[i].SortByLastMessageTime();
             }
         }
 
@@ -142,37 +140,21 @@ namespace LettreForAndroid.Utility
             //카테고리 0~7까지 병합
             for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
             {
-                foreach(Dialogue elem in mDialogueSets[i].DialogueList.Values)
+                foreach(Dialogue elem in _DialogueSets[i].DialogueList.Values)
                 {
                     resultDialogueSet.Add(elem);
                 }
             }
-            mDialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
+            _DialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
 
-        public void sendTextMessage(Activity activity, string address, string msg)
+        public long getThreadId(Context context, string address)
         {
-            var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_SENT"), 0);
-            var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_DELIVERED"), 0);
-
-            //권한 체크
-            if (PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
-            {
-                Toast.MakeText(activity, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
-                PermissionManager.RequestPermission(
-                    activity,
-                    PermissionManager.sendSMSPermission,
-                    "버튼을 눌러 권한을 승인해주세요.",
-                    (int)PermissionManager.REQUESTS.SENDSMS
-                    );
-            }
-            else
-            {
-                //권한이 있다면 바로 발송
-                _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
-            }
+            return Telephony.Threads.GetOrCreateThreadId(context, address);      //make new Thread_id
         }
     }
+
+    
 
 
 }

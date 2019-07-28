@@ -46,8 +46,6 @@ namespace LettreForAndroid.UI
             //뒤로가기를 눌렀을때 아무 반응 하지 않음.
         }
 
-
-
         //권한 체크와 승인, 이후 기본앱 설정
         async Task GetEsentialPermissionAsync()
         {
@@ -140,7 +138,7 @@ namespace LettreForAndroid.UI
 
         private void backToTheMain()
         {
-            DataStorageManager.saveBoolData(this, "isFirst", false);
+            //DataStorageManager.saveBoolData(this, "isFirst", false);
 
             //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯
             welcomepage_guidetext1.Text = "잠시만 기다려주세요.";

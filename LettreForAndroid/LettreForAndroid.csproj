@@ -66,12 +66,12 @@
     <Compile Include="Class\Dialogue.cs" />
     <Compile Include="Class\RecyclerItem.cs" />
     <Compile Include="Class\TabFrag.cs" />
+    <Compile Include="Receivers\SmsSentReceiver.cs" />
     <Compile Include="Receivers\WAPPushDeliverer.cs" />
-    <Compile Include="Receivers\SmsSendActivity.cs" />
     <Compile Include="Receivers\SmsDeliverer.cs" />
     <Compile Include="Receivers\SmsSendService.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
-    <Compile Include="UI\dialogue_page.cs" />
+    <Compile Include="UI\DialogueActivity.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="UI\main_page.cs" />
     <Compile Include="UI\TabFragManager.cs" />

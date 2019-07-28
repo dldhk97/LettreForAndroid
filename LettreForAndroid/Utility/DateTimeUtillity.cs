@@ -33,6 +33,12 @@ namespace LettreForAndroid.Utility
             return Convert.ToInt32(result);
         }
 
+        public long getCurrentMilTime()
+        {
+            DateTime baseDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return (long)(DateTime.Now.ToUniversalTime() - baseDate).TotalMilliseconds;
+        }
+
         public string milisecondToDateTimeStr(long milTime, string pattern)
         {
             //날짜 표시

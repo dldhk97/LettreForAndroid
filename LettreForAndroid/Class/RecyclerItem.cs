@@ -15,7 +15,7 @@ namespace LettreForAndroid.Class
 
     public class RecyclerItem
     {
-        public enum TYPE { HEADER = 1, MESSAGE }
+        public enum TYPE { HEADER = 1, MESSAGE = 10 }
         public virtual int Type
         {
             get { return -1; }

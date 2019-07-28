@@ -6,30 +6,39 @@ using System.Text;
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Provider;
 using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Telephony;
 using Android.Views;
 using Android.Widget;
 
 using LettreForAndroid.Class;
+using LettreForAndroid.Receivers;
 using LettreForAndroid.Utility;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "dialogue_page", Theme = "@style/NulltActivity")]
-    public class dialogue_page : AppCompatActivity
+    [Activity(Label = "DialogueActivity", Theme = "@style/FadeInOutActivity")]
+    [IntentFilter(new[] { "android.intent.action.SEND", "android.intent.action.SENDTO" }, Categories = new[] { "android.intent.category.DEFAULT", "android.intent.category.BROWSABLE" }, DataSchemes = new[] { "sms", "smsto", "mms", "mmsto" })]
+    public class DialogueActivity : AppCompatActivity
     {
-        private string curThread_id;
-        private int curCategory;
-        Dialogue curDialogue;
+        int _CurCategory;
+        long _CurThread_id;
+        Dialogue _CurDialogue;
 
-        List<RecyclerItem> mRecyclerItems;
+        List<RecyclerItem> _RecyclerItems;
 
-        Button sendButton;
-        EditText msgBox;
+        RecyclerView _RecyclerView;
+        Button _SendButton;
+        EditText _MsgBox;
+
+        SmsManager _SmsManager;
+
+        SmsSentReceiver _SmsSentReceiver;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -37,52 +46,199 @@ namespace LettreForAndroid.UI
 
             SetContentView(Resource.Layout.dialogue_page);
 
+            //현페이지의 카테고리와 쓰레드ID 설정, 이것으로 어느 대화인지 특정할 수 있다.
+            _CurCategory = Intent.GetIntExtra("category", -1);
+            _CurThread_id = Intent.GetLongExtra("thread_id", -1);
+
+            SetupRecyclerView();
+
             SetupToolbar();
 
-            //UI
-            sendButton = FindViewById<Button>(Resource.Id.dp_sendBtn);
-            msgBox = FindViewById<EditText>(Resource.Id.dp_msgBox);
-            RecyclerView RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
+            _SmsManager = SmsManager.Default;
 
-            //데이터 준비 : 해당되는 대화를 불러옴
-            curDialogue = MessageManager.Get().DialogueSets[curCategory][curThread_id];
+            //브로드캐스트 리시버 초기화
+            _SmsSentReceiver = new SmsSentReceiver();
+            _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
+        }
 
-            sendButton.Click += (sender, e) =>
+        //문자 전송 이후 호출됨
+        private void _SmsSentReceiver_SentCompleteEvent(int resultCode)
+        {
+            //문자 전송 성공
+            if (resultCode.Equals((int)Result.Ok))
             {
-                string msgBody = msgBox.Text;
-                if(msgBody != string.Empty)
-                    MessageManager.Get().sendTextMessage(this, curDialogue.Address, msgBox.Text);
-                msgBox.Text = string.Empty;
-            };
+                //문자를 DB에 저장
+                ContentValues values = new ContentValues();
+                values.Put(Telephony.TextBasedSmsColumns.Address, _CurDialogue.Address);
+                values.Put(Telephony.TextBasedSmsColumns.Body, _MsgBox.Text);
+                DateTimeUtillity dtu = new DateTimeUtillity();
+                values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
+                values.Put(Telephony.TextBasedSmsColumns.Read, 1);
+                values.Put(Telephony.TextBasedSmsColumns.Type, 1);
+                values.Put(Telephony.TextBasedSmsColumns.ThreadId, _CurDialogue.Thread_id);
 
-            mRecyclerItems = groupByDate(curDialogue);
+                ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
+
+                //입력칸 비우기
+                _MsgBox.Text = string.Empty;
+
+                //리사이클러뷰 새로고침
+                RefreshRecyclerView();
+            }
+            else
+            {
+                //문자 전송 실패시
+                throw new Exception("문자 전송 실패시 코드 짜라");
+            }
+        }
+
+        //Resume됬을때는 리시버 다시 등록
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            IntentFilter ifr = new IntentFilter(SmsSentReceiver.FILTER_SENT);
+            RegisterReceiver(_SmsSentReceiver, ifr);
+        }
+
+        //멈추면 리시버 해제
+        protected override void OnPause()
+        {
+            base.OnPause();
+            UnregisterReceiver(_SmsSentReceiver);
+        }
+
+        //-----------------------------------------------------------------
+        //툴바 설정
+        private void SetupToolbar()
+        {
+            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
+
+            SetSupportActionBar(toolbar);
+
+            SupportActionBar.Title = _CurDialogue.DisplayName;
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetHomeButtonEnabled(true);
+        }
+        //툴바 버튼 클릭 시
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            //돌아가기 클릭 시
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                Finish();
+                OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);     //창 닫을때 페이드효과
+                //OverridePendingTransition(0, 0);     //창 닫을때 효과 없음
+            }
+            return base.OnOptionsItemSelected(item);
+        }
+
+        //툴바에 메뉴 추가
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu);
+            return base.OnCreateOptionsMenu(menu);
+        }
+
+        //-----------------------------------------------------------------
+        //UI
+        private void SetupRecyclerView()
+        {
+            _SendButton = FindViewById<Button>(Resource.Id.dp_sendBtn);
+            _MsgBox = FindViewById<EditText>(Resource.Id.dp_msgBox);
+
+            _RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
+
+            _SendButton.Click += SendButton_Click;
+
+            RefreshRecyclerView();
+        }
+
+        private void RefreshRecyclerView()
+        {
+            MessageManager.Get().refreshMessages(this);                                         //DB에서 다시 불러옴
+            _CurDialogue = MessageManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
+
+            //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
+            _RecyclerItems = groupByDate(_CurDialogue);
 
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if (mRecyclerItems.Count > 0)
+            if (_RecyclerItems.Count > 0)
             {
                 LinearLayoutManager mLayoutManager = new LinearLayoutManager(Application.Context);
                 mLayoutManager.ReverseLayout = true;
                 mLayoutManager.StackFromEnd = true;
 
-                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(mRecyclerItems, curDialogue.Contact);
-                RecyclerView.SetAdapter(Adapter);
-                RecyclerView.SetLayoutManager(mLayoutManager);
-                RecyclerView.ScrollToPosition(0);
+                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(_RecyclerItems, _CurDialogue.Contact);
+                _RecyclerView.SetAdapter(Adapter);
+                _RecyclerView.SetLayoutManager(mLayoutManager);
+                _RecyclerView.ScrollToPosition(0);
             }
             else
             {
-                //문자가 없으면 없다고 알려준다. 여긴 버그 영역임...
-                //문자가 없는데 어케 대화페이지 들어옴
+                //문자가 없으면... 여긴 버그 영역임...
                 throw new Exception("어케들어왔노");
             }
-
         }
 
+        //전송 버튼 클릭
+        private void SendButton_Click(object sender, EventArgs e)
+        {
+            string msgBody = _MsgBox.Text;
+
+            if (msgBody != string.Empty)
+                sendSms(_CurDialogue.Address, _MsgBox.Text);
+        }
+
+        public void sendSms(string address, string msg)
+        {
+            //권한 체크
+            if (PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
+            {
+                Toast.MakeText(this, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
+                PermissionManager.RequestPermission(
+                    this,
+                    PermissionManager.sendSMSPermission,
+                    "버튼을 눌러 권한을 승인해주세요.",
+                    (int)PermissionManager.REQUESTS.SENDSMS
+                    );
+            }
+            else
+            {
+                //권한이 있다면 바로 발송
+                var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsSentReceiver.FILTER_SENT), 0);
+                //var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsDeliverer.FILTER_DELIVERED), 0);
+
+                _SmsManager.SendTextMessage(address, null, msg, piSent, null);
+            }
+        }
+
+        //-----------------------------------------------------------------
+        //리퀘스트
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            switch (requestCode)
+            {
+                case (int)PermissionManager.REQUESTS.SENDSMS:
+                    if (PermissionManager.HasPermission(this, PermissionManager.sendSMSPermission))
+                    {
+                        //권한 취득했으면 다시 전송요청
+                        sendSms(_CurDialogue.Address, _MsgBox.Text);
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "권한이 없어 메세지 발송에 실패했습니다.", ToastLength.Short).Show();
+                    }
+                    break;
+            }
+        }
+
+        //-----------------------------------------------------------------
         //대화(메세지 목록)을 리사이클러뷰에 넣기 알맞은 형태로 변환하고, 날짜별로 그룹화 및 헤더추가함.
         public List<RecyclerItem> groupByDate(Dialogue iDialogue)
         {
             string prevTime = "NULL";
-            List<RecyclerItem>  recyclerItems = new List<RecyclerItem>();
+            List<RecyclerItem> recyclerItems = new List<RecyclerItem>();
 
             for (int i = 0; i < iDialogue.Count; i++)
             {
@@ -103,65 +259,10 @@ namespace LettreForAndroid.UI
 
             return recyclerItems;
         }
-
-
-
-        //-----------------------------------------------------------------
-        //툴바 설정
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            if (item.ItemId == Android.Resource.Id.Home)
-            {
-                Finish();
-                //OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);     //창 닫을때 페이드효과
-                OverridePendingTransition(0, 0);     //창 닫을때 효과 없음
-            }
-            return base.OnOptionsItemSelected(item);
-        }
-
-        //툴바에 메뉴 추가
-        public override bool OnCreateOptionsMenu(IMenu menu)
-        {
-            MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu);
-            return base.OnCreateOptionsMenu(menu);
-        }
-
-        private void SetupToolbar()
-        {
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
-            //Toolbar will now take on default actionbar characteristics
-            SetSupportActionBar(toolbar);
-
-            curThread_id = Intent.GetStringExtra("thread_id");
-            curCategory = Intent.GetIntExtra("category", -1);
-
-            DialogueSet a = MessageManager.Get().DialogueSets[curCategory];
-            Dialogue b = a[curThread_id];
-            SupportActionBar.Title = b.DisplayName;
-
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.SetHomeButtonEnabled(true);
-        }
-
-        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
-        {
-            switch (requestCode)
-            {
-                case (int)PermissionManager.REQUESTS.SENDSMS:
-                    if (PermissionManager.HasPermission(this, PermissionManager.sendSMSPermission))
-                    {
-                        MessageManager.Get().sendTextMessage(this, curDialogue.Address, msgBox.Text);
-
-                    }
-                    else
-                    {
-                        Toast.MakeText(this, "권한이 없어 메세지 발송에 실패했습니다.", ToastLength.Short).Show();
-                    }
-                    break;
-            }
-        }
     }
 
+
+    //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     // HEADER VIEW HOLDER
 
@@ -282,9 +383,9 @@ namespace LettreForAndroid.UI
 
     public class RecyclerItemAdpater : RecyclerView.Adapter
     {
-        private const int VIEW_TYPE_HEADER = 0;
-        private const int VIEW_TYPE_MESSAGE_RECEIVED = 1;
-        private const int VIEW_TYPE_MESSAGE_SENT = 2;
+        private const int VIEW_TYPE_HEADER = 2;
+        private const int VIEW_TYPE_MESSAGE_RECEIVED = 0;
+        private const int VIEW_TYPE_MESSAGE_SENT = 1;
 
 
         // Event handler for item clicks:
@@ -311,16 +412,16 @@ namespace LettreForAndroid.UI
             else if (mRecyclerItem[position].Type == (int)RecyclerItem.TYPE.MESSAGE)
             {
                 MessageItem ch = mRecyclerItem[position] as MessageItem;
-                TextMessage tm = ch.TextMessage;
+                TextMessage objSms = ch.TextMessage;
 
-                switch (Convert.ToInt32(tm.Type))
+                switch (objSms.Type)
                 {
                     case (int)TextMessage.MESSAGE_FOLDER.RECEIVED:
                         return VIEW_TYPE_MESSAGE_RECEIVED;
                     case (int)TextMessage.MESSAGE_FOLDER.SENT:
                         return VIEW_TYPE_MESSAGE_SENT;
                     default:
-                        return -1;        //에러 체크해야됨
+                        return -2;
                 }
             }
             else

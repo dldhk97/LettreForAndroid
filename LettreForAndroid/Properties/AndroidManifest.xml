@@ -17,7 +17,7 @@
     </receiver>
 
     <!-- Activity that allows the user to send new SMS/MMS messages -->
-    <activity android:name=".SmsSendActivity">
+    <activity android:name=".DialogueActivity">
       <intent-filter>
         <action android:name="android.intent.action.SEND" />
         <action android:name="android.intent.action.SENDTO" />
