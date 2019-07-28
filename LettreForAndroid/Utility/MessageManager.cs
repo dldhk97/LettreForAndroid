@@ -70,7 +70,6 @@ namespace LettreForAndroid.Utility
             string sortOrder = "thread_id asc, date desc";                   //정렬조건
             ICursor cursor = cr.Query(uri, projection, null, null, sortOrder);
 
-            activity.StartManagingCursor(cursor);
             int totalSMS = cursor.Count;
 
             //탐색 시작
@@ -125,10 +124,6 @@ namespace LettreForAndroid.Utility
                     cursor.MoveToNext();
                 }
             }
-            // else {
-            // throw new RuntimeException("You have no SMS");
-            // }
-            activity.StopManagingCursor(cursor);
             cursor.Close();
 
             //0번 카테고리 생성, 생성된 카테고리들 정렬
@@ -160,55 +155,24 @@ namespace LettreForAndroid.Utility
             var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_SENT"), 0);
             var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent("SMS_DELIVERED"), 0);
 
-            //마시멜로우 이하인 경우 권한체크없이 발송 가능
-            if ((int)Build.VERSION.SdkInt < 23)
+            //권한 체크
+            if (PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
             {
-                _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
+                Toast.MakeText(activity, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
+                PermissionManager.RequestPermission(
+                    activity,
+                    PermissionManager.sendSMSPermission,
+                    "버튼을 눌러 권한을 승인해주세요.",
+                    (int)PermissionManager.REQUESTS.SENDSMS
+                    );
             }
             else
             {
-                //마시멜로우 이상이면 권한 체크
-                if(PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
-                {
-                    Toast.MakeText(activity, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
-                    PermissionManager.RequestPermission(
-                        activity,
-                        PermissionManager.sendSMSPermission, 
-                        "버튼을 눌러 권한을 승인해주세요.", 
-                        (int)PermissionManager.REQUESTS.SENDSMS
-                        );
-                }
-                else
-                {
-                    //권한이 있다면 바로 발송
-                    _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
-                }
+                //권한이 있다면 바로 발송
+                _smsManager.SendTextMessage(address, null, msg, piSent, piDelivered);
             }
         }
     }
 
-    [BroadcastReceiver(Enabled = true, Exported = true)]
-    [IntentFilter(new[] { "android.provider.Telephony.SMS_RECEIVED" })]
-    class SmsReceiver : BroadcastReceiver
-    {
-        private const string TAG = "AA:SmsReceiver";
-        public override void OnReceive(Context context, Intent intent)
-        {
-
-            if (intent.Action.Equals(Telephony.Sms.Intents.SmsReceivedAction))
-            {
-                var msgs = Telephony.Sms.Intents.GetMessagesFromIntent(intent);
-                foreach (var msg in msgs)
-                {
-                    Console.WriteLine("received");
-                    //Log.Debug(TAG, $" MessageBody {msg.MessageBody}");
-                    //Log.Debug(TAG, $"DisplayOriginatingAddress {msg.DisplayOriginatingAddress}");
-                    //Log.Debug(TAG, $"OriginatingAddress {msg.OriginatingAddress}");
-                }
-            }
-
-        }
-
-    }
 
 }

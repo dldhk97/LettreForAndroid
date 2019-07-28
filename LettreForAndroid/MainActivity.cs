@@ -31,14 +31,14 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.activity_main);
 
-            //처음 사용자면 welcompage 표시
-            if (DataStorageManager.loadBoolData(this, "isFirst", true))
+            //기본앱이 아니면
+            if (!this.PackageName.Equals(Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this)))
             {
                 StartActivityForResult(typeof(welcome_page), mWelcomeActivityCallback);
             }
             else
             {
-                //처음 사용자가 아니면 바로 할일 함.
+                //기본앱으로 되있으면
                 OnWelcomeComplete();
             }
         }
@@ -98,16 +98,9 @@ namespace LettreForAndroid
         //툴바 선택시
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            //Toast.MakeText(this, "Top ActionBar pressed: " + item.TitleFormatted, ToastLength.Short).Show();
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-                //string str = DataStorageManager.loadStringData(this,"temp", "NULL");
-                //Toast.MakeText(this, "Top ActionBar pressed: " + str, ToastLength.Short).Show();
-                //StartActivity(typeof(dialogue_page));
-                //string[] header = new string[] { "0", "1" };
-                //string[] data1 = new string[] { "010-1234-1234", "하나만 보냄, 문자내용이 들어감1" };
-                //List<string[]> dataList = new List<string[]>() { data1};
-                //NetworkManager.Get().sendAndReceiveData(dataList, 0);
+                //검색버튼 클릭시
             }
             else
             {
