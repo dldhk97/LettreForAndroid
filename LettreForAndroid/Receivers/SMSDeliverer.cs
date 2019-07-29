@@ -54,7 +54,8 @@ namespace LettreForAndroid.Receivers
                 for(int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
                 {
                     CustomPagerAdapter._Pages[i].refreshRecyclerView();
-                    CustomPagerAdapter._Pages[i].refreshFrag();
+                    if (DialogueActivity._Instance == null)
+                        CustomPagerAdapter._Pages[i].refreshFrag();
                 }
                     
             }
