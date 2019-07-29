@@ -17,6 +17,8 @@ namespace LettreForAndroid.UI
 {
     public class main_page : Fragment
     {
+        public static main_page _Instance;
+
         const string INTENT_CATEGORY = "intentCategory";
         private int _Category;
 
@@ -39,6 +41,7 @@ namespace LettreForAndroid.UI
         public override void OnCreate(Bundle iSavedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
         {
             base.OnCreate(iSavedInstanceState);
+            _Instance = this;
             _Category = Arguments.GetInt(INTENT_CATEGORY);
         }
 
@@ -53,7 +56,7 @@ namespace LettreForAndroid.UI
             return view;
         }
 
-        private void refreshRecyclerView()
+        public void refreshRecyclerView()
         {
             //RecyclerView에 어댑터 Plug
             RecyclerView.LayoutManager LayoutManager = new LinearLayoutManager(Context);

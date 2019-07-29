@@ -10,6 +10,7 @@ using Android.Runtime;
 using Android.Telephony;
 using Android.Views;
 using Android.Widget;
+using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.Receivers
 {

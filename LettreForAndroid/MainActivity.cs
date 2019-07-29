@@ -79,7 +79,7 @@ namespace LettreForAndroid
             ContactManager.Get().Initialization();
             ContactManager.Get().refreshContacts(this);
             MessageManager.Get().Initialization();
-            MessageManager.Get().refreshMessages(this);
+            MessageManager.Get().refreshMessages();
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
             //툴바 세팅

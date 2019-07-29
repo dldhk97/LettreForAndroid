@@ -12,6 +12,7 @@ using Android.Telephony;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using LettreForAndroid.UI;
 using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.Receivers
@@ -41,6 +42,10 @@ namespace LettreForAndroid.Receivers
                 values.Put(Telephony.TextBasedSmsColumns.ThreadId, MessageManager.Get().getThreadId(context, msg.OriginatingAddress));
 
                 context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
+
+                MessageManager.Get().refreshMessages();
+                DialogueActivity._Instance.RefreshRecyclerView();
+                main_page._Instance.refreshRecyclerView();
             }
         }
 

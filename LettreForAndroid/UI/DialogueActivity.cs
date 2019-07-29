@@ -26,6 +26,8 @@ namespace LettreForAndroid.UI
     [IntentFilter(new[] { "android.intent.action.SEND", "android.intent.action.SENDTO" }, Categories = new[] { "android.intent.category.DEFAULT", "android.intent.category.BROWSABLE" }, DataSchemes = new[] { "sms", "smsto", "mms", "mmsto" })]
     public class DialogueActivity : AppCompatActivity
     {
+        public static DialogueActivity _Instance;
+
         int _CurCategory;
         long _CurThread_id;
         Dialogue _CurDialogue;
@@ -46,9 +48,13 @@ namespace LettreForAndroid.UI
 
             SetContentView(Resource.Layout.dialogue_page);
 
+            _Instance = this;
+
             //현페이지의 카테고리와 쓰레드ID 설정, 이것으로 어느 대화인지 특정할 수 있다.
             _CurCategory = Intent.GetIntExtra("category", -1);
             _CurThread_id = Intent.GetLongExtra("thread_id", -1);
+
+            MessageManager.Get().refreshMessages();                                         //DB에서 문자 불러옴
 
             SetupRecyclerView();
 
@@ -76,11 +82,13 @@ namespace LettreForAndroid.UI
                 values.Put(Telephony.TextBasedSmsColumns.Read, 1);
                 values.Put(Telephony.TextBasedSmsColumns.Type, 1);
                 values.Put(Telephony.TextBasedSmsColumns.ThreadId, _CurDialogue.Thread_id);
-
                 ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
 
                 //입력칸 비우기
                 _MsgBox.Text = string.Empty;
+
+                //DB 새로고침
+                MessageManager.Get().refreshMessages();
 
                 //리사이클러뷰 새로고침
                 RefreshRecyclerView();
@@ -154,9 +162,8 @@ namespace LettreForAndroid.UI
             RefreshRecyclerView();
         }
 
-        private void RefreshRecyclerView()
+        public void RefreshRecyclerView()
         {
-            MessageManager.Get().refreshMessages(this);                                         //DB에서 다시 불러옴
             _CurDialogue = MessageManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.

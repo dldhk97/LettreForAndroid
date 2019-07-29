@@ -56,11 +56,11 @@ namespace LettreForAndroid.Utility
         }
 
         //모든 문자메세지를 thread_id별로 묶어 mAllDialgoues에 저장
-        public void refreshMessages(Activity activity)
+        public void refreshMessages()
         {
             TextMessage objSms = new TextMessage();
 
-            ContentResolver cr = activity.BaseContext.ContentResolver;
+            ContentResolver cr = Application.Context.ContentResolver;
 
             //DB 탐색 SQL문 설정
             Uri uri = Uri.Parse("content://sms/");
