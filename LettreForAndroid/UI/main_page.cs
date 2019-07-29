@@ -17,6 +17,8 @@ namespace LettreForAndroid.UI
 {
     public class main_page : Fragment
     {
+        public static main_page _Instance;
+
         const string INTENT_CATEGORY = "intentCategory";
         const string INTENT_POSITION = "intentPosition";
         private int _Category;
@@ -26,6 +28,7 @@ namespace LettreForAndroid.UI
 
         TextView textView1;
         RecyclerView recyclerView;
+        RecyclerView.LayoutManager _LayoutManager;
 
         //새로운 페이지가 만들어질때 호출됨
         public static main_page newInstance(int iPosition, int iCategory)  //어댑터로부터 현재 탭의 정보를 받음. 이것을 args에 저장함. Static이라서 args를 통해 OnCreate로 전달.
@@ -47,6 +50,8 @@ namespace LettreForAndroid.UI
 
             _Category = Arguments.GetInt(INTENT_CATEGORY);
             _Position = Arguments.GetInt(INTENT_POSITION);
+
+            _Instance = this;
         }
 
         //페이지를 넘길때마다 호출됨
@@ -56,17 +61,18 @@ namespace LettreForAndroid.UI
             textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
             recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
+            //RecyclerView에 어댑터 Plug
+            _LayoutManager = new LinearLayoutManager(Context);
+            recyclerView.SetLayoutManager(_LayoutManager);
+
             refreshRecyclerView();
 
             return view;
         }
 
+
         public void refreshRecyclerView()
         {
-            //RecyclerView에 어댑터 Plug
-            RecyclerView.LayoutManager LayoutManager = new LinearLayoutManager(Context);
-            recyclerView.SetLayoutManager(LayoutManager);
-
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
             _DialogueSet = MessageManager.Get().DialogueSets[_Category];
 
@@ -86,6 +92,7 @@ namespace LettreForAndroid.UI
 
         //----------------------------------------------------------------------
         // DialogueFragAll VIEW HOLDER
+        // 전체 탭의 프래그먼트
 
         public class DialogueFragAllHolder : RecyclerView.ViewHolder
         {
@@ -116,7 +123,7 @@ namespace LettreForAndroid.UI
 
             public void bind(Dialogue dialogue)
             {
-                TextMessage lastMessage = dialogue[0];  //대화 중 가장 마지막 문자
+                TextMessage lastMessage = dialogue[0];                           //대화 중 가장 마지막 문자
 
                 mCategoryText.Text = TabFrag.mCategory_Str[dialogue.Category];   //카테고리 설정
 
@@ -126,13 +133,16 @@ namespace LettreForAndroid.UI
 
                 //날짜 표시
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getCurrentYear() > dtu.getYear(lastMessage.Time))         //올해 메세지가 아니면
+                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");
+                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
+                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
+                    else
+                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
                 }
                 else
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");
+                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
                 }
 
                 //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
@@ -150,6 +160,7 @@ namespace LettreForAndroid.UI
 
         //----------------------------------------------------------------------
         // DialogueFragCategory VIEW HOLDER
+        // 전체 탭을 제외한 나머지 탭의 프래그먼트
 
         public class DialogueFragCategoryHolder : RecyclerView.ViewHolder
         {
@@ -207,17 +218,20 @@ namespace LettreForAndroid.UI
 
                 //날짜 표시
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getCurrentYear() > dtu.getYear(lastMessage.Time))         //올해 메세지가 아니면
+                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");
+                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
+                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
+                    else
+                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
                 }
                 else
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");
+                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
                 }
 
                 //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
-                if(dialogue.UnreadCnt > 0)
+                if (dialogue.UnreadCnt > 0)
                 {
                     mReadStateRL.Visibility = ViewStates.Visible;
                     mReadStateCnt.Text = dialogue.UnreadCnt.ToString();

@@ -80,7 +80,7 @@ namespace LettreForAndroid.UI
                 DateTimeUtillity dtu = new DateTimeUtillity();
                 values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
                 values.Put(Telephony.TextBasedSmsColumns.Read, 1);
-                values.Put(Telephony.TextBasedSmsColumns.Type, 1);
+                values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.SENT);
                 values.Put(Telephony.TextBasedSmsColumns.ThreadId, _CurDialogue.Thread_id);
                 ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
 
@@ -90,8 +90,14 @@ namespace LettreForAndroid.UI
                 //DB 새로고침
                 MessageManager.Get().refreshMessages();
 
-                //리사이클러뷰 새로고침
-                RefreshRecyclerView();
+                //UI 업데이트
+                if (_Instance != null)
+                    _Instance.RefreshRecyclerView();
+
+                for (int i = 0; i < CustomPagerAdapter.pages.Count; i++)
+                {
+                    CustomPagerAdapter.pages[i].refreshRecyclerView();
+                }
             }
             else
             {
@@ -281,11 +287,6 @@ namespace LettreForAndroid.UI
         public HeaderHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
         {
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfh_timeTV);
-
-            iItemView.Click += (sender, e) =>
-            {
-                iListener(base.LayoutPosition);
-            };
         }
 
         public void bind(List<RecyclerItem> list, int iPosition)
@@ -315,10 +316,13 @@ namespace LettreForAndroid.UI
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfr_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfr_timeTV);
 
-            iItemView.Click += (sender, e) =>
-            {
-                iListener(base.LayoutPosition);
-            };
+            iItemView.LongClick += (sendet, e) =>
+             {
+                 //iListener(base.LayoutPosition);
+                 Android.Widget.PopupMenu menu = new Android.Widget.PopupMenu(Application.Context, iItemView);
+                 menu.MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu.Menu);
+                 menu.Show();
+             };
         }
 
         public void bind(List<RecyclerItem> list, int iPosition, Contact iContact)
@@ -364,9 +368,12 @@ namespace LettreForAndroid.UI
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
-            iItemView.Click += (sender, e) =>
+            iItemView.LongClick += (sender, e) =>
             {
-                iListener(base.LayoutPosition);
+                //iListener(base.LayoutPosition);
+                Android.Widget.PopupMenu menu = new Android.Widget.PopupMenu(Application.Context, iItemView);
+                menu.MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu.Menu);
+                menu.Show();
             };
         }
 
@@ -393,11 +400,7 @@ namespace LettreForAndroid.UI
         private const int VIEW_TYPE_HEADER = 2;
         private const int VIEW_TYPE_MESSAGE_RECEIVED = 0;
         private const int VIEW_TYPE_MESSAGE_SENT = 1;
-
-
-        // Event handler for item clicks:
-        public event System.EventHandler<int> mItemClick;
-
+        
         // 현 페이지 대화 목록
         public List<RecyclerItem> mRecyclerItem;
 
@@ -423,12 +426,14 @@ namespace LettreForAndroid.UI
 
                 switch (objSms.Type)
                 {
-                    case (int)TextMessage.MESSAGE_FOLDER.RECEIVED:
+                    case (int)TextMessage.MESSAGE_TYPE.RECEIVED:
                         return VIEW_TYPE_MESSAGE_RECEIVED;
-                    case (int)TextMessage.MESSAGE_FOLDER.SENT:
+                    case (int)TextMessage.MESSAGE_TYPE.SENT:
                         return VIEW_TYPE_MESSAGE_SENT;
                     default:
-                        return -2;
+                        //DEBUG!
+                        Toast.MakeText(Application.Context, "DB에 타입이" + objSms.Type.ToString() + "인 메세지가 존재합니다.", ToastLength.Short);
+                        return VIEW_TYPE_MESSAGE_RECEIVED;
                 }
             }
             else
@@ -446,20 +451,19 @@ namespace LettreForAndroid.UI
             if (iViewType == VIEW_TYPE_HEADER)
             {
                 itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_header, iParent, false);
-                return new HeaderHolder(itemView, OnClick);
+                return new HeaderHolder(itemView, null);
             }
             else if (iViewType == VIEW_TYPE_MESSAGE_RECEIVED)
             {
                 itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_received, iParent, false);
-                return new ReceivedMessageHolder(itemView, OnClick);
+                return new ReceivedMessageHolder(itemView, OnMsgBoxLongClick);
             }
             else if (iViewType == VIEW_TYPE_MESSAGE_SENT)
             {
                 itemView = LayoutInflater.From(iParent.Context).Inflate(Resource.Layout.message_frag_sent, iParent, false);
-                return new SentMessageHolder(itemView, OnClick);
+                return new SentMessageHolder(itemView, OnMsgBoxLongClick);
             }
             throw new InvalidProgramException("존재하지 않는 뷰홀더 타입입니다!");
-            return null;
         }
 
         // 뷰 홀더에 데이터를 설정하는 부분
@@ -491,11 +495,10 @@ namespace LettreForAndroid.UI
             get { return mRecyclerItem.Count; }
         }
 
-        // 메세지를 클릭했을 때 발생하는 메소드
-        void OnClick(int iPosition)
+        // 메세지를 롱 클릭했을 때 발생하는 메소드
+        void OnMsgBoxLongClick(int iPosition)
         {
-            if (mItemClick != null)
-                mItemClick(this, iPosition);
+
         }
 
     }

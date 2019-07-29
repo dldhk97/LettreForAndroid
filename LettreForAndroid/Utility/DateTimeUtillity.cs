@@ -21,11 +21,23 @@ namespace LettreForAndroid.Utility
         //    return startdate;
         //}
 
-        public int getCurrentYear()
+        public DateTime getNow()
         {
-            return DateTime.Now.Year;
+            return DateTime.Now;
+        }
+
+        public DateTime getToday()
+        {
+            return DateTime.Today;
         }
         
+        public DateTime getDatetime(long milTime)
+        {
+            TimeSpan time = TimeSpan.FromMilliseconds(milTime);
+            DateTime startdate = new DateTime(1970, 1, 1) + time;
+            return startdate;
+        }
+
         public int getYear(long milTime)
         {
             Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat("YYYY");

@@ -39,7 +39,7 @@ namespace LettreForAndroid.Receivers
                 DateTimeUtillity dtu = new DateTimeUtillity();
                 values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
                 values.Put(Telephony.TextBasedSmsColumns.Read, 0);
-                values.Put(Telephony.TextBasedSmsColumns.Type, 0);
+                values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
                 values.Put(Telephony.TextBasedSmsColumns.ThreadId, MessageManager.Get().getThreadId(context, msg.OriginatingAddress));
 
                 context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
@@ -58,9 +58,5 @@ namespace LettreForAndroid.Receivers
                     
             }
         }
-
-
-        public delegate void DeliverEventHandler();
-        public event DeliverEventHandler DeliverCompleteEvent;
     }
 }
