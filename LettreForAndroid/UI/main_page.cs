@@ -17,20 +17,22 @@ namespace LettreForAndroid.UI
 {
     public class main_page : Fragment
     {
-        public static main_page _Instance;
-
         const string INTENT_CATEGORY = "intentCategory";
+        const string INTENT_POSITION = "intentPosition";
         private int _Category;
+        private int _Position;
 
         DialogueSet _DialogueSet;
 
         TextView textView1;
         RecyclerView recyclerView;
 
-        public static main_page newInstance(int iCategory)  //어댑터로부터 현재 탭의 위치, 코드를 받음. 이것을 argument에 저장함. Static이라서 전역변수 못씀.
+        //새로운 페이지가 만들어질때 호출됨
+        public static main_page newInstance(int iPosition, int iCategory)  //어댑터로부터 현재 탭의 정보를 받음. 이것을 args에 저장함. Static이라서 args를 통해 OnCreate로 전달.
         {
             var args = new Bundle();
             args.PutInt(INTENT_CATEGORY, iCategory);
+            args.PutInt(INTENT_POSITION, iPosition);
 
             var fragment = new main_page();
             fragment.Arguments = args;
@@ -38,13 +40,16 @@ namespace LettreForAndroid.UI
             return fragment;
         }
 
-        public override void OnCreate(Bundle iSavedInstanceState)    //newInstance에서 argument에 저장한 값들을 전역변수에 저장시킴. 
+        //새로운 페이지가 만들어질때 호출됨
+        public override void OnCreate(Bundle iSavedInstanceState)
         {
             base.OnCreate(iSavedInstanceState);
-            _Instance = this;
+
             _Category = Arguments.GetInt(INTENT_CATEGORY);
+            _Position = Arguments.GetInt(INTENT_POSITION);
         }
 
+        //페이지를 넘길때마다 호출됨
         public override View OnCreateView(LayoutInflater iInflater, ViewGroup iContainer, Bundle iSavedInstanceState)
         {
             var view = iInflater.Inflate(Resource.Layout.fragment_page, iContainer, false);

@@ -16,6 +16,7 @@ namespace LettreForAndroid.UI
     public class CustomPagerAdapter : FragmentPagerAdapter
     {
         private List<TabFrag> tabs = new List<TabFrag>();
+        public static List<main_page> pages = new List<main_page>();
         readonly Context context;
 
         public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
@@ -28,11 +29,14 @@ namespace LettreForAndroid.UI
             get { return tabs.Count; }
         }
 
-        //메인문이 모두 끝났을때와, 페이지 넘길때 이 메소드가 호출되어 newInstance가 각 FragmentPage의 내용물을 채움
+        //새로운 탭이 만들어질때 호출됨.
         public override Fragment GetItem(int position)
         {
-            return main_page.newInstance(tabs[position].Category);
+            main_page fragPage = main_page.newInstance(position, tabs[position].Category);
+            pages.Add(fragPage);
+            return fragPage;
         }
+
 
         public View GetTabView(int position)
         {
@@ -45,6 +49,7 @@ namespace LettreForAndroid.UI
             tabTitle.Text = tabs[position].TabTitle;
 
             DialogueSet curDialogueSet = MessageManager.Get().DialogueSets[position];
+
             int totalUnreadCnt = 0;
             for (int i = 0; i < curDialogueSet.Count; i++)
             {

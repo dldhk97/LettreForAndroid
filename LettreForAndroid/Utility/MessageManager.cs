@@ -51,8 +51,6 @@ namespace LettreForAndroid.Utility
                 _DialogueSets.Add(new DialogueSet());
                 _DialogueSets[i].Category = i;
             }
-                
-            //refreshMessages();
         }
 
         //모든 문자메세지를 thread_id별로 묶어 mAllDialgoues에 저장
@@ -114,7 +112,7 @@ namespace LettreForAndroid.Utility
                         if (objSms.ReadState == "0")                               //읽지 않은 문자면, 대화에 읽지않은 문자가 존재한다고 체크함.
                             objDialogue.UnreadCnt++;
 
-                        _DialogueSets[objDialogue.Category].Add(objDialogue);                                                     //카테고리 알맞게 대화 집합에 추가
+                        _DialogueSets[objDialogue.Category].Add(objDialogue);       //카테고리 알맞게 대화 집합에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }

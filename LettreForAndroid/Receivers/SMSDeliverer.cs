@@ -12,6 +12,7 @@ using Android.Telephony;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using LettreForAndroid.Class;
 using LettreForAndroid.UI;
 using LettreForAndroid.Utility;
 
@@ -43,9 +44,18 @@ namespace LettreForAndroid.Receivers
 
                 context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
 
+                //메세지 DB 불러오기
                 MessageManager.Get().refreshMessages();
-                DialogueActivity._Instance.RefreshRecyclerView();
-                main_page._Instance.refreshRecyclerView();
+
+                //UI 업데이트
+                if(DialogueActivity._Instance != null)
+                    DialogueActivity._Instance.RefreshRecyclerView();
+
+                for(int i = 0; i < CustomPagerAdapter.pages.Count; i++)
+                {
+                    CustomPagerAdapter.pages[i].refreshRecyclerView();
+                }
+                    
             }
         }
 
