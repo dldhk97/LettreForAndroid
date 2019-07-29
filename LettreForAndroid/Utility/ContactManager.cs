@@ -22,18 +22,18 @@ namespace LettreForAndroid.Utility
     class ContactManager
     {
 
-        private static ContactManager mInstance = null;
-        private List<Contact> contactList = new List<Contact>();
+        private static ContactManager _Instance = null;
+        private List<Contact> _ContactList = new List<Contact>();
 
         public static ContactManager Get()
         {
-            if (mInstance == null)
-                mInstance = new ContactManager();
-            return mInstance;
+            if (_Instance == null)
+                _Instance = new ContactManager();
+            return _Instance;
         }
         public Contact this[int i]
         {
-            get { return contactList[i]; }
+            get { return _ContactList[i]; }
         }
 
         //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
@@ -44,16 +44,16 @@ namespace LettreForAndroid.Utility
 
         public int Count
         {
-            get { return contactList.Count; }
+            get { return _ContactList.Count; }
         }
 
         public Contact getContactByAddress(string address)
         {
-            for(int i =0; i < contactList.Count; i++)
+            for(int i =0; i < _ContactList.Count; i++)
             {
-                if(contactList[i].Address.Replace("-","") == address)
+                if(_ContactList[i].Address.Replace("-","") == address)
                 {
-                    return contactList[i];
+                    return _ContactList[i];
                 }
             }
             return null;
@@ -90,7 +90,7 @@ namespace LettreForAndroid.Utility
                     result.Address = cursor.GetString(cursor.GetColumnIndex(projection[1]));
                     result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
                     result.PhotoThumnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
-                    contactList.Add(result);
+                    _ContactList.Add(result);
                     cursor.MoveToNext();
                 }
             }

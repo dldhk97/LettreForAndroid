@@ -39,27 +39,26 @@ namespace LettreForAndroid.Utility
     //Singleton
     class NetworkManager
     {
-        private static NetworkManager mInstance = null;
-
+        private static NetworkManager _Instance = null;
         
         public static NetworkManager Get()
         {
-            if (mInstance == null)
-                mInstance = new NetworkManager();
+            if (_Instance == null)
+                _Instance = new NetworkManager();
             //mAsyncReceiveHandler = new AsyncCallback(mInstance.handleDataReceive);
             //mAsyncSendHandler = new AsyncCallback(mInstance.handleDataSend);
-            return mInstance;
+            return _Instance;
         }
 
-        private const string mServerIP = "192.168.0.5";                                  //아이피는 서버에 맞게 설정하시오.
+        private const string _ServerIP = "192.168.0.5";                                  //아이피는 서버에 맞게 설정
         //private const string mServerIP = "59.151.215.129";
-        private const int mPort = 10101;
-        private const int mMaxBuffer = 1024;
-        private TimeSpan mTimeout = new TimeSpan(0,0,2);
+        private const int _Port = 10101;                                                //포트 설정            
+        private const int _MaxBuffer = 1024;                                            //최대 버퍼, 사용되지 않음.
+        private TimeSpan _Timeout = new TimeSpan(0,0,2);                                //타임아웃 시간 설정
 
-        private bool isConnected = false;
+        private bool _IsConnected = false;
 
-        private Socket mCurrentSocket = null;
+        private Socket _CurrentSocket = null;
 
         /// <summary>
         /// 여기부터는 동기 메소드
@@ -67,9 +66,9 @@ namespace LettreForAndroid.Utility
 
         public void makeConnection()
         {
-            if (mCurrentSocket != null)
-                mCurrentSocket.Close();
-            mCurrentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            if (_CurrentSocket != null)
+                _CurrentSocket.Close();
+            _CurrentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             //타임아웃 설정
             //mCurrentSocket.SendTimeout = 5000;
@@ -81,34 +80,34 @@ namespace LettreForAndroid.Utility
             {
                 // 연결 시도
                 //m_CurrentSocket.Connect(mServerIP, mPort);    //타임아웃이 긴 기존의 연결메소드
-                var ep = new IPEndPoint(IPAddress.Parse(mServerIP), mPort);
-                mCurrentSocket.connect(ep, mTimeout);
+                var ep = new IPEndPoint(IPAddress.Parse(_ServerIP), _Port);
+                _CurrentSocket.connect(ep, _Timeout);
 
                 // 연결 성공
-                isConnected = true;
+                _IsConnected = true;
             }
             catch
             {
                 // 연결 실패 (연결 도중 오류가 발생함)
-                isConnected = false;
+                _IsConnected = false;
             }
         }
 
         //데이터를 여러개 보낼 때(어플 -> 서버)
         public void sendAndReceiveData(List<string[]> dataList, int type)
         {
-            if (!isConnected)
+            if (!_IsConnected)
                 makeConnection();
 
-            if (isConnected)
+            if (_IsConnected)
             {
                 //타입 전송 (기본 0이라 상정하고 아래 코드 작성함)
                 byte[] typeByte = intToByteArray(type, 1);
-                mCurrentSocket.Send(typeByte, SocketFlags.None);
+                _CurrentSocket.Send(typeByte, SocketFlags.None);
 
                 //데이터 수량 전송
                 byte[] amountByte = intToByteArray(dataList.Count, 2);
-                mCurrentSocket.Send(amountByte, SocketFlags.None);
+                _CurrentSocket.Send(amountByte, SocketFlags.None);
 
                 //실 데이터 전송
                 for (int i = 0; i < dataList.Count; i++)
@@ -125,23 +124,23 @@ namespace LettreForAndroid.Utility
                     byte[] msg_lengthByte = intToByteArray(msgByte.Length, 2);    //문자내용을 바이트로 바꾼 값의 길이
 
                     //연락처 길이 전송
-                    mCurrentSocket.Send(addr_lengthByte, SocketFlags.None);
+                    _CurrentSocket.Send(addr_lengthByte, SocketFlags.None);
 
                     //연락처 전송
-                    mCurrentSocket.Send(addrByte, SocketFlags.None);
+                    _CurrentSocket.Send(addrByte, SocketFlags.None);
 
                     //메세지 길이 전송
-                    mCurrentSocket.Send(msg_lengthByte, SocketFlags.None);
+                    _CurrentSocket.Send(msg_lengthByte, SocketFlags.None);
 
                     //메세지 전송
-                    mCurrentSocket.Send(msgByte, SocketFlags.None);
+                    _CurrentSocket.Send(msgByte, SocketFlags.None);
                 }
 
                 //---------------------------------------------------------------------------
 
                 //데이터 수량 수신
                 byte[] receive_amount_byte = new byte[2];
-                mCurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
+                _CurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
 
                 //받은 바이트 배열을 string으로 바꾼 뒤 int로 변환
                 int receive_amount = byteToInt(receive_amount_byte);
@@ -150,7 +149,7 @@ namespace LettreForAndroid.Utility
                 {
                     //레이블 수신
                     byte[] receive_lable_byte = new byte[1];
-                    mCurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
+                    _CurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
 
                     //받은 바이트를 int로 변환
                     int receive_lable = byteToInt(receive_lable_byte);
@@ -159,7 +158,7 @@ namespace LettreForAndroid.Utility
 
                     //연락처 길이 수신
                     byte[] receive_addr_length_byte = new byte[2];
-                    mCurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
+                    _CurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
 
                     //받은 바이트를 int로 변환
                     int receive_addr_length = byteToInt(receive_addr_length_byte);
@@ -168,7 +167,7 @@ namespace LettreForAndroid.Utility
 
                     //연락처 수신
                     byte[] receive_addr_byte = new byte[receive_addr_length];
-                    mCurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
+                    _CurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
 
                     //받은 바이트를 string으로 변환
                     string receive_addr_str = Encoding.UTF8.GetString(receive_addr_byte);
@@ -186,7 +185,7 @@ namespace LettreForAndroid.Utility
             }
 
             // (4) 소켓 닫기
-            mCurrentSocket.Close();
+            _CurrentSocket.Close();
         }
 
         //str을 고정길이 length만큼 바이트 배열로 변환함.

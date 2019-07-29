@@ -26,8 +26,8 @@ namespace LettreForAndroid.UI
 
         DialogueSet _DialogueSet;
 
-        TextView textView1;
-        RecyclerView recyclerView;
+        TextView _GuideText;
+        RecyclerView _RecyclerView;
         RecyclerView.LayoutManager _LayoutManager;
 
         //새로운 페이지가 만들어질때 호출됨
@@ -58,18 +58,25 @@ namespace LettreForAndroid.UI
         public override View OnCreateView(LayoutInflater iInflater, ViewGroup iContainer, Bundle iSavedInstanceState)
         {
             var view = iInflater.Inflate(Resource.Layout.fragment_page, iContainer, false);
-            textView1 = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
-            recyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
+            _GuideText = view.FindViewById<TextView>(Resource.Id.fragPage_textView1);
+            _RecyclerView = view.FindViewById<RecyclerView>(Resource.Id.fragPage_recyclerView1);
 
             //RecyclerView에 어댑터 Plug
             _LayoutManager = new LinearLayoutManager(Context);
-            recyclerView.SetLayoutManager(_LayoutManager);
+            _RecyclerView.SetLayoutManager(_LayoutManager);
 
             refreshRecyclerView();
 
             return view;
         }
 
+        public void refreshFrag()
+        {
+            FragmentTransaction a = FragmentManager.BeginTransaction();
+            a.Detach(this);
+            a.Attach(this);
+            a.Commit();
+        }
 
         public void refreshRecyclerView()
         {
@@ -80,13 +87,13 @@ namespace LettreForAndroid.UI
             if (_DialogueSet.Count > 0)
             {
                 DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet);
-                recyclerView.SetAdapter(adapter);
+                _RecyclerView.SetAdapter(adapter);
             }
             else
             {
                 //문자가 없으면 없다고 알려준다.
-                textView1.Visibility = ViewStates.Visible;
-                recyclerView.Visibility = ViewStates.Gone;
+                _GuideText.Visibility = ViewStates.Visible;
+                _RecyclerView.Visibility = ViewStates.Gone;
             }
         }
 

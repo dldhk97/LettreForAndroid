@@ -26,14 +26,14 @@ namespace LettreForAndroid.Utility
     {
         private SmsManager _smsManager;
 
-        private static MessageManager mInstance = null;
+        private static MessageManager _Instance = null;
         private static List<DialogueSet> _DialogueSets;     //인덱스 = 카테고리인 총 문자 집합, 0번 인덱스는 비어있다.
 
         public static MessageManager Get()
         {
-            if (mInstance == null)
-                mInstance = new MessageManager();
-            return mInstance;
+            if (_Instance == null)
+                _Instance = new MessageManager();
+            return _Instance;
         }
 
         public List<DialogueSet> DialogueSets

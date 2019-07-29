@@ -21,8 +21,8 @@ namespace LettreForAndroid.UI
     [Activity(Label = "welcome_page", Theme = "@style/FadeInOutActivity")]
     public class welcome_page : Activity
     {
-        Button mBtnContinue;
-        TextView welcomepage_guidetext1;
+        Button _BtnContinue;
+        TextView _welcomepage_guidetext1;
 
         const int REQUEST_DEFAULT_CALLBACK = 2;
 
@@ -32,10 +32,10 @@ namespace LettreForAndroid.UI
 
             SetContentView(Resource.Layout.welcome_page);
 
-            mBtnContinue = FindViewById<Button>(Resource.Id.welcomepage_button1);
-            welcomepage_guidetext1 = FindViewById<TextView>(Resource.Id.welcomepage_guidetext1);
+            _BtnContinue = FindViewById<Button>(Resource.Id.welcomepage_button1);
+            _welcomepage_guidetext1 = FindViewById<TextView>(Resource.Id.welcomepage_guidetext1);
 
-            mBtnContinue.Click += async (sender, e) =>
+            _BtnContinue.Click += async (sender, e) =>
             {
                 await GetEsentialPermissionAsync();
             };
@@ -141,8 +141,8 @@ namespace LettreForAndroid.UI
             //DataStorageManager.saveBoolData(this, "isFirst", false);
 
             //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯
-            welcomepage_guidetext1.Text = "잠시만 기다려주세요.";
-            mBtnContinue.Enabled = false;
+            _welcomepage_guidetext1.Text = "잠시만 기다려주세요.";
+            _BtnContinue.Enabled = false;
             Finish();
         }
     }

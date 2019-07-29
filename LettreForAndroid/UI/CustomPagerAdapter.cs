@@ -15,38 +15,38 @@ namespace LettreForAndroid.UI
 {
     public class CustomPagerAdapter : FragmentPagerAdapter
     {
-        private List<TabFrag> tabs = new List<TabFrag>();
-        public static List<main_page> pages = new List<main_page>();
-        readonly Context context;
+        private List<TabFrag> _Tabs = new List<TabFrag>();
+        public static List<main_page> _Pages = new List<main_page>();
+        readonly Context _Context;
 
         public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
         {
-            this.context = context;
+            this._Context = context;
         }
 
         public override int Count
         {
-            get { return tabs.Count; }
+            get { return _Tabs.Count; }
         }
 
         //새로운 탭이 만들어질때 호출됨.
         public override Fragment GetItem(int position)
         {
-            main_page fragPage = main_page.newInstance(position, tabs[position].Category);
-            pages.Add(fragPage);
+            main_page fragPage = main_page.newInstance(position, _Tabs[position].Category);
+            _Pages.Add(fragPage);
             return fragPage;
         }
 
 
         public View GetTabView(int position)
         {
-            var view = LayoutInflater.From(context).Inflate(Resource.Layout.custom_tab, null);
+            var view = LayoutInflater.From(_Context).Inflate(Resource.Layout.custom_tab, null);
 
             TextView tabTitle = view.FindViewById<TextView>(Resource.Id.custTab_title);
             TextView notiCount = view.FindViewById<TextView>(Resource.Id.custTab_count);
             ImageView notiBackground = view.FindViewById<ImageView>(Resource.Id.custTab_count_background);
 
-            tabTitle.Text = tabs[position].TabTitle;
+            tabTitle.Text = _Tabs[position].TabTitle;
 
             DialogueSet curDialogueSet = MessageManager.Get().DialogueSets[position];
 
@@ -55,11 +55,11 @@ namespace LettreForAndroid.UI
             {
                 totalUnreadCnt += curDialogueSet[i].UnreadCnt;
             }
-            tabs[position].NotiCount = totalUnreadCnt;
+            _Tabs[position].NotiCount = totalUnreadCnt;
 
-            if (tabs[position].NotiCount > 0)
+            if (_Tabs[position].NotiCount > 0)
             {
-                notiCount.Text = tabs[position].NotiCount.ToString();
+                notiCount.Text = _Tabs[position].NotiCount.ToString();
                 notiCount.Visibility = ViewStates.Visible;
                 notiBackground.Visibility = ViewStates.Visible;
             }
@@ -75,7 +75,7 @@ namespace LettreForAndroid.UI
         public void AddTab(TabFrag[] iTabFrags)
         {
             for(int i = 0; i < iTabFrags.Length; i++)
-                tabs.Add(iTabFrags[i]);
+                _Tabs.Add(iTabFrags[i]);
         }
     }
 }
