@@ -14,10 +14,6 @@ namespace LettreForAndroid.Class
 {
     public class TabFrag
     {
-        public const int CATEGORY_COUNT = 8;
-        public enum CATEGORY { ALL = 0, COMMON, DELIVERY, CARD, IDENTIFICATION, PUBLIC, AGENCY, SPAM};
-        public static string[] mCategory_Str = { "전체", "대화", "택배", "카드", "인증", "공공기관", "통신사", "스팸" };
-
         private string tabTitle;    //탭에 표시될 제목
         private int category;       //탭의 코드, 전체 0, 대화 1, 택배 2, 카드 3, 인증 4, 공공기관 5, 통신사 6, SPAM 7
         private int position;       //위치

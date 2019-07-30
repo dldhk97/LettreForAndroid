@@ -46,7 +46,7 @@ namespace LettreForAndroid.Utility
             _smsManager = SmsManager.Default;
 
             _DialogueSets = new List<DialogueSet>();
-            for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
+            for (int i = 0; i < Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets.Add(new DialogueSet());
                 _DialogueSets[i].Category = i;
@@ -98,12 +98,12 @@ namespace LettreForAndroid.Utility
                         //카테고리 분류
                         if (objDialogue.Contact != null)                            //연락처에 있으면 대화로 분류
                         {
-                            objDialogue.Category = 1;
+                            objDialogue.MajorLable = 1;
                             objDialogue.DisplayName = objDialogue.Contact.Name;
                         }
                         else
                         {
-                            objDialogue.Category = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
+                            objDialogue.MajorLable = 2;                              //DEBUG 임시로 2로 설정, 서버와 통신해서 카테고리 분류를 받는다.
                             objDialogue.DisplayName = objSms.Address;
                             if (objSms.Address == "#CMAS#CMASALL")
                                 objDialogue.DisplayName = "긴급 재난 문자";
@@ -112,7 +112,8 @@ namespace LettreForAndroid.Utility
                         if (objSms.ReadState == "0")                               //읽지 않은 문자면, 대화에 읽지않은 문자가 존재한다고 체크함.
                             objDialogue.UnreadCnt++;
 
-                        _DialogueSets[objDialogue.Category].Add(objDialogue);       //카테고리 알맞게 대화 집합에 추가
+                        _DialogueSets[objDialogue.MajorLable].Add(objDialogue);       //카테고리 알맞게 대화 집합에 추가
+                        _DialogueSets[0].Add(objDialogue);                           //전체 카테고리에도 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
@@ -123,27 +124,10 @@ namespace LettreForAndroid.Utility
             cursor.Close();
 
             //0번 카테고리 생성, 생성된 카테고리들 정렬
-            createAllCategory();
-            for(int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
+            for(int i = 0; i < Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets[i].SortByLastMessageTime();
             }
-        }
-
-        private void createAllCategory()
-        {
-            DialogueSet resultDialogueSet = new DialogueSet();
-            resultDialogueSet.Category = (int)TabFrag.CATEGORY.ALL;
-
-            //카테고리 0~7까지 병합
-            for (int i = 0; i < TabFrag.CATEGORY_COUNT; i++)
-            {
-                foreach(Dialogue elem in _DialogueSets[i].DialogueList.Values)
-                {
-                    resultDialogueSet.Add(elem);
-                }
-            }
-            _DialogueSets[(int)TabFrag.CATEGORY.ALL] = resultDialogueSet;
         }
 
         public long getThreadId(Context context, string address)

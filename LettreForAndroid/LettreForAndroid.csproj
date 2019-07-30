@@ -79,6 +79,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BlurViewManager.cs" />
     <Compile Include="Utility\ContactManager.cs" />
+    <Compile Include="Utility\InternalDBManager.cs" />
+    <Compile Include="Utility\MySQLiteOpenHelper.cs" />
     <Compile Include="Utility\DataStorageManager.cs" />
     <Compile Include="Utility\DateTimeUtillity.cs" />
     <Compile Include="Utility\MessageManager.cs" />

@@ -105,7 +105,7 @@ namespace LettreForAndroid
         {
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-                //검색버튼 클릭시
+
             }
             else
             {

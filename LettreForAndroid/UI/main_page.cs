@@ -132,7 +132,7 @@ namespace LettreForAndroid.UI
             {
                 TextMessage lastMessage = dialogue[0];                           //대화 중 가장 마지막 문자
 
-                mCategoryText.Text = TabFrag.mCategory_Str[dialogue.Category];   //카테고리 설정
+                mCategoryText.Text = Dialogue._LableTypeStr[dialogue.MajorLable];   //카테고리 설정
 
                 //이름 혹은 연락처 표시, 문자 내용 표시
                 mAddress.Text = dialogue.DisplayName;
@@ -274,11 +274,11 @@ namespace LettreForAndroid.UI
 
             public override int GetItemViewType(int iPosition)
             {
-                if (_DialogueSet.Category == (int)TabFrag.CATEGORY.ALL)
+                if (_DialogueSet.Category == (int)Dialogue.LableType.ALL)
                 {
                     return VIEW_TYPE_ALL;
                 }
-                else if ((int)TabFrag.CATEGORY.ALL < _DialogueSet.Category && _DialogueSet.Category < TabFrag.CATEGORY_COUNT)
+                else if ((int)Dialogue.LableType.ALL < _DialogueSet.Category && _DialogueSet.Category < Dialogue.Lable_COUNT)
                 {
                     return VIEW_TYPE_CATEGORY;
                 }

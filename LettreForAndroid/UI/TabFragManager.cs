@@ -24,14 +24,14 @@ namespace LettreForAndroid.UI
     {
         TabFrag[] tabFrags = 
         {
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.ALL], (int)TabFrag.CATEGORY.ALL, 0, 0),                         //전체
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.COMMON], (int)TabFrag.CATEGORY.COMMON, 1, 0),                   //대화
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.DELIVERY], (int)TabFrag.CATEGORY.DELIVERY, 2, 0),               //택배
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.CARD], (int)TabFrag.CATEGORY.CARD, 3, 0),                       //카드
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.IDENTIFICATION], (int)TabFrag.CATEGORY.IDENTIFICATION, 4, 0),   //인증
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.PUBLIC], (int)TabFrag.CATEGORY.PUBLIC, 5, 0),                   //공공기관
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.AGENCY], (int)TabFrag.CATEGORY.AGENCY, 6, 0),                   //통신사
-            new TabFrag(TabFrag.mCategory_Str[(int)TabFrag.CATEGORY.SPAM], (int)TabFrag.CATEGORY.SPAM, 7, 0),                       //스팸
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.ALL], (int)Dialogue.LableType.ALL, 0, 0),                         //전체
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.COMMON], (int)Dialogue.LableType.COMMON, 1, 0),                   //대화
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.DELIVERY], (int)Dialogue.LableType.DELIVERY, 2, 0),               //택배
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.CARD], (int)Dialogue.LableType.CARD, 3, 0),                       //카드
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.IDENTIFICATION], (int)Dialogue.LableType.IDENTIFICATION, 4, 0),   //인증
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.PUBLIC], (int)Dialogue.LableType.PUBLIC, 5, 0),                   //공공기관
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.AGENCY], (int)Dialogue.LableType.AGENCY, 6, 0),                   //통신사
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.SPAM], (int)Dialogue.LableType.SPAM, 7, 0),                       //스팸
         };
 
         readonly Activity activity;

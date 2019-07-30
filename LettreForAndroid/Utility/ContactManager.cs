@@ -75,7 +75,7 @@ namespace LettreForAndroid.Utility
 
             //SQLITE 조건문 설정
             string[] projection = { id_code, phoneNumber_code, name_code, photoThumbnail_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
-            string selectionClause = "REPLACE( " + phoneNumber_code + ",'-' ,'')";       //?는 현재 찾고자 하는 값, phoneNumber_code에는 DB값이 들어간다.
+            string selectionClause = "REPLACE( " + phoneNumber_code + ",'-' ,'')";                        //?는 현재 찾고자 하는 값, phoneNumber_code에는 DB값이 들어간다.
 
             ICursor cursor = cr.Query(uri, projection, selectionClause, null, null);   //쿼리
 
