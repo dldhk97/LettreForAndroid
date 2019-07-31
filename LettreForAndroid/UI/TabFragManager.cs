@@ -31,7 +31,7 @@ namespace LettreForAndroid.UI
             new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.IDENTIFICATION], (int)Dialogue.LableType.IDENTIFICATION, 4, 0),   //인증
             new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.PUBLIC], (int)Dialogue.LableType.PUBLIC, 5, 0),                   //공공기관
             new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.AGENCY], (int)Dialogue.LableType.AGENCY, 6, 0),                   //통신사
-            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.SPAM], (int)Dialogue.LableType.SPAM, 7, 0),                       //스팸
+            new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.UNKNOWN], (int)Dialogue.LableType.UNKNOWN, 7, 0),                       //스팸
         };
 
         readonly Activity activity;

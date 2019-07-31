@@ -40,12 +40,12 @@ namespace LettreForAndroid.Receivers
                 values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
                 values.Put(Telephony.TextBasedSmsColumns.Read, 0);
                 values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
-                values.Put(Telephony.TextBasedSmsColumns.ThreadId, MessageManager.Get().getThreadId(context, msg.OriginatingAddress));
+                values.Put(Telephony.TextBasedSmsColumns.ThreadId, MessageDBManager.Get().GetThreadId(msg.OriginatingAddress));
 
                 context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
 
                 //메세지 DB 불러오기
-                MessageManager.Get().refreshMessages();
+                MessageDBManager.Get().Refresh();
 
                 //UI 업데이트
                 if(DialogueActivity._Instance != null)

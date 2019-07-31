@@ -54,7 +54,7 @@ namespace LettreForAndroid.UI
             _CurCategory = Intent.GetIntExtra("category", -1);
             _CurThread_id = Intent.GetLongExtra("thread_id", -1);
 
-            MessageManager.Get().refreshMessages();                                         //DB에서 문자 불러옴
+            MessageDBManager.Get().Refresh();                                         //DB에서 문자 불러옴
 
             SetupRecyclerView();
 
@@ -88,7 +88,7 @@ namespace LettreForAndroid.UI
                 _MsgBox.Text = string.Empty;
 
                 //DB 새로고침
-                MessageManager.Get().refreshMessages();
+                MessageDBManager.Get().Refresh();
 
                 //UI 업데이트
                 if (_Instance != null)
@@ -170,7 +170,7 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            _CurDialogue = MessageManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
+            _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
             _RecyclerItems = groupByDate(_CurDialogue);

@@ -22,7 +22,7 @@ namespace LettreForAndroid.Utility
         public LableDBManager()
         {
             _Helper = new MySQLiteOpenHelper(Application.Context);
-            Load();                                                         //객체 생성시 메모리에 레이블 테이블 올림.
+            Load();
         }
 
         public static LableDBManager Get()
@@ -33,11 +33,25 @@ namespace LettreForAndroid.Utility
         }
 
         //쓰레드 ID로 레이블을 찾는다. 현재 레이블 중 최대값을 반환함.
-        public int GetLable(long thread_id)
+        public int GetMajorLable(long thread_id)
         {
-            Dialogue objdialogue = _OnMemoryLables[thread_id];
-            int resultLable = objdialogue.Lables.Max();
-            return resultLable;
+            if(_OnMemoryLables.DialogueList.ContainsKey(thread_id))
+            {
+                Dialogue objdialogue = _OnMemoryLables[thread_id];
+                int resultLable = objdialogue.Lables.Max();
+                return resultLable;
+            }
+            return -1;
+        }
+
+        public int[] GetLables(long thread_id)
+        {
+            if (_OnMemoryLables.DialogueList.ContainsKey(thread_id))
+            {
+                Dialogue objdialogue = _OnMemoryLables[thread_id];
+                return objdialogue.Lables;
+            }
+            return null;
         }
 
         //내장 DB에 단일 데이터 삽입 혹은 업데이트
@@ -59,7 +73,7 @@ namespace LettreForAndroid.Utility
         }
 
         //내장 DB에서 레이블 테이블 불러옴
-        private void Load()
+        public void Load()
         {
             _OnMemoryLables = _Helper.Load(Application.Context);
         }
@@ -86,18 +100,22 @@ namespace LettreForAndroid.Utility
             //받은 결과값들을 하나하나 DB에 넣는다.
             foreach(string[] objStr in receivedData)
             {
-                Dialogue a = new Dialogue();
-                a.Address = objStr[0];
-                a.Lables[1] = Convert.ToInt32(objStr[0]); 
-                a.Lables[2] = Convert.ToInt32(objStr[1]);
-                a.Lables[3] = Convert.ToInt32(objStr[2]);
-                a.Lables[4] = Convert.ToInt32(objStr[3]);
-                a.Lables[5] = Convert.ToInt32(objStr[4]);
-                a.Lables[6] = Convert.ToInt32(objStr[5]);
+                Dialogue newDialogue = new Dialogue();
+                newDialogue.Address = objStr[0];
 
-                a.Thread_id = MessageManager.Get().getThreadId(Application.Context, a.Address);
+                for(int i = 0; i < 6; i++)
+                    newDialogue.Lables[i + 1] = Convert.ToInt32(objStr[i]);
 
-                InsertOrUpdate(a);
+                //newDialogue.Lables[1] = Convert.ToInt32(objStr[0]); 
+                //newDialogue.Lables[2] = Convert.ToInt32(objStr[1]);
+                //newDialogue.Lables[3] = Convert.ToInt32(objStr[2]);
+                //newDialogue.Lables[4] = Convert.ToInt32(objStr[3]);
+                //newDialogue.Lables[5] = Convert.ToInt32(objStr[4]);
+                //newDialogue.Lables[6] = Convert.ToInt32(objStr[5]);
+
+                newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
+
+                InsertOrUpdate(newDialogue);
             }
         }
 

@@ -19,27 +19,27 @@ using Uri = Android.Net.Uri;
 namespace LettreForAndroid.Utility
 {
     //Singleton
-    class ContactManager
+    class ContactDBManager
     {
 
-        private static ContactManager _Instance = null;
+        private static ContactDBManager _Instance = null;
         private List<Contact> _ContactList = new List<Contact>();
 
-        public static ContactManager Get()
+        //객체 생성시 DB에서 연락처 다 불러옴
+        ContactDBManager()
+        {
+            Load();
+        }
+
+        public static ContactDBManager Get()
         {
             if (_Instance == null)
-                _Instance = new ContactManager();
+                _Instance = new ContactDBManager();
             return _Instance;
         }
         public Contact this[int i]
         {
             get { return _ContactList[i]; }
-        }
-
-        //activity가 있어야 하기 때문에 처음 한번만 이 메소드로 activity를 설정해줘야 함.
-        public void Initialization()
-        {
-            //refreshContacts();
         }
 
         public int Count
@@ -59,9 +59,9 @@ namespace LettreForAndroid.Utility
             return null;
         }
 
-        public void refreshContacts(Activity activity)
+        private void Load()
         {
-            ContentResolver cr = activity.BaseContext.ContentResolver;
+            ContentResolver cr = Application.Context.ContentResolver;
 
             string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
             string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
@@ -70,20 +70,16 @@ namespace LettreForAndroid.Utility
 
             Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
 
-            //string hipenAddress = Android.Telephony.PhoneNumberUtils.FormatNumber(address);    //하이픈 붙이기
-            //address = address.Replace("-", "");                                                  //하이픈을 제거
-
             //SQLITE 조건문 설정
             string[] projection = { id_code, phoneNumber_code, name_code, photoThumbnail_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
-            string selectionClause = "REPLACE( " + phoneNumber_code + ",'-' ,'')";                        //?는 현재 찾고자 하는 값, phoneNumber_code에는 DB값이 들어간다.
 
-            ICursor cursor = cr.Query(uri, projection, selectionClause, null, null);   //쿼리
+            ICursor cursor = cr.Query(uri, projection, null, null, null);   //쿼리
 
             Contact result = null;
 
-            if (cursor.MoveToFirst())
+            if (cursor != null && cursor.Count > 0)
             {
-                for(int i = 0; i < cursor.Count; i++)
+                while(cursor.MoveToNext())
                 {
                     result = new Contact();
                     result.Id = cursor.GetString(cursor.GetColumnIndex(projection[0]));
@@ -91,7 +87,6 @@ namespace LettreForAndroid.Utility
                     result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
                     result.PhotoThumnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
                     _ContactList.Add(result);
-                    cursor.MoveToNext();
                 }
             }
         }

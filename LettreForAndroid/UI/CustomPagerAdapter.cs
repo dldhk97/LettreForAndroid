@@ -48,7 +48,7 @@ namespace LettreForAndroid.UI
 
             tabTitle.Text = _Tabs[position].TabTitle;
 
-            DialogueSet curDialogueSet = MessageManager.Get().DialogueSets[position];
+            DialogueSet curDialogueSet = MessageDBManager.Get().DialogueSets[position];
 
             int totalUnreadCnt = 0;
             for (int i = 0; i < curDialogueSet.Count; i++)

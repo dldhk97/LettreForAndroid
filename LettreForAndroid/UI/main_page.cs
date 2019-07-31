@@ -81,7 +81,7 @@ namespace LettreForAndroid.UI
         public void refreshRecyclerView()
         {
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
-            _DialogueSet = MessageManager.Get().DialogueSets[_Category];
+            _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
 
             //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_DialogueSet.Count > 0)
@@ -274,11 +274,11 @@ namespace LettreForAndroid.UI
 
             public override int GetItemViewType(int iPosition)
             {
-                if (_DialogueSet.Category == (int)Dialogue.LableType.ALL)
+                if (_DialogueSet.Lable == (int)Dialogue.LableType.ALL)
                 {
                     return VIEW_TYPE_ALL;
                 }
-                else if ((int)Dialogue.LableType.ALL < _DialogueSet.Category && _DialogueSet.Category < Dialogue.Lable_COUNT)
+                else if ((int)Dialogue.LableType.ALL < _DialogueSet.Lable && _DialogueSet.Lable < Dialogue.Lable_COUNT)
                 {
                     return VIEW_TYPE_CATEGORY;
                 }
@@ -341,7 +341,7 @@ namespace LettreForAndroid.UI
 
                 Android.Content.Intent intent = new Android.Content.Intent(context, typeof(DialogueActivity));
                 intent.PutExtra("thread_id", _DialogueSet[iPosition].Thread_id);
-                intent.PutExtra("category", _DialogueSet.Category);
+                intent.PutExtra("category", _DialogueSet.Lable);
 
                 context.StartActivity(intent);
             }

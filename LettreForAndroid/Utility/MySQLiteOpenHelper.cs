@@ -101,7 +101,7 @@ namespace LettreForAndroid.Utility
             if (cursor != null)
             {
                 result = new DialogueSet();
-                if (cursor.MoveToNext())
+                while(cursor.MoveToNext())
                 {
                     Dialogue objDialogue = new Dialogue();
                     objDialogue.Thread_id = cursor.GetLong(0);

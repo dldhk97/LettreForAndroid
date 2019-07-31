@@ -63,11 +63,11 @@ namespace LettreForAndroid
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
         public void Setup()
         {
-            //연락처 및 메세지 매니저 세팅
-            ContactManager.Get().Initialization();
-            ContactManager.Get().refreshContacts(this);
-            MessageManager.Get().Initialization();
-            MessageManager.Get().refreshMessages();
+            ContactDBManager.Get();           //연락처를 모두 메모리에 올림
+            MessageDBManager.Get();           //메시지를 모두 메모리에 올림
+            LableDBManager.Get();           //레이블 DB를 모두 메모리에 올림
+            LableDBManager.Get().CreateNewDB(MessageDBManager.Get().DialogueSets[0]);
+            MessageDBManager.Get().Categorize();
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
             //툴바 세팅

@@ -19,7 +19,7 @@ namespace LettreForAndroid.Class
     public class DialogueSet
     {
         private Dictionary<long, Dialogue> dialogueList;
-        int category;
+        int lable;
 
         public DialogueSet()
         {
@@ -50,10 +50,10 @@ namespace LettreForAndroid.Class
             get { return dialogueList.Values.ToList()[index]; }
         }
 
-        public int Category
+        public int Lable
         {
-            get { return category; }
-            set { category = value; }
+            get { return lable; }
+            set { lable = value; }
         }
 
         public void Add(Dialogue dialogue)
@@ -85,8 +85,8 @@ namespace LettreForAndroid.Class
     public class Dialogue
     {
         public const int Lable_COUNT = 8;
-        public static string[] _LableTypeStr = { "전체", "대화", "택배", "카드", "인증", "공공기관", "통신사", "스팸" };
-        public enum LableType { ALL = 0, COMMON, DELIVERY, CARD, IDENTIFICATION, PUBLIC, AGENCY, SPAM };
+        public static string[] _LableTypeStr = { "전체", "대화", "택배", "카드", "인증", "공공기관", "통신사", "미분류" };
+        public enum LableType { ALL = 0, COMMON, DELIVERY, CARD, IDENTIFICATION, PUBLIC, AGENCY, UNKNOWN };
 
         private Contact contact;
         private int majorLable;                 //카테고리
