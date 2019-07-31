@@ -66,7 +66,6 @@ namespace LettreForAndroid
             ContactDBManager.Get();           //연락처를 모두 메모리에 올림
             MessageDBManager.Get();           //메시지를 모두 메모리에 올림
             LableDBManager.Get();           //레이블 DB를 모두 메모리에 올림
-            LableDBManager.Get().CreateNewDB(MessageDBManager.Get().DialogueSets[0]);
             MessageDBManager.Get().Categorize();
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
@@ -109,14 +108,7 @@ namespace LettreForAndroid
             }
             else
             {
-                DataStorageManager.saveStringData(this, "temp", item.TitleFormatted.ToString());
-                string[] data1 = new string[] { "010-1234-1234", "문자내용이 들어감1" };
-                string[] data2 = new string[] { "010-1234-1235", "문자내용이 들어감2" };
-                string[] data3 = new string[] { "010-1234-1236", "문자내용이 들어감3" };
-                string[] data4 = new string[] { "010-1234-1237", "문자내용이 들어감4" };
-                string[] data5 = new string[] { "010-1234-1238", "문자내용이 들어감5" };
-                List<string[]> dataList = new List<string[]>() { data1, data2, data3, data4, data5 };
-                NetworkManager.Get().SendAndReceiveData(dataList);
+
             }
             return base.OnOptionsItemSelected(item);
         }

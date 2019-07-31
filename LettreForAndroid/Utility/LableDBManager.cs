@@ -78,46 +78,39 @@ namespace LettreForAndroid.Utility
             _OnMemoryLables = _Helper.Load(Application.Context);
         }
 
+        public bool IsDBExist()
+        {
+            return _OnMemoryLables.DialogueList.Count > 0;
+        }
+
         //전체 대화목록을 받아 그것을 바탕으로 DB를 만든다.
         public void CreateNewDB(DialogueSet dialogues)
         {
-            List<string[]> toSendData = new List<string[]>();
+            //대화가 하나도 없으면 그냥 놔둔다.
+            if (dialogues.DialogueList.Count <= 0)
+                return;
 
-            //대화목록에서 대화 각각을 살펴본다.
-            foreach (Dialogue objDialogue in dialogues.DialogueList.Values)
-            {
-                //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
-                foreach (TextMessage objMessage in objDialogue.TextMessageList)
-                {
-                    toSendData.Add(new string[] { objMessage.Address, objMessage.Msg });
-                }
-
-            }
-
-            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
-            List<string[]> receivedData = NetworkManager.Get().SendAndReceiveData(toSendData);
+            List<string[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogues);
 
             //받은 결과값들을 하나하나 DB에 넣는다.
-            foreach(string[] objStr in receivedData)
+            foreach (string[] objStr in receivedData)
             {
                 Dialogue newDialogue = new Dialogue();
                 newDialogue.Address = objStr[0];
 
-                for(int i = 0; i < 6; i++)
-                    newDialogue.Lables[i + 1] = Convert.ToInt32(objStr[i]);
-
-                //newDialogue.Lables[1] = Convert.ToInt32(objStr[0]); 
-                //newDialogue.Lables[2] = Convert.ToInt32(objStr[1]);
-                //newDialogue.Lables[3] = Convert.ToInt32(objStr[2]);
-                //newDialogue.Lables[4] = Convert.ToInt32(objStr[3]);
-                //newDialogue.Lables[5] = Convert.ToInt32(objStr[4]);
-                //newDialogue.Lables[6] = Convert.ToInt32(objStr[5]);
+                for (int i = 1; i < 7; i++)
+                    newDialogue.Lables[i] = Convert.ToInt32(objStr[i]);
 
                 newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
                 InsertOrUpdate(newDialogue);
             }
+
+            //DB를 메모리에 올림
+            Load();
         }
+
+
 
     }
 }

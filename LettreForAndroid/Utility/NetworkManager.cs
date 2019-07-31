@@ -11,7 +11,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-
+using LettreForAndroid.Class;
 
 namespace LettreForAndroid.Utility
 {
@@ -82,8 +82,41 @@ namespace LettreForAndroid.Utility
             }
         }
 
+        public List<string[]> GetLablesFromServer(DialogueSet dialogues)
+        {
+            List<string[]> toSendData = new List<string[]>();
+
+            //대화목록에서 대화 각각을 살펴본다.
+            foreach (Dialogue objDialogue in dialogues.DialogueList.Values)
+            {
+                //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
+                foreach (TextMessage objMessage in objDialogue.TextMessageList)
+                {
+                    toSendData.Add(new string[] { objMessage.Address, objMessage.Msg });
+                }
+
+            }
+
+            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
+            return SendAndReceiveData(toSendData);
+        }
+
+        public List<string[]> GetLableFromServer(Dialogue dialogue)
+        {
+            List<string[]> toSendData = new List<string[]>();
+
+            //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
+            foreach (TextMessage objMessage in dialogue.TextMessageList)
+            {
+                toSendData.Add(new string[] { objMessage.Address, objMessage.Msg });
+            }
+
+            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
+            return SendAndReceiveData(toSendData);
+        }
+
         //데이터를 여러개 보낼 때(어플 -> 서버)
-        public List<string[]> SendAndReceiveData(List<string[]> dataList )
+        private List<string[]> SendAndReceiveData(List<string[]> dataList )
         {
             if (!_IsConnected)
                 makeConnection();

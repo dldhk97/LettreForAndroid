@@ -54,7 +54,7 @@ namespace LettreForAndroid.UI
             _CurCategory = Intent.GetIntExtra("category", -1);
             _CurThread_id = Intent.GetLongExtra("thread_id", -1);
 
-            MessageDBManager.Get().Refresh();                                         //DB에서 문자 불러옴
+            //MessageDBManager.Get().Refresh();                                         //DB에서 문자 불러옴
 
             SetupRecyclerView();
 
