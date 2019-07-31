@@ -38,7 +38,8 @@ namespace LettreForAndroid.Utility
             if(_OnMemoryLables.DialogueList.ContainsKey(thread_id))
             {
                 Dialogue objdialogue = _OnMemoryLables[thread_id];
-                int resultLable = objdialogue.Lables.Max();
+                int maxValue = objdialogue.Lables.Max();
+                int resultLable = objdialogue.Lables.ToList().IndexOf(maxValue);
                 return resultLable;
             }
             return -1;

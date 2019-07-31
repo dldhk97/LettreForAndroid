@@ -94,18 +94,30 @@ namespace LettreForAndroid.Utility
                         objDialogue.Contact = ContactDBManager.Get().getContactByAddress(objSms.Address);
                         objDialogue.Thread_id = objSms.Thread_id;
                         objDialogue.Address = objSms.Address;
-                        objDialogue.MajorLable = 7;                                                         //일단 모두 미분류로 설정
 
-                        objDialogue.DisplayName = objDialogue.Contact != null ? objDialogue.Contact.Name : objSms.Address;
+                        //연락처에 있으면 대화로 분류
+                        if (objDialogue.Contact != null)
+                        {
+                            objDialogue.DisplayName = objDialogue.Contact.Name;
+                            objDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+                        }
+                        else
+                        {
+                            objDialogue.DisplayName = objSms.Address;
+                            
+                            //연락처에 없으면, Lable DB에 있는지, 없으면 미분류로 설정
+                            int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
+                            objDialogue.MajorLable = majorLable != -1 ? majorLable : (int)Dialogue.LableType.UNKNOWN;
+                        }
 
-                        if (objSms.ReadState == "0")                                                          //읽지 않은 문자면, 대화에 읽지않은 문자가 존재한다고 체크함.
-                            objDialogue.UnreadCnt++;
-
-                        _DialogueSets[(int)Dialogue.LableType.ALL].Add(objDialogue);                                                  //전체에 추가
-                        _DialogueSets[(int)Dialogue.LableType.UNKNOWN].Add(objDialogue);                                                  //미분류에 추가
+                        _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                           //알맞게 리스트에 추가
+                        _DialogueSets[(int)Dialogue.LableType.ALL].Add(objDialogue);                      //전체 리스트에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
+                    if (objSms.ReadState == "0")                                                          //읽지 않은 문자면, 카운트 추가
+                        objDialogue.UnreadCnt++;
+
                     objDialogue.Add(objSms);
                 }
             }
@@ -115,6 +127,7 @@ namespace LettreForAndroid.Utility
         public void Refresh()
         {
             Load();
+            LableDBManager.Get().Load();
             Categorize();
         }
 
@@ -122,61 +135,45 @@ namespace LettreForAndroid.Utility
         //이것은 처음 어플 실행했을 때, 문자를 보냈을때, 받았을때 호출됨.
         public void Categorize()
         {
+            //DB가 없으면 새로 만든다.
             if (!LableDBManager.Get().IsDBExist())
                 LableDBManager.Get().CreateNewDB(_DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
 
             List<Dialogue> deleteTarget = new List<Dialogue>();
 
+            //미분류 대화들을 탐색.
             foreach(Dialogue objDialogue in _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Values)
             {
-                int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
-                if(majorLable == -1)
+                //서버에 보내서 결과값을 받는다.
+                List<string[]> receivedData = NetworkManager.Get().GetLableFromServer(objDialogue);
+
+                //서버에서 데이터 받았으면
+                if(receivedData.Count > 0)
                 {
-                    //DB에 레이블이 없음.
-                    //서버랑 통신해보고, 서버랑 통신이 안되면 7번으로 분류
-                    List<string[]> receivedData = NetworkManager.Get().GetLableFromServer(objDialogue);
-
-                    //서버와 통신해서 레이블을 받았다면
-                    if(receivedData != null)
-                    {
-                        //레이블 DB에 추가
-                        Dialogue newDialogue = new Dialogue();
-                        newDialogue.Address = receivedData[0][0];
-
-                        for (int i = 1; i < 7; i++)
-                            newDialogue.Lables[i] = Convert.ToInt32(receivedData[0][i]);
-
-                        newDialogue.Thread_id = GetThreadId(newDialogue.Address);
-
-                        LableDBManager.Get().InsertOrUpdate(newDialogue);
-
-                        //메모리에서 세팅
-                        deleteTarget.Add(objDialogue);                          //삭제대상에 추가
-                        objDialogue.MajorLable = newDialogue.Lables.Max();
-                        objDialogue.Lables = newDialogue.Lables;                //이거 완전복사 안되면 해주어야함.
-                        _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                                     //알맞는 레이블에 추가
-                    }
-                    else
-                    {
-                        //서버와 통신 실패시
-                        //아무것도 안하나?
-                    }
+                    //디버깅용 예외
+                    if (receivedData[0][0] != objDialogue.Address)
+                        throw new Exception("보낸 주소와 받은 주소가 다르다???");
                     
-                }
-                else
-                {
-                    //내장 DB에서 레이블을 구했음.
-                    deleteTarget.Add(objDialogue);                                                                //삭제대상에 추가
+                    //미분류 목록에서 삭제할 대상으로 추가
+                    deleteTarget.Add(objDialogue);
 
-                    objDialogue.MajorLable = majorLable;
-                    objDialogue.Lables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
-                    _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                                     //알맞는 레이블에 추가
+                    //레이블 누적하고 DB에 삽입
+                    for (int i = 1; i < 7; i++)
+                        objDialogue.Lables[i] += Convert.ToInt32(receivedData[0][i]);
+
+                    int prevMajorLable = objDialogue.MajorLable;
+
+                    objDialogue.MajorLable = objDialogue.Lables.ToList().IndexOf(objDialogue.Lables.Max());
+
+                    LableDBManager.Get().InsertOrUpdate(objDialogue);
+
+                    _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                                 //이 대화를 알맞는 레이블에 추가
                 }
             }
 
             foreach (Dialogue target in deleteTarget)
             {
-                _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(target.Thread_id);           //미분류에서 삭제
+                _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(target.Thread_id);           //미분류 대화 목록에서 삭제
             }
         }
 
