@@ -90,7 +90,7 @@ namespace LettreForAndroid.Class
 
         private Contact contact;
         private int majorLable;                 //카테고리
-        private int[] lableCnt = new int[8];    //레이블별 레이블 수
+        private int[] lables = new int[8];    //레이블별 레이블 수, 0번인 전체는 사용되지 않는다.
         private string displayName;    //화면상 표시되는 전화번호 혹은 이름
         private int unreadCnt = 0;
         private long thread_id;
@@ -127,10 +127,10 @@ namespace LettreForAndroid.Class
             get { return majorLable; }
         }
 
-        public int[] LableCnt
+        public int[] Lables
         {
-            set { lableCnt = value; }
-            get { return lableCnt; }
+            set { lables = value; }
+            get { return lables; }
         }
 
         public string DisplayName

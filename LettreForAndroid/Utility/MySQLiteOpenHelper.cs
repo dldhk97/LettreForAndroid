@@ -30,7 +30,7 @@ namespace LettreForAndroid.Utility
         private const string COLUMN_Lable_IDENTIFICATION = "lable_identification";
         private const string COLUMN_Lable_PUBLIC = "lable_public";
         private const string COLUMN_Lable_AGENCY = "lable_agency";
-        private const string COLUMN_Lable_SPAM = "lable_spam";
+        //private const string COLUMN_Lable_SPAM = "lable_spam";
 
         public MySQLiteOpenHelper(Context context) : base(context, _DB_NAME, null, _DB_VERSION) { }
 
@@ -53,33 +53,33 @@ namespace LettreForAndroid.Utility
             + COLUMN_Lable_CARD + " integer not null , "
             + COLUMN_Lable_IDENTIFICATION + " integer not null , "
             + COLUMN_Lable_PUBLIC + " integer not null , "
-            + COLUMN_Lable_AGENCY + " integer not null , "
-            + COLUMN_Lable_SPAM + " integer not null );";
+            + COLUMN_Lable_AGENCY + " integer not null ); ";
+            //+ COLUMN_Lable_SPAM + " integer not null );";
 
         public const string DeleteQuery = "drop table if exists " + _TABLE_NAME;
 
-        public void InsertDialogue(Context context, Dialogue dialogue)
+        public void InsertOrUpdate(Context context, Dialogue dialogue)
         {
             SQLiteDatabase db = new MySQLiteOpenHelper(context).WritableDatabase;
 
             ContentValues values = new ContentValues();
             values.Put(COLUMN_THREAD_ID, dialogue.Thread_id);
             values.Put(COLUMN_ADDRESS, dialogue.Address);
-            values.Put(COLUMN_Lable_COMMON, dialogue.LableCnt[1]);
-            values.Put(COLUMN_Lable_DELIVERY, dialogue.LableCnt[2]);
-            values.Put(COLUMN_Lable_CARD, dialogue.LableCnt[3]);
-            values.Put(COLUMN_Lable_IDENTIFICATION, dialogue.LableCnt[4]);
-            values.Put(COLUMN_Lable_PUBLIC, dialogue.LableCnt[5]);
-            values.Put(COLUMN_Lable_AGENCY, dialogue.LableCnt[6]);
-            values.Put(COLUMN_Lable_SPAM, dialogue.LableCnt[7]);
+            values.Put(COLUMN_Lable_COMMON, dialogue.Lables[1]);
+            values.Put(COLUMN_Lable_DELIVERY, dialogue.Lables[2]);
+            values.Put(COLUMN_Lable_CARD, dialogue.Lables[3]);
+            values.Put(COLUMN_Lable_IDENTIFICATION, dialogue.Lables[4]);
+            values.Put(COLUMN_Lable_PUBLIC, dialogue.Lables[5]);
+            values.Put(COLUMN_Lable_AGENCY, dialogue.Lables[6]);
+            //values.Put(COLUMN_Lable_SPAM, dialogue.Lables[7]);
 
-            db.Insert(_TABLE_NAME, null, values);
+            db.InsertWithOnConflict(_TABLE_NAME, null, values, Conflict.Replace);
 
             db.Close();
         }
 
         //모든 대화 메타데이터를 DB에서 불러온다.
-        public DialogueSet LoadAllDialogues(Context context)
+        public DialogueSet Load(Context context)
         {
             SQLiteDatabase db = new MySQLiteOpenHelper(context).ReadableDatabase;
 
@@ -93,7 +93,7 @@ namespace LettreForAndroid.Utility
                 COLUMN_Lable_IDENTIFICATION,
                 COLUMN_Lable_PUBLIC,
                 COLUMN_Lable_AGENCY,
-                COLUMN_Lable_SPAM
+                //COLUMN_Lable_SPAM
             },
             null, null, null, null, null);
 
@@ -106,8 +106,8 @@ namespace LettreForAndroid.Utility
                     Dialogue objDialogue = new Dialogue();
                     objDialogue.Thread_id = cursor.GetLong(0);
                     objDialogue.Address = cursor.GetString(1);
-                    for(int i = 2; i < 9; i++)
-                        objDialogue.LableCnt[i-1] = cursor.GetInt(i);
+                    for(int i = 2; i < Dialogue.Lable_COUNT; i++)   //DB의 2~7행까지 데이터를 1~6번 레이블에 저장, 0번과 7번레이블은 사용안됨.
+                        objDialogue.Lables[i-1] = cursor.GetInt(i);
                     result.Add(objDialogue);
                 }
             }
@@ -115,29 +115,6 @@ namespace LettreForAndroid.Utility
             cursor.Close();
             db.Close();
             return result;
-        }
-
-        //DB에 dialogueSet 내의 모든 dialogue를 저장함
-        public void SaveAllDialogues(Context context, DialogueSet allDialogueSet)
-        {
-            SQLiteDatabase db = new MySQLiteOpenHelper(context).WritableDatabase;
-
-            foreach (Dialogue objDialouge in allDialogueSet.DialogueList.Values)
-            {
-                ContentValues values = new ContentValues();
-                values.Put(COLUMN_THREAD_ID, objDialouge.Thread_id);
-                values.Put(COLUMN_ADDRESS, objDialouge.Address);
-                values.Put(COLUMN_Lable_COMMON, objDialouge.LableCnt[1]);
-                values.Put(COLUMN_Lable_DELIVERY, objDialouge.LableCnt[2]);
-                values.Put(COLUMN_Lable_CARD, objDialouge.LableCnt[3]);
-                values.Put(COLUMN_Lable_IDENTIFICATION, objDialouge.LableCnt[4]);
-                values.Put(COLUMN_Lable_PUBLIC, objDialouge.LableCnt[5]);
-                values.Put(COLUMN_Lable_AGENCY, objDialouge.LableCnt[6]);
-                values.Put(COLUMN_Lable_SPAM, objDialouge.LableCnt[7]);
-                db.InsertWithOnConflict(_TABLE_NAME, null, values, Conflict.Replace);
-            }
-
-            db.Close();
         }
     }
 

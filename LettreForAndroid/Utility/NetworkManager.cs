@@ -45,35 +45,24 @@ namespace LettreForAndroid.Utility
         {
             if (_Instance == null)
                 _Instance = new NetworkManager();
-            //mAsyncReceiveHandler = new AsyncCallback(mInstance.handleDataReceive);
-            //mAsyncSendHandler = new AsyncCallback(mInstance.handleDataSend);
             return _Instance;
         }
 
         private const string _ServerIP = "192.168.0.5";                                  //아이피는 서버에 맞게 설정
         //private const string mServerIP = "59.151.215.129";
         private const int _Port = 10101;                                                //포트 설정            
-        private const int _MaxBuffer = 1024;                                            //최대 버퍼, 사용되지 않음.
         private TimeSpan _Timeout = new TimeSpan(0,0,2);                                //타임아웃 시간 설정
 
         private bool _IsConnected = false;
 
         private Socket _CurrentSocket = null;
 
-        /// <summary>
-        /// 여기부터는 동기 메소드
-        /// </summary>
 
-        public void makeConnection()
+        private void makeConnection()
         {
             if (_CurrentSocket != null)
                 _CurrentSocket.Close();
             _CurrentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-            //타임아웃 설정
-            //mCurrentSocket.SendTimeout = 5000;
-            //mCurrentSocket.ReceiveTimeout = 5000;
-            //mCurrentSocket.LingerState = new LingerOption(true, 0);
 
             // (2) 서버에 연결
             try
@@ -94,15 +83,18 @@ namespace LettreForAndroid.Utility
         }
 
         //데이터를 여러개 보낼 때(어플 -> 서버)
-        public void sendAndReceiveData(List<string[]> dataList, int type)
+        public List<string[]> SendAndReceiveData(List<string[]> dataList )
         {
             if (!_IsConnected)
                 makeConnection();
 
+            List<string[]> receivedData = new List<string[]>();
+
             if (_IsConnected)
             {
-                //타입 전송 (기본 0이라 상정하고 아래 코드 작성함)
-                byte[] typeByte = intToByteArray(type, 1);
+                //타입 전송, 타입은 0이면 데이터 제공 X, 1이면 데이터 제공
+                int type = 0;
+                byte[] typeByte = intToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
                 _CurrentSocket.Send(typeByte, SocketFlags.None);
 
                 //데이터 수량 전송
@@ -147,15 +139,6 @@ namespace LettreForAndroid.Utility
 
                 for (int i = 0; i < receive_amount; i++)
                 {
-                    //레이블 수신
-                    byte[] receive_lable_byte = new byte[1];
-                    _CurrentSocket.Receive(receive_lable_byte, 1, SocketFlags.None);
-
-                    //받은 바이트를 int로 변환
-                    int receive_lable = byteToInt(receive_lable_byte);
-
-                    //-------------------------------------------------------
-
                     //연락처 길이 수신
                     byte[] receive_addr_length_byte = new byte[2];
                     _CurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
@@ -174,18 +157,44 @@ namespace LettreForAndroid.Utility
 
                     //-------------------------------------------------------
 
+                    //레이블 수신
+                    int[] receive_lables = new int[6];
+                    for(int j = 0; j < 6; j++)
+                    {
+                        byte[] receive_lable_byte = new byte[2];
+                        _CurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
+
+                        //받은 바이트를 int로 변환
+                        receive_lables[j] = byteToInt(receive_lable_byte);
+                    }
+
+                    //-------------------------------------------------------
+
                     //DEBUG : 출력 창에 표시함.
                     Console.WriteLine("---------------------------[" + (i + 1) + "] 번째 데이터----------------------");
-                    Console.WriteLine("레이블 : " + receive_lable.ToString());
                     Console.WriteLine("연락처 길이 : " + receive_addr_length.ToString());
                     Console.WriteLine("연락처 : " + receive_addr_str);
+                    for(int j = 0; j < 6; j++)
+                    {
+                        Console.WriteLine("레이블" + "[" + j + "] " + receive_lables[j].ToString());
+                    }
+
+                    receivedData.Add(new string[] {
+                        receive_addr_str,
+                        receive_lables[0].ToString(),
+                        receive_lables[1].ToString(),
+                        receive_lables[2].ToString(),
+                        receive_lables[3].ToString(),
+                        receive_lables[4].ToString(),
+                        receive_lables[5].ToString(),
+                    });
                 }
                 Console.WriteLine("수신 완료!!!");
-
             }
-
             // (4) 소켓 닫기
             _CurrentSocket.Close();
+
+            return receivedData;
         }
 
         //str을 고정길이 length만큼 바이트 배열로 변환함.

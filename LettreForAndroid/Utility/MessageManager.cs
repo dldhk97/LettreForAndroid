@@ -123,7 +123,7 @@ namespace LettreForAndroid.Utility
             }
             cursor.Close();
 
-            //0번 카테고리 생성, 생성된 카테고리들 정렬
+            //생성된 카테고리들 정렬
             for(int i = 0; i < Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets[i].SortByLastMessageTime();
