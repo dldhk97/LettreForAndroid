@@ -32,6 +32,8 @@ namespace LettreForAndroid.Receivers
             {
                 Toast.MakeText(context, "FROM : " + msg.DisplayOriginatingAddress + "\nMSG : " + msg.MessageBody, ToastLength.Short).Show();
 
+                long thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
+
                 //문자를 DB에 저장
                 ContentValues values = new ContentValues();
                 values.Put(Telephony.TextBasedSmsColumns.Address, msg.OriginatingAddress);
@@ -40,24 +42,34 @@ namespace LettreForAndroid.Receivers
                 values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
                 values.Put(Telephony.TextBasedSmsColumns.Read, 0);
                 values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
-                values.Put(Telephony.TextBasedSmsColumns.ThreadId, MessageDBManager.Get().GetThreadId(msg.OriginatingAddress));
+                values.Put(Telephony.TextBasedSmsColumns.ThreadId, thread_id);
 
                 context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
 
-                //메세지 DB 불러오기
-                MessageDBManager.Get().Refresh();
+                //레이블 DB에 누적
+                TextMessage message = new TextMessage();
+                message.Address = msg.OriginatingAddress;
+                message.Msg = msg.MessageBody;
+                LableDBManager.Get().AccumulateLableDB(message);
+            }
 
-                //UI 업데이트
-                if(DialogueActivity._Instance != null)
-                    DialogueActivity._Instance.RefreshRecyclerView();
+            //메세지 DB 불러오기
+            MessageDBManager.Get().Refresh();
 
-                for(int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
-                {
-                    CustomPagerAdapter._Pages[i].refreshRecyclerView();
-                    if (DialogueActivity._Instance == null)
-                        CustomPagerAdapter._Pages[i].refreshFrag();
-                }
-                    
+            //UI 업데이트
+            //대화창 존재하면 새로고침
+            if (DialogueActivity._Instance != null)
+                DialogueActivity._Instance.RefreshRecyclerView();
+
+            //탭 새로고침
+            //TabFragManager._Instance.RefreshTabs();
+
+            //대화목록(메인) 새로고침
+            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+            {
+                CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                if (DialogueActivity._Instance == null)
+                    CustomPagerAdapter._Pages[i].refreshFrag();
             }
         }
     }

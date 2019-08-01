@@ -56,7 +56,7 @@ namespace LettreForAndroid.Class
             set { lable = value; }
         }
 
-        public void Add(Dialogue dialogue)
+        public void InsertOrUpdate(Dialogue dialogue)
         {
             if (dialogueList.ContainsKey(dialogue.Thread_id))
                 dialogueList[dialogue.Thread_id] = dialogue;

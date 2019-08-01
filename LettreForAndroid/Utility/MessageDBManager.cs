@@ -34,13 +34,6 @@ namespace LettreForAndroid.Utility
         {
             _smsManager = SmsManager.Default;
 
-            _DialogueSets = new List<DialogueSet>();
-            for (int i = 0; i < Dialogue.Lable_COUNT; i++)
-            {
-                _DialogueSets.Add(new DialogueSet());
-                _DialogueSets[i].Lable = i;                 //고유 레이블 붙여줌
-            }
-
             Load();
         }
 
@@ -56,9 +49,29 @@ namespace LettreForAndroid.Utility
             get { return _DialogueSets; }
         }
 
+        private void ResetDialogueSet()
+        {
+            if(_DialogueSets != null)
+            {
+                foreach (DialogueSet objSet in _DialogueSets)
+                {
+                    objSet.Clear();
+                }
+                _DialogueSets.Clear();
+            }
+
+            _DialogueSets = new List<DialogueSet>();
+            for (int i = 0; i < Dialogue.Lable_COUNT; i++)
+            {
+                _DialogueSets.Add(new DialogueSet());
+                _DialogueSets[i].Lable = i;                 //고유 레이블 붙여줌
+            }
+        }
+
         //모든 문자메세지를 대화로 묶어 _DialogueSet[0] = 전체에만 저장
         private void Load()
         {
+            ResetDialogueSet();
             TextMessage objSms = new TextMessage();
 
             ContentResolver cr = Application.Context.ContentResolver;
@@ -103,15 +116,13 @@ namespace LettreForAndroid.Utility
                         }
                         else
                         {
+                            //연락처에 없는 대화는, 레이블 분석에 따라 MajorLable이 변경될수 있으므로 여기서 MajorLable을 결정하지 않음. 미분류로 보냄.
                             objDialogue.DisplayName = objSms.Address;
-                            
-                            //연락처에 없으면, Lable DB에 있는지, 없으면 미분류로 설정
-                            int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
-                            objDialogue.MajorLable = majorLable != -1 ? majorLable : (int)Dialogue.LableType.UNKNOWN;
+                            objDialogue.MajorLable = (int)Dialogue.LableType.UNKNOWN;
                         }
 
-                        _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                           //알맞게 리스트에 추가
-                        _DialogueSets[(int)Dialogue.LableType.ALL].Add(objDialogue);                      //전체 리스트에 추가
+                        _DialogueSets[objDialogue.MajorLable].InsertOrUpdate(objDialogue);                           //알맞게 리스트에 추가
+                        _DialogueSets[(int)Dialogue.LableType.ALL].InsertOrUpdate(objDialogue);                      //전체 리스트에 추가
 
                         prevThreadId = objSms.Thread_id;
                     }
@@ -124,63 +135,96 @@ namespace LettreForAndroid.Utility
             cursor.Close();
         }
 
-        public void Refresh()
-        {
-            Load();
-            LableDBManager.Get().Load();
-            Categorize();
-        }
-
-        //미분류에 저장된 대화를 레이블에 맞게 이동하여 탭에 넣음.
-        //이것은 처음 어플 실행했을 때, 문자를 보냈을때, 받았을때 호출됨.
-        public void Categorize()
-        {
-            //DB가 없으면 새로 만든다.
-            if (!LableDBManager.Get().IsDBExist())
-                LableDBManager.Get().CreateNewDB(_DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
-
-            List<Dialogue> deleteTarget = new List<Dialogue>();
-
-            //미분류 대화들을 탐색.
-            foreach(Dialogue objDialogue in _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Values)
-            {
-                //서버에 보내서 결과값을 받는다.
-                List<string[]> receivedData = NetworkManager.Get().GetLableFromServer(objDialogue);
-
-                //서버에서 데이터 받았으면
-                if(receivedData.Count > 0)
-                {
-                    //디버깅용 예외
-                    if (receivedData[0][0] != objDialogue.Address)
-                        throw new Exception("보낸 주소와 받은 주소가 다르다???");
-                    
-                    //미분류 목록에서 삭제할 대상으로 추가
-                    deleteTarget.Add(objDialogue);
-
-                    //레이블 누적하고 DB에 삽입
-                    for (int i = 1; i < 7; i++)
-                        objDialogue.Lables[i] += Convert.ToInt32(receivedData[0][i]);
-
-                    int prevMajorLable = objDialogue.MajorLable;
-
-                    objDialogue.MajorLable = objDialogue.Lables.ToList().IndexOf(objDialogue.Lables.Max());
-
-                    LableDBManager.Get().InsertOrUpdate(objDialogue);
-
-                    _DialogueSets[objDialogue.MajorLable].Add(objDialogue);                                 //이 대화를 알맞는 레이블에 추가
-                }
-            }
-
-            foreach (Dialogue target in deleteTarget)
-            {
-                _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(target.Thread_id);           //미분류 대화 목록에서 삭제
-            }
-        }
-
         public long GetThreadId(string address)
         {
             return Telephony.Threads.GetOrCreateThreadId(Application.Context, address);      //make new Thread_id
         }
+
+        public void Refresh()
+        {
+            Load();
+            CategorizeLocally(_DialogueSets[(int)Dialogue.LableType.ALL]);
+        }
+        
+        //해당 대화집합이 모두 LableDB에 포함되어있다는 가정 하에 문자를 분류해서 메모리에 올림. 네트워크에 연결하지 않음.
+        public void CategorizeLocally(DialogueSet dialogueSet)
+        {
+            List<Dialogue> deleteTarget = new List<Dialogue>();
+
+            //대화들을 탐색. Lable DB에 있는지 확인함.
+            foreach (Dialogue objDialogue in dialogueSet.DialogueList.Values)
+            {
+                int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
+                int[] lables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
+
+                if (majorLable == -1 || lables == null)                                 //레이블 DB에 없는것이 있다?
+                    throw new Exception("레이블 DB에 없는 데이터가 있는데 InitialCategorize 호출됨");
+
+                objDialogue.MajorLable = majorLable;                                    //대표 레이블 설정
+                lables.CopyTo(objDialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
+                _DialogueSets[majorLable].InsertOrUpdate(objDialogue);                  //레이블에 맞는 셋에 대화 추가
+                deleteTarget.Add(objDialogue);
+            }
+
+            //미분류 탭에 남아있는 대화를 삭제
+            foreach(Dialogue objDialogue in deleteTarget)
+            {
+                _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(objDialogue.Thread_id);
+            }
+        }
+
+        //어플이 실행했됬을 때, 네트워크에 다시 연결됬을 때 분류되지 않은 메시지가 있으면 그것을 분류함. 네트워크에 연결함.
+        public void CategorizeNewMsg()
+        {
+            foreach(Dialogue objDialogue in _DialogueSets[0].DialogueList.Values)
+            {
+                int[] objLables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
+
+                if (objLables == null)
+                {
+                    //레이블 DB에 이 대화가 없음. 새 대화임.
+                    CategorizeFromServer(objDialogue);
+                    continue;
+                }
+                else
+                {
+                    int msgCnt = 0;
+                    for (int i = 0; i < objLables.Length; i++)
+                        msgCnt += objLables[i];
+                    
+                    if(msgCnt != objDialogue.Count)
+                    {
+                        //신규메시지 존재하는 경우 이 대화를 다시 레이블 매김.
+                        CategorizeFromServer(objDialogue);
+                    }
+                }
+
+            }
+        }
+
+        //서버로부터 이 대화의 레이블을 받고, 레이블 DB에 업데이트 한 뒤, 이 대화를 메모리에 올림
+        public void CategorizeFromServer(Dialogue dialogue)
+        {
+            if (dialogue.Count <= 0)
+                return;
+
+            int majorLable = LableDBManager.Get().GetMajorLable(dialogue.Thread_id);    //레이블 DB에 저장되있는 대표 레이블 가져옴 
+            int[] lables = LableDBManager.Get().GetLables(dialogue.Thread_id);          //레이블 DB에 저장되있는 레이블들 가져옴
+
+            LableDBManager.Get().UpdateLableDB(dialogue);
+            majorLable = LableDBManager.Get().GetMajorLable(dialogue.Thread_id); //업데이트된 대표 레이블 가져옴
+            lables = LableDBManager.Get().GetLables(dialogue.Thread_id);         //업데이트된 레이블 가져옴
+
+            if (majorLable == -1 || lables == null)                             //서버 통신 실패면 아무것도 하지 않음.
+                return;
+
+            dialogue.MajorLable = majorLable;                                    //대표 레이블 설정
+            lables.CopyTo(dialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
+            _DialogueSets[majorLable].InsertOrUpdate(dialogue);                  //레이블에 맞는 셋에 대화 추가
+
+            _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(dialogue.Thread_id); //미분류 탭에 남아있는 대화를 삭제함.
+        }
+
     }
 
     

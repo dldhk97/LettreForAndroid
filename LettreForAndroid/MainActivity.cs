@@ -63,12 +63,43 @@ namespace LettreForAndroid
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
         public void Setup()
         {
-            ContactDBManager.Get();           //연락처를 모두 메모리에 올림
-            LableDBManager.Get();           //레이블 DB를 모두 메모리에 올림
-            MessageDBManager.Get();           //메시지를 모두 메모리에 올림
-            MessageDBManager.Get().Categorize();
+            ContactDBManager.Get();                         //연락처를 모두 메모리에 올림
+            LableDBManager.Get();                           //레이블 DB를 모두 메모리에 올림
+            MessageDBManager.Get();                         //메시지를 모두 메모리에 올림
+
+            //레이블 DB가 있나?
+            if(LableDBManager.Get().IsDBExist())
+            {
+                MessageDBManager.Get().CategorizeNewMsg(); //메시지 중 레이블이 붙어있지 않은 대화가 있으면, 그 대화 다시 카테고라이즈함.
+                MessageDBManager.Get().CategorizeLocally(
+                    MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
+            }
+            else
+            {
+                //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
+                LableDBManager.Get().CreateLableDB(
+                MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
+
+                //만들어진 Lable DB로 카테고라이징
+                if (LableDBManager.Get().IsDBExist())
+                {
+                    MessageDBManager.Get().CategorizeLocally(
+                    MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
+                }
+                else
+                {
+                    Toast.MakeText(this, "레이블 DB 생성에 실패했습니다.", ToastLength.Long).Show();
+                }
+            }
+
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
+
+            SetupLayout();
+        }
+
+        public void SetupLayout()
+        {
             //툴바 세팅
             SetupToolBar();
 
@@ -78,7 +109,6 @@ namespace LettreForAndroid
             //탭 레이아웃 세팅
             _TabFragManager = new TabFragManager(this, SupportFragmentManager);
             _TabFragManager.SetupTabLayout();
-
         }
 
         //-------------------------------------------------------------

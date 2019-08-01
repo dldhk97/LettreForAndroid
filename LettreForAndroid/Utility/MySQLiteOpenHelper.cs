@@ -58,6 +58,7 @@ namespace LettreForAndroid.Utility
 
         public const string DeleteQuery = "drop table if exists " + _TABLE_NAME;
 
+        //DB에 대화가 있으면 교체, 없으면 삽입
         public void InsertOrUpdate(Context context, Dialogue dialogue)
         {
             SQLiteDatabase db = new MySQLiteOpenHelper(context).WritableDatabase;
@@ -78,7 +79,7 @@ namespace LettreForAndroid.Utility
             db.Close();
         }
 
-        //모든 대화 메타데이터를 DB에서 불러온다.
+        //모든 Lable 데이터를 DB에서 불러온다.
         public DialogueSet Load(Context context)
         {
             SQLiteDatabase db = new MySQLiteOpenHelper(context).ReadableDatabase;
@@ -108,7 +109,7 @@ namespace LettreForAndroid.Utility
                     objDialogue.Address = cursor.GetString(1);
                     for(int i = 2; i < Dialogue.Lable_COUNT; i++)   //DB의 2~7행까지 데이터를 1~6번 레이블에 저장, 0번과 7번레이블은 사용안됨.
                         objDialogue.Lables[i-1] = cursor.GetInt(i);
-                    result.Add(objDialogue);
+                    result.InsertOrUpdate(objDialogue);
                 }
             }
 

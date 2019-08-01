@@ -101,7 +101,7 @@ namespace LettreForAndroid.Utility
             return SendAndReceiveData(toSendData);
         }
 
-        public List<string[]> GetLableFromServer(Dialogue dialogue)
+        public List<string[]> GetLablesFromServer(Dialogue dialogue)
         {
             List<string[]> toSendData = new List<string[]>();
 
@@ -115,16 +115,28 @@ namespace LettreForAndroid.Utility
             return SendAndReceiveData(toSendData);
         }
 
+        public List<string[]> GetLableFromServer(TextMessage message)
+        {
+            List<string[]> toSendData = new List<string[]>();
+
+            toSendData.Add(new string[] { message.Address, message.Msg });
+
+            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
+            return SendAndReceiveData(toSendData);
+        }
+
         //데이터를 여러개 보낼 때(어플 -> 서버)
         private List<string[]> SendAndReceiveData(List<string[]> dataList)
         {
             if (!_IsConnected)
                 makeConnection();
 
-            List<string[]> receivedData = new List<string[]>();
+            List<string[]> receivedData = null;
 
             if (_IsConnected)
             {
+                receivedData = new List<string[]>();
+
                 //타입 전송, 타입은 0이면 데이터 제공 X, 1이면 데이터 제공
                 int type = 0;
                 byte[] typeByte = intToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
@@ -203,15 +215,6 @@ namespace LettreForAndroid.Utility
 
                     //-------------------------------------------------------
 
-                    //DEBUG : 출력 창에 표시함.
-                    //Console.WriteLine("---------------------------[" + (i + 1) + "] 번째 데이터----------------------");
-                    //Console.WriteLine("연락처 길이 : " + receive_addr_length.ToString());
-                    //Console.WriteLine("연락처 : " + receive_addr_str);
-                    //for(int j = 0; j < 6; j++)
-                    //{
-                    //    Console.WriteLine("레이블" + "[" + j + "] " + receive_lables[j].ToString());
-                    //}
-
                     receivedData.Add(new string[] {
                         receive_addr_str,
                         receive_lables[0].ToString(),
@@ -222,7 +225,6 @@ namespace LettreForAndroid.Utility
                         receive_lables[5].ToString(),
                     });
                 }
-                //Console.WriteLine("수신 완료!!!");
             }
             // (4) 소켓 닫기
             _CurrentSocket.Close();

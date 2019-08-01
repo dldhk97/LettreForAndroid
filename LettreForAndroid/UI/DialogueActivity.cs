@@ -178,13 +178,13 @@ namespace LettreForAndroid.UI
             //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_RecyclerItems.Count > 0)
             {
-                LinearLayoutManager mLayoutManager = new LinearLayoutManager(Application.Context);
-                mLayoutManager.ReverseLayout = true;
-                mLayoutManager.StackFromEnd = true;
+                LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
+                layoutManager.ReverseLayout = true;
+                layoutManager.StackFromEnd = true;
 
                 RecyclerItemAdpater Adapter = new RecyclerItemAdpater(_RecyclerItems, _CurDialogue.Contact);
                 _RecyclerView.SetAdapter(Adapter);
-                _RecyclerView.SetLayoutManager(mLayoutManager);
+                _RecyclerView.SetLayoutManager(layoutManager);
                 _RecyclerView.ScrollToPosition(0);
             }
             else
