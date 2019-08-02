@@ -89,7 +89,26 @@ namespace LettreForAndroid
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
+            CreateNotificationChannel();            //Notification을 위한 채널 등록
+
             SetupLayout();
+        }
+
+        private void CreateNotificationChannel()
+        {
+            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
+                return;
+
+            var channelName = Resources.GetString(Resource.String.channel_name);
+            var channelDescription = GetString(Resource.String.channel_description);
+            var channelID = GetString(Resource.String.channel_Id);
+
+            var channel = new NotificationChannel(channelID, channelName, NotificationImportance.Default);
+            channel.Description = channelDescription;
+            channel.Importance = NotificationImportance.Max;
+
+            var notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            notificationManager.CreateNotificationChannel(channel);
         }
 
         public void SetupLayout()

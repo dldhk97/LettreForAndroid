@@ -86,6 +86,7 @@
     <Compile Include="Utility\DateTimeUtillity.cs" />
     <Compile Include="Utility\MessageDBManager.cs" />
     <Compile Include="Utility\NetworkManager.cs" />
+    <Compile Include="Utility\NotificationHandler.cs" />
     <Compile Include="Utility\PermissionManager.cs" />
     <Compile Include="UI\DefaultPackActivity.cs" />
   </ItemGroup>

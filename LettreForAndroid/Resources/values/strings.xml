@@ -1,4 +1,7 @@
 <resources>
   <string name="app_name">Lettre</string>
   <string name="action_settings">Settings</string>
+  <string name="channel_name">Message Channel</string>
+  <string name="channel_description">Channel For Lettre</string>
+  <string name="channel_Id">Lettre Channel 1</string>
 </resources>

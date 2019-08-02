@@ -3657,6 +3657,15 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0c0022
 			public const int bottom_sheet_behavior = 2131492898;
 			
+			// aapt resource value: 0x7f0c002d
+			public const int channel_Id = 2131492909;
+			
+			// aapt resource value: 0x7f0c002c
+			public const int channel_description = 2131492908;
+			
+			// aapt resource value: 0x7f0c002b
+			public const int channel_name = 2131492907;
+			
 			// aapt resource value: 0x7f0c0023
 			public const int character_counter_pattern = 2131492899;
 			
