@@ -16,7 +16,7 @@ namespace LettreForAndroid.UI
     public class CustomPagerAdapter : FragmentPagerAdapter
     {
         private List<TabFrag> _Tabs = new List<TabFrag>();
-        public static List<main_page> _Pages = new List<main_page>();
+        public static List<MainFragActivity> _Pages = new List<MainFragActivity>();
         readonly Context _Context;
 
         public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
@@ -32,7 +32,7 @@ namespace LettreForAndroid.UI
         //새로운 탭이 만들어질때 호출됨.
         public override Fragment GetItem(int position)
         {
-            main_page fragPage = main_page.newInstance(position, _Tabs[position].Category);
+            MainFragActivity fragPage = MainFragActivity.newInstance(position, _Tabs[position].Category);
             _Pages.Add(fragPage);
             return fragPage;
         }

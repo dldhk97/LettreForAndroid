@@ -133,6 +133,11 @@ namespace LettreForAndroid.Utility
                 }
             }
             cursor.Close();
+
+            foreach(DialogueSet dialgoueSet in _DialogueSets)
+            {
+                dialgoueSet.SortByLastMessageTime();
+            }
         }
 
         public long GetThreadId(string address)
@@ -149,27 +154,39 @@ namespace LettreForAndroid.Utility
         //해당 대화집합이 모두 LableDB에 포함되어있다는 가정 하에 문자를 분류해서 메모리에 올림. 네트워크에 연결하지 않음.
         public void CategorizeLocally(DialogueSet dialogueSet)
         {
-            List<Dialogue> deleteTarget = new List<Dialogue>();
+            List<Dialogue> unlabledTarget = new List<Dialogue>();                 //연락처에 없는 대화들은 모두 미분류 카테고리에 있음. 분류가 되면 미분류탭에서 삭제해야함.
+            List<KeyValuePair<int, Dialogue>> lableChangedTarget = new List<KeyValuePair<int, Dialogue>>();          //분류가 변경된 대화들
 
             //대화들을 탐색. Lable DB에 있는지 확인함.
             foreach (Dialogue objDialogue in dialogueSet.DialogueList.Values)
             {
+                int prevMajorLable = objDialogue.MajorLable;
                 int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
                 int[] lables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
 
                 if (majorLable == -1 || lables == null)                                 //레이블 DB에 없는것이 있다?
-                    throw new Exception("레이블 DB에 없는 데이터가 있는데 InitialCategorize 호출됨");
+                    throw new Exception("레이블 DB에 없는 데이터가 있는데 CategorizeLocally 호출됨. 왜 호출됬는지 알아봐라");
 
                 objDialogue.MajorLable = majorLable;                                    //대표 레이블 설정
                 lables.CopyTo(objDialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
                 _DialogueSets[majorLable].InsertOrUpdate(objDialogue);                  //레이블에 맞는 셋에 대화 추가
-                deleteTarget.Add(objDialogue);
+
+                unlabledTarget.Add(objDialogue);                                  //미분류탭 삭제대상으로 선정
+
+                if (prevMajorLable != majorLable)                                       //분류가 레이블 DB갱신으로 인해 변경된 경우 이전 탭에서 삭제대상으로 선정
+                    lableChangedTarget.Add(new KeyValuePair<int, Dialogue>(prevMajorLable, objDialogue));
             }
 
             //미분류 탭에 남아있는 대화를 삭제
-            foreach(Dialogue objDialogue in deleteTarget)
+            foreach(Dialogue objDialogue in unlabledTarget)
             {
                 _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(objDialogue.Thread_id);
+            }
+
+            //분류가 변경된 대화들은 이전 탭에서 삭제
+            foreach(KeyValuePair<int, Dialogue> objDialogue in lableChangedTarget)
+            {
+                _DialogueSets[objDialogue.Key].DialogueList.Remove(objDialogue.Value.Thread_id);
             }
         }
 
@@ -183,7 +200,7 @@ namespace LettreForAndroid.Utility
                 if (objLables == null)
                 {
                     //레이블 DB에 이 대화가 없음. 새 대화임.
-                    CategorizeFromServer(objDialogue);
+                    ReCategorize(objDialogue);
                     continue;
                 }
                 else
@@ -195,7 +212,8 @@ namespace LettreForAndroid.Utility
                     if(msgCnt != objDialogue.Count)
                     {
                         //신규메시지 존재하는 경우 이 대화를 다시 레이블 매김.
-                        CategorizeFromServer(objDialogue);
+                        //한 메세지만 보내는게 아니라 대화 전체를 보내는데, 이는 어느 메세지가 분류되지 않은것인지 모르기 때문.
+                        ReCategorize(objDialogue);
                     }
                 }
 
@@ -203,7 +221,7 @@ namespace LettreForAndroid.Utility
         }
 
         //서버로부터 이 대화의 레이블을 받고, 레이블 DB에 업데이트 한 뒤, 이 대화를 메모리에 올림
-        public void CategorizeFromServer(Dialogue dialogue)
+        public void ReCategorize(Dialogue dialogue)
         {
             if (dialogue.Count <= 0)
                 return;

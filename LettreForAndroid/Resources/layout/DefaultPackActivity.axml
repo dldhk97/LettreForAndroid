@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:id="@+id/welcomepage_Title"
+        android:id="@+id/dpa_Title"
         android:text="레뜨레를 기본앱으로 설정 해주세요!"
         android:textColor="@android:color/white"
         android:gravity="center"
@@ -31,7 +31,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/welcomepage_guidetext1"
+        android:id="@+id/dpa_guidetext1"
         android:text="레뜨레 사용을 위해 설정이 조금 필요합니다.&#10;아래 버튼을 눌러 기본 문자앱으로 설정해주세요!"
         android:gravity="center"
         android:textSize="15dp"
@@ -44,7 +44,7 @@
         android:text="기본 앱으로 설정"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/welcomepage_button1"
+        android:id="@+id/dpa_button1"
         android:textSize="20dp"
         android:textColor="#fff"
         android:textStyle="bold"

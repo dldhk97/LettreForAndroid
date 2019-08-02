@@ -73,7 +73,7 @@
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\DialogueActivity.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="UI\main_page.cs" />
+    <Compile Include="UI\MainFragActivity.cs" />
     <Compile Include="UI\TabFragManager.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,7 +86,7 @@
     <Compile Include="Utility\MessageDBManager.cs" />
     <Compile Include="Utility\NetworkManager.cs" />
     <Compile Include="Utility\PermissionManager.cs" />
-    <Compile Include="UI\welcome_page.cs" />
+    <Compile Include="UI\DefaultPackActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -94,7 +94,7 @@
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\activity_main.axml">
+    <AndroidResource Include="Resources\layout\MainActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\values\colors.xml" />
@@ -162,7 +162,7 @@
     <AndroidResource Include="Resources\drawable\dd9_send_256.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\welcome_page.axml">
+    <AndroidResource Include="Resources\layout\DefaultPackActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -212,7 +212,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\main_icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\dialogue_page.axml">
+    <AndroidResource Include="Resources\layout\DialogueActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
@@ -241,7 +241,7 @@
     <AndroidResource Include="Resources\drawable\dd9_send_36dp_2x_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\dp_add_36_2x.png" />
+    <AndroidResource Include="Resources\drawable\da_add_36_2x.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\dialogue_frag_category.axml">

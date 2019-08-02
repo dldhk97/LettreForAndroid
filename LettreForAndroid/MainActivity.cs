@@ -32,7 +32,7 @@ namespace LettreForAndroid
         {
             base.OnCreate(bundle);
 
-            SetContentView(Resource.Layout.activity_main);
+            SetContentView(Resource.Layout.MainActivity);
 
             string thisPackName = PackageName;
             string defulatPackName = Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this);
@@ -40,7 +40,7 @@ namespace LettreForAndroid
             //기본앱이 아니면 Welcompage Activity 시작
             if (!thisPackName.Equals(defulatPackName))
             {
-                StartActivityForResult(typeof(welcome_page), REQUEST_WELCOMECOMPLETE);
+                StartActivityForResult(typeof(DefaultPackActivity), REQUEST_WELCOMECOMPLETE);
             }
             else
             {
@@ -93,7 +93,6 @@ namespace LettreForAndroid
             }
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
-
 
             SetupLayout();
         }
@@ -148,8 +147,8 @@ namespace LettreForAndroid
 
         public void SetupBottomBar()
         {
-            var dialogueViewBtn = FindViewById<Button>(Resource.Id.mp_bottomBtn1);
-            var contactViewBtn = FindViewById<Button>(Resource.Id.mp_bottomBtn2);
+            var dialogueViewBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn1);
+            var contactViewBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn2);
             //연락처 액티비티와 메인액티비티 간 전환 메소드 넣으면 됨.
         }
     }

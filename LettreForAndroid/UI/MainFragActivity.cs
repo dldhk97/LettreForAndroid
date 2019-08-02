@@ -15,9 +15,9 @@ using LettreForAndroid.Receivers;
 
 namespace LettreForAndroid.UI
 {
-    public class main_page : Fragment
+    public class MainFragActivity : Fragment
     {
-        public static main_page _Instance;
+        public static MainFragActivity _Instance;
 
         const string INTENT_CATEGORY = "intentCategory";
         const string INTENT_POSITION = "intentPosition";
@@ -31,13 +31,13 @@ namespace LettreForAndroid.UI
         RecyclerView.LayoutManager _LayoutManager;
 
         //새로운 페이지가 만들어질때 호출됨
-        public static main_page newInstance(int iPosition, int iCategory)  //어댑터로부터 현재 탭의 정보를 받음. 이것을 args에 저장함. Static이라서 args를 통해 OnCreate로 전달.
+        public static MainFragActivity newInstance(int iPosition, int iCategory)  //어댑터로부터 현재 탭의 정보를 받음. 이것을 args에 저장함. Static이라서 args를 통해 OnCreate로 전달.
         {
             var args = new Bundle();
             args.PutInt(INTENT_CATEGORY, iCategory);
             args.PutInt(INTENT_POSITION, iPosition);
 
-            var fragment = new main_page();
+            var fragment = new MainFragActivity();
             fragment.Arguments = args;
 
             return fragment;

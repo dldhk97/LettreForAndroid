@@ -41,7 +41,7 @@
                 android:background="#50000000"
                 android:foregroundGravity="center"
                 android:layout_below="@+id/sliding_tabs"
-                android:layout_above="@+id/mp_bottomBarLayout" />
+                android:layout_above="@+id/ma_bottomBarLayout" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/sendButton"
@@ -51,7 +51,7 @@
                 android:layout_marginBottom="20dp"
                 android:src="@drawable/dd9_send_36dp_2x_2"
                 android:layout_alignParentRight="true"
-                android:layout_above="@+id/mp_bottomBarLayout"
+                android:layout_above="@+id/ma_bottomBarLayout"
                 android:backgroundTint="#FFFFFF"
                 app:fabSize="normal"
                 android:scaleType="centerCrop"
@@ -60,7 +60,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/mp_bottomBarLayout"
+                android:id="@+id/ma_bottomBarLayout"
                 android:layout_alignParentBottom="true"
                 android:background="#30FFFFFF"
                 android:orientation="horizontal"
@@ -69,7 +69,7 @@
                     android:text="메시지"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/mp_bottomBtn1"
+                    android:id="@+id/ma_bottomBtn1"
                     android:background="?android:attr/selectableItemBackground"
                     android:layout_weight="1"
                     android:textSize="20dp"
@@ -86,7 +86,7 @@
                     android:text="연락처"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/mp_bottomBtn2"
+                    android:id="@+id/ma_bottomBtn2"
                     android:background="?android:attr/selectableItemBackground"
                     android:layout_weight="1"
                     android:textSize="20dp" />

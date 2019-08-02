@@ -46,7 +46,7 @@ namespace LettreForAndroid.UI
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.dialogue_page);
+            SetContentView(Resource.Layout.DialogueActivity);
 
             _Instance = this;
 
@@ -158,10 +158,10 @@ namespace LettreForAndroid.UI
         //UI
         private void SetupRecyclerView()
         {
-            _SendButton = FindViewById<Button>(Resource.Id.dp_sendBtn);
-            _MsgBox = FindViewById<EditText>(Resource.Id.dp_msgBox);
+            _SendButton = FindViewById<Button>(Resource.Id.da_sendBtn);
+            _MsgBox = FindViewById<EditText>(Resource.Id.da_msgBox);
 
-            _RecyclerView = FindViewById<RecyclerView>(Resource.Id.dp_recyclerView1);
+            _RecyclerView = FindViewById<RecyclerView>(Resource.Id.da_recyclerView1);
 
             _SendButton.Click += SendButton_Click;
 
