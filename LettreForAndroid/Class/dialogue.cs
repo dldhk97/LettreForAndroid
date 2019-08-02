@@ -182,11 +182,12 @@ namespace LettreForAndroid.Class
     public class TextMessage
     {
         public enum MESSAGE_TYPE { RECEIVED = 1, SENT = 2 };
+        public enum MESSAGE_READSTATE { UNREAD = 0, READ = 1};
 
         private string id;          //ID
         private string address;     //보낸사람, MMS 메세지는 여기서 번호 안나옴.
         private string msg;         //메세지(body)
-        private string readState;   //0은 읽지않음, 1은 읽음.
+        private int readState;   //0은 읽지않음, 1은 읽음.
         private long time;           //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
         private int type;           //1은 상대방이 보낸 것, 2는 내가 보낸 것
         private long thread_id;   //대화방 고유 ID?
@@ -206,7 +207,7 @@ namespace LettreForAndroid.Class
             get { return msg; }
             set { msg = value; }
         }
-        public string ReadState
+        public int ReadState
         {
             get { return readState; }
             set { readState = value; }

@@ -67,6 +67,7 @@ namespace LettreForAndroid.UI
             _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
         }
 
+
         //문자 전송 이후 호출됨
         private void _SmsSentReceiver_SentCompleteEvent(int resultCode)
         {
@@ -166,11 +167,33 @@ namespace LettreForAndroid.UI
             _SendButton.Click += SendButton_Click;
 
             RefreshRecyclerView();
+
+            //탭 새로고침
+            TabFragManager._Instance.RefreshLayout();
+
+            //대화목록(메인) 새로고침
+            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+            {
+                CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                if (DialogueActivity._Instance == null)
+                    CustomPagerAdapter._Pages[i].refreshFrag();
+            }
         }
 
         public void RefreshRecyclerView()
         {
             _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
+
+            //대화를 모두 읽음으로 처리
+            _CurDialogue.UnreadCnt = 0;
+            foreach (TextMessage msg in _CurDialogue.TextMessageList)
+            {
+                if(msg.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)
+                {
+                    msg.ReadState = (int)TextMessage.MESSAGE_READSTATE.READ;
+                    MessageDBManager.Get().ChangeReadState(msg, (int)TextMessage.MESSAGE_READSTATE.READ);
+                }
+            }
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
             _RecyclerItems = groupByDate(_CurDialogue);

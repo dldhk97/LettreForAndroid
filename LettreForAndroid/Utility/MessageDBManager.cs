@@ -95,7 +95,7 @@ namespace LettreForAndroid.Utility
                     string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
                     objSms.Address = address != "" ? address : "Unknown";
                     objSms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
-                    objSms.ReadState = cursor.GetString(cursor.GetColumnIndex("read"));
+                    objSms.ReadState = cursor.GetInt(cursor.GetColumnIndex("read"));
                     objSms.Time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
                     objSms.Thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
                     objSms.Type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
@@ -126,7 +126,7 @@ namespace LettreForAndroid.Utility
 
                         prevThreadId = objSms.Thread_id;
                     }
-                    if (objSms.ReadState == "0")                                                          //읽지 않은 문자면, 카운트 추가
+                    if (objSms.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)                              //읽지 않은 문자면, 카운트 추가
                         objDialogue.UnreadCnt++;
 
                     objDialogue.Add(objSms);
@@ -143,6 +143,15 @@ namespace LettreForAndroid.Utility
         public long GetThreadId(string address)
         {
             return Telephony.Threads.GetOrCreateThreadId(Application.Context, address);      //make new Thread_id
+        }
+
+        public void ChangeReadState(TextMessage msg, int readState)
+        {
+            ContentValues values = new ContentValues();
+            values.Put("read", readState);
+
+            ContentResolver cr = Application.Context.ContentResolver; 
+            cr.Update(Uri.Parse("content://sms/"), values, "_id=" + msg.Id, null);
         }
 
         public void Refresh()
@@ -164,8 +173,12 @@ namespace LettreForAndroid.Utility
                 int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
                 int[] lables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
 
-                if (majorLable == -1 || lables == null)                                 //레이블 DB에 없는것이 있다?
-                    throw new Exception("레이블 DB에 없는 데이터가 있는데 CategorizeLocally 호출됨. 왜 호출됬는지 알아봐라");
+                if (majorLable == -1 || lables == null)                                 //레이블 DB에 없는것이 있다? -> 서버와 통신이 안됬을때 새 문자가 생긴 경우. 미분류로 처리
+                {
+                    continue;
+                    //throw new Exception("레이블 DB에 없는 데이터가 있는데 CategorizeLocally 호출됨. 왜 호출됬는지 알아봐라");
+                }
+                    
 
                 objDialogue.MajorLable = majorLable;                                    //대표 레이블 설정
                 lables.CopyTo(objDialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
@@ -193,38 +206,52 @@ namespace LettreForAndroid.Utility
         //어플이 실행했됬을 때, 네트워크에 다시 연결됬을 때 분류되지 않은 메시지가 있으면 그것을 분류함. 네트워크에 연결함.
         public void CategorizeNewMsg()
         {
+            bool isNetworkConnected = true;
             foreach(Dialogue objDialogue in _DialogueSets[0].DialogueList.Values)
             {
                 int[] objLables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
 
+                //레이블 DB에 이 대화가 없으면. 새 대화로 간주, 레이블DB에 새 값을 넣음.
                 if (objLables == null)
                 {
-                    //레이블 DB에 이 대화가 없음. 새 대화임.
-                    ReCategorize(objDialogue);
-                    continue;
+                    if (ReCategorize(objDialogue) == false)     //만약 서버 통신 실패면 중단
+                    {
+                        isNetworkConnected = false;
+                        break;
+                    }
                 }
                 else
                 {
+                    //이 대화에서 레이블이 붙여진 문자의 수를 센다.
                     int msgCnt = 0;
                     for (int i = 0; i < objLables.Length; i++)
                         msgCnt += objLables[i];
                     
+                    //실제 존재하는 문자수와 레이블 붙여진 문자수가 다르면, 레이블이 붙여지지 않은 문자가 존재한다는 의미.
                     if(msgCnt != objDialogue.Count)
                     {
                         //신규메시지 존재하는 경우 이 대화를 다시 레이블 매김.
                         //한 메세지만 보내는게 아니라 대화 전체를 보내는데, 이는 어느 메세지가 분류되지 않은것인지 모르기 때문.
-                        ReCategorize(objDialogue);
+                        if (ReCategorize(objDialogue) == false) 
+                        {
+                            isNetworkConnected = false;
+                            break;      //서버 통신 실패시 중단함.
+                        }
                     }
                 }
+            }
 
+            if(isNetworkConnected == false)
+            {
+                Toast.MakeText(Application.Context, "서버와 통신이 원할하지 않아 미분류된 문자가 존재합니다.", ToastLength.Long).Show();
             }
         }
 
         //서버로부터 이 대화의 레이블을 받고, 레이블 DB에 업데이트 한 뒤, 이 대화를 메모리에 올림
-        public void ReCategorize(Dialogue dialogue)
+        public bool ReCategorize(Dialogue dialogue)
         {
             if (dialogue.Count <= 0)
-                return;
+                return true;
 
             int majorLable = LableDBManager.Get().GetMajorLable(dialogue.Thread_id);    //레이블 DB에 저장되있는 대표 레이블 가져옴 
             int[] lables = LableDBManager.Get().GetLables(dialogue.Thread_id);          //레이블 DB에 저장되있는 레이블들 가져옴
@@ -234,13 +261,14 @@ namespace LettreForAndroid.Utility
             lables = LableDBManager.Get().GetLables(dialogue.Thread_id);         //업데이트된 레이블 가져옴
 
             if (majorLable == -1 || lables == null)                             //서버 통신 실패면 아무것도 하지 않음.
-                return;
+                return false;
 
             dialogue.MajorLable = majorLable;                                    //대표 레이블 설정
             lables.CopyTo(dialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
             _DialogueSets[majorLable].InsertOrUpdate(dialogue);                  //레이블에 맞는 셋에 대화 추가
 
             _DialogueSets[(int)Dialogue.LableType.UNKNOWN].DialogueList.Remove(dialogue.Thread_id); //미분류 탭에 남아있는 대화를 삭제함.
+            return true;
         }
 
     }

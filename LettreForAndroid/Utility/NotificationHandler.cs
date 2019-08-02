@@ -14,7 +14,7 @@ using LettreForAndroid.UI;
 
 namespace LettreForAndroid.Utility
 {
-    class NotificationHandler : Activity
+    class NotificationHandler
     {
         public static void Notification(Context context, string channelID, string title, string msg, string ticker, int notifId)
         {
@@ -31,12 +31,17 @@ namespace LettreForAndroid.Utility
                 .SetPriority((int)NotificationPriority.Max)
                 .SetVibrate(new long[0])
                 //.SetFullScreenIntent(intent, true)
-                .SetSmallIcon(Resource.Drawable.dd9_send_256);
+                .SetSmallIcon(Resource.Mipmap.main_icon);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.From(context);
             notificationManager.Notify(notifId, builder.Build());
         }
 
+        //private int getNotificationIcon()
+        //{
+        //    bool useWhiteIcon = (Android.OS.Build.VERSION.SdkInt >= Android.OS.Build.VERSION_CODES.Lollipop);
+        //    return useWhiteIcon ? Resource.dra.main_icon : R.drawable.ic_launcher;
+        //}
 
     }
 }

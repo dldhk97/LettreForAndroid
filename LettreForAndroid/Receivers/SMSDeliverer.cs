@@ -35,7 +35,7 @@ namespace LettreForAndroid.Receivers
 
                 UpdateMessage(context, objMsg);                 //DB에 저장
 
-                LableDBManager.Get().AccumulateLableDB(objMsg); //레이블 DB에 저장
+                LableDBManager.Get().AccumulateLableDB(objMsg); //서버에서 데이터 받은 후 레이블 DB에 저장
 
                 NotificationHandler.Notification(context, "Lettre Channel 1", objMsg.Address, objMsg.Msg, "Ticker", 101);       //알림 표시
             }
@@ -54,7 +54,7 @@ namespace LettreForAndroid.Receivers
             DateTimeUtillity dtu = new DateTimeUtillity();
             objMessage.Time = dtu.getCurrentMilTime();
 
-            objMessage.ReadState = "0";
+            objMessage.ReadState = (int)TextMessage.MESSAGE_READSTATE.UNREAD;
             objMessage.Type = (int)TextMessage.MESSAGE_TYPE.RECEIVED;
             objMessage.Thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
 
