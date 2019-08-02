@@ -213,6 +213,10 @@ namespace LettreForAndroid.Utility
             bool isNetworkConnected = true;
             foreach(Dialogue objDialogue in _DialogueSets[0].DialogueList.Values)
             {
+                //연락처가 있는 대화는 분류하지 않는다.
+                if (objDialogue.Contact != null)
+                    continue;
+
                 int[] objLables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
 
                 //레이블 DB에 이 대화가 없으면. 새 대화로 간주, 레이블DB에 새 값을 넣음.
