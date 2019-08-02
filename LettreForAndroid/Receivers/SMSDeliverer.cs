@@ -35,9 +35,15 @@ namespace LettreForAndroid.Receivers
 
                 UpdateMessage(context, objMsg);                 //DB에 저장
 
-                LableDBManager.Get().AccumulateLableDB(objMsg); //서버에서 데이터 받은 후 레이블 DB에 저장
+                string displayName = objMsg.Address;
 
-                NotificationHandler.Notification(context, "Lettre Channel 1", objMsg.Address, objMsg.Msg, "Ticker", 101);       //알림 표시
+                //연락처에 없으면 일상 대화가 아니므로, 서버에 보낸다.
+                if (ContactDBManager.Get().getContactByAddress(objMsg.Address) == null)
+                    LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 데이터 받은 후 레이블 DB에 저장
+                else
+                    displayName = MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.COMMON][objMsg.Thread_id].DisplayName;       //연락처에 있으면 표시될 이름 변경
+
+                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, "Ticker", 101);       //알림 표시
             }
 
             MessageDBManager.Get().Refresh();           //메세지 DB 새로고침

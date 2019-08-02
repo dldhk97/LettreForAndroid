@@ -69,7 +69,7 @@ namespace LettreForAndroid.Utility
         }
 
         //모든 문자메세지를 대화로 묶어 _DialogueSet[0] = 전체에만 저장
-        private void Load()
+        public void Load()
         {
             ResetDialogueSet();
             TextMessage objSms = new TextMessage();
