@@ -76,8 +76,6 @@ namespace LettreForAndroid.UI
 
             if (LableDBManager.Get().IsDBExist())
             {
-                MessageDBManager.Get().CategorizeLocally(
-                    MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
                 return true;
             }
             else

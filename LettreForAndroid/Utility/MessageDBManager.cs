@@ -169,6 +169,10 @@ namespace LettreForAndroid.Utility
             //대화들을 탐색. Lable DB에 있는지 확인함.
             foreach (Dialogue objDialogue in dialogueSet.DialogueList.Values)
             {
+                //연락처가 있으면 대화이므로 패스
+                if (objDialogue.Contact != null)
+                    continue;
+
                 int prevMajorLable = objDialogue.MajorLable;
                 int majorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
                 int[] lables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
