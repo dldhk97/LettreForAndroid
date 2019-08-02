@@ -26,7 +26,8 @@ namespace LettreForAndroid
     {
         TabFragManager _TabFragManager;
 
-        const int REQUEST_WELCOMECOMPLETE = 1;
+        const int REQUEST_DEFAULTPACKCOMPLETE = 1;
+        const int REQUEST_WELCOMEACTIVITYCOMPLETE = 2;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -40,7 +41,11 @@ namespace LettreForAndroid
             //기본앱이 아니면 Welcompage Activity 시작
             if (!thisPackName.Equals(defulatPackName))
             {
-                StartActivityForResult(typeof(DefaultPackActivity), REQUEST_WELCOMECOMPLETE);
+                StartActivityForResult(typeof(DefaultPackActivity), REQUEST_DEFAULTPACKCOMPLETE);
+            }
+            else if(!LableDBManager.Get().IsDBExist())
+            {
+                StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
             }
             else
             {
@@ -53,7 +58,10 @@ namespace LettreForAndroid
             base.OnActivityResult(requestCode, resultCode, data);
             switch (requestCode)
             {
-                case REQUEST_WELCOMECOMPLETE:
+                case REQUEST_DEFAULTPACKCOMPLETE:
+                    StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
+                    break;
+                case REQUEST_WELCOMEACTIVITYCOMPLETE:
                     Setup();
                     break;
             }
@@ -76,20 +84,7 @@ namespace LettreForAndroid
             }
             else
             {
-                //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
-                LableDBManager.Get().CreateLableDB(
-                MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
-
-                //만들어진 Lable DB로 카테고라이징
-                if (LableDBManager.Get().IsDBExist())
-                {
-                    MessageDBManager.Get().CategorizeLocally(
-                    MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
-                }
-                else
-                {
-                    Toast.MakeText(this, "레이블 DB 생성에 실패했습니다.", ToastLength.Long).Show();
-                }
+                //레이블 DB가 없는 경우. 정상적인 사용이 불가능.
             }
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용

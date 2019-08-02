@@ -18,11 +18,11 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "welcome_page", Theme = "@style/FadeInOutActivity")]
+    [Activity(Label = "DefaultPackActivity", Theme = "@style/FadeInOutActivity")]
     public class DefaultPackActivity : Activity
     {
         Button _BtnContinue;
-        TextView _dpa_guidetext1;
+        TextView _wa_guidetext1;
 
         const int REQUEST_DEFAULT_CALLBACK = 2;
 
@@ -32,8 +32,8 @@ namespace LettreForAndroid.UI
 
             SetContentView(Resource.Layout.DefaultPackActivity);
 
-            _BtnContinue = FindViewById<Button>(Resource.Id.dpa_button1);
-            _dpa_guidetext1 = FindViewById<TextView>(Resource.Id.dpa_guidetext1);
+            _BtnContinue = FindViewById<Button>(Resource.Id.wa_button1);
+            _wa_guidetext1 = FindViewById<TextView>(Resource.Id.wa_guidetext1);
 
             _BtnContinue.Click += async (sender, e) =>
             {
@@ -138,11 +138,10 @@ namespace LettreForAndroid.UI
 
         private void backToTheMain()
         {
-            //DataStorageManager.saveBoolData(this, "isFirst", false);
-
             //Finish 이후 문자 로딩하는데, 로딩하는동안 프로그레스바라도 띄우면 좋을듯
-            _dpa_guidetext1.Text = "잠시만 기다려주세요.";
+            _wa_guidetext1.Text = "잠시만 기다려주세요.";
             _BtnContinue.Enabled = false;
+
             Finish();
         }
     }
