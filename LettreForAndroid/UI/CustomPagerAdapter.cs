@@ -48,15 +48,6 @@ namespace LettreForAndroid.UI
 
             tabTitle.Text = _Tabs[position].TabTitle;
 
-            DialogueSet curDialogueSet = MessageDBManager.Get().DialogueSets[position];
-
-            int totalUnreadCnt = 0;
-            for (int i = 0; i < curDialogueSet.Count; i++)
-            {
-                totalUnreadCnt += curDialogueSet[i].UnreadCnt;
-            }
-            _Tabs[position].NotiCount = totalUnreadCnt;
-
             if (_Tabs[position].NotiCount > 0)
             {
                 notiCount.Text = _Tabs[position].NotiCount.ToString();
@@ -72,9 +63,9 @@ namespace LettreForAndroid.UI
             return view;
         }
 
-        public void AddTab(TabFrag[] iTabFrags)
+        public void AddTab(List<TabFrag> iTabFrags)
         {
-            for(int i = 0; i < iTabFrags.Length; i++)
+            for(int i = 0; i < iTabFrags.Count; i++)
                 _Tabs.Add(iTabFrags[i]);
         }
     }

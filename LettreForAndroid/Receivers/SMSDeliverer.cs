@@ -32,37 +32,51 @@ namespace LettreForAndroid.Receivers
             {
                 Toast.MakeText(context, "FROM : " + msg.DisplayOriginatingAddress + "\nMSG : " + msg.MessageBody, ToastLength.Short).Show();
 
-                long thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
+                UpdateMessage(context, msg);
 
-                //문자를 DB에 저장
-                ContentValues values = new ContentValues();
-                values.Put(Telephony.TextBasedSmsColumns.Address, msg.OriginatingAddress);
-                values.Put(Telephony.TextBasedSmsColumns.Body, msg.MessageBody);
-                DateTimeUtillity dtu = new DateTimeUtillity();
-                values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
-                values.Put(Telephony.TextBasedSmsColumns.Read, 0);
-                values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
-                values.Put(Telephony.TextBasedSmsColumns.ThreadId, thread_id);
-
-                context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
-
-                //레이블 DB에 누적
-                TextMessage message = new TextMessage();
-                message.Address = msg.OriginatingAddress;
-                message.Msg = msg.MessageBody;
-                LableDBManager.Get().AccumulateLableDB(message);
+                UpdateLable(msg);
             }
 
-            //메세지 DB 불러오기
-            MessageDBManager.Get().Refresh();
+            MessageDBManager.Get().Refresh();           //메세지 DB 새로고침
 
-            //UI 업데이트
+            RefreshUI();
+        }
+
+        //문자를 DB에 저장
+        private void UpdateMessage(Context context, SmsMessage msg)
+        {
+            long thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
+
+            ContentValues values = new ContentValues();
+            values.Put(Telephony.TextBasedSmsColumns.Address, msg.OriginatingAddress);
+            values.Put(Telephony.TextBasedSmsColumns.Body, msg.MessageBody);
+            DateTimeUtillity dtu = new DateTimeUtillity();
+            values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
+            values.Put(Telephony.TextBasedSmsColumns.Read, 0);
+            values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
+            values.Put(Telephony.TextBasedSmsColumns.ThreadId, thread_id);
+
+            context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
+        }
+
+        //레이블을 서버에서 받아서, 내장 레이블 DB에 누적
+        private void UpdateLable(SmsMessage msg)
+        {
+            TextMessage message = new TextMessage();
+            message.Address = msg.OriginatingAddress;
+            message.Msg = msg.MessageBody;
+            LableDBManager.Get().AccumulateLableDB(message);
+        }
+
+        //UI 새로고침
+        private void RefreshUI()
+        {
             //대화창 존재하면 새로고침
             if (DialogueActivity._Instance != null)
                 DialogueActivity._Instance.RefreshRecyclerView();
 
             //탭 새로고침
-            //TabFragManager._Instance.RefreshTabs();
+            TabFragManager._Instance.RefreshLayout();
 
             //대화목록(메인) 새로고침
             for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)

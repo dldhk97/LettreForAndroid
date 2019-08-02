@@ -44,6 +44,7 @@ namespace LettreForAndroid.UI
         {
             if (CreateLableDB())
             {
+                Toast.MakeText(this, "레이블 DB가 생성되었습니다.", ToastLength.Long).Show();
                 Finish();
             }
             else
@@ -65,6 +66,10 @@ namespace LettreForAndroid.UI
 
         private bool CreateLableDB()
         {
+            //미분류 메시지가 하나도 없는 경우
+            if (MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN].Count <= 0)
+                return true;
+
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
             LableDBManager.Get().CreateLableDB(
             MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
@@ -73,7 +78,6 @@ namespace LettreForAndroid.UI
             {
                 MessageDBManager.Get().CategorizeLocally(
                     MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
-                Toast.MakeText(this, "레이블 DB가 생성되었습니다.", ToastLength.Long).Show();
                 return true;
             }
             else

@@ -15,14 +15,14 @@ using Android.Views;
 using Android.Widget;
 
 using LettreForAndroid.Class;
-
+using LettreForAndroid.Utility;
 using FragmentManager = Android.Support.V4.App.FragmentManager;
 
 namespace LettreForAndroid.UI
 {
     public class TabFragManager
     {
-        TabFrag[] tabFrags = 
+        List<TabFrag> tabFrags = new List<TabFrag>()
         {
             new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.ALL], (int)Dialogue.LableType.ALL, 0, 0),                         //전체
             new TabFrag(Dialogue._LableTypeStr[(int)Dialogue.LableType.COMMON], (int)Dialogue.LableType.COMMON, 1, 0),                   //대화
@@ -36,35 +36,58 @@ namespace LettreForAndroid.UI
 
         readonly Activity activity;
         readonly FragmentManager fm;
-        
+
+        public static TabFragManager _Instance;
+        TabLayout _TabLayout;
+        CustomPagerAdapter _Adapter;
+
         public TabFragManager(Activity iActivity, FragmentManager iFm)
         {
             activity = iActivity;
             fm = iFm;
+            _Instance = this;
         }
         // 탭 레이아웃 설정
         public void SetupTabLayout()
         {
-            var pager = activity.FindViewById<ViewPager>(Resource.Id.pager);
-            var tabLayout = activity.FindViewById<TabLayout>(Resource.Id.sliding_tabs);
-            var adapter = new CustomPagerAdapter(activity.BaseContext, fm);
+            var viewPager = activity.FindViewById<ViewPager>(Resource.Id.pager);
+            _TabLayout = activity.FindViewById<TabLayout>(Resource.Id.sliding_tabs);
+            _Adapter = new CustomPagerAdapter(activity.BaseContext, fm);
 
-            adapter.AddTab(tabFrags);
+            _Adapter.AddTab(tabFrags);
 
             // Set adapter to view pager
-            pager.Adapter = adapter;
+            viewPager.Adapter = _Adapter;
 
             // Setup tablayout with view pager
-            tabLayout.SetupWithViewPager(pager);
+            _TabLayout.SetupWithViewPager(viewPager);
+
+            CountNoti();
 
             //모든 탭에 커스텀 뷰 적용
-            for (int i = 0; i < tabLayout.TabCount; i++)
+            for (int i = 0; i < _TabLayout.TabCount; i++)
             {
-                TabLayout.Tab tab = tabLayout.GetTabAt(i);
-                tab.SetCustomView(adapter.GetTabView(i));
+                TabLayout.Tab tab = _TabLayout.GetTabAt(i);
+
+                tab.SetCustomView(_Adapter.GetTabView(i));
             }
-            tabLayout.TabSelected += TabLayout_TabSelected;
-            tabLayout.TabUnselected += TabLayout_TabUnselected;
+            _TabLayout.TabSelected += TabLayout_TabSelected;
+            _TabLayout.TabUnselected += TabLayout_TabUnselected;
+        }
+
+        private void CountNoti()
+        {
+            for(int i = 0; i < tabFrags.Count; i++)
+            {
+                int totalUnreadCnt = 0;
+                DialogueSet objDialogueSet = MessageDBManager.Get().DialogueSets[i];
+
+                for (int j = 0; j < objDialogueSet.Count; j++)
+                {
+                    totalUnreadCnt += objDialogueSet[j].UnreadCnt;
+                }
+                tabFrags[i].NotiCount = totalUnreadCnt;
+            }
         }
 
         private void TabLayout_TabSelected(object sender, TabLayout.TabSelectedEventArgs e)
@@ -76,6 +99,20 @@ namespace LettreForAndroid.UI
         {
             TextView tv = e.Tab.CustomView.FindViewById<TextView>(Resource.Id.custTab_title);
             tv.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
+        }
+
+        public void RefreshLayout()
+        {
+            CountNoti();
+            //모든 탭에 커스텀 뷰 다시 적용
+            for (int i = 0; i < _TabLayout.TabCount; i++)
+            {
+                TabLayout.Tab tab = _TabLayout.GetTabAt(i);
+
+                tab.SetCustomView(null);
+                tab.SetCustomView(_Adapter.GetTabView(i));
+
+            }
         }
     }
 }
