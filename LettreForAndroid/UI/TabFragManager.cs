@@ -39,7 +39,7 @@ namespace LettreForAndroid.UI
 
         public static TabFragManager _Instance;
         TabLayout _TabLayout;
-        CustomPagerAdapter _Adapter;
+        Customma_pagerAdapter _Adapter;
 
         public TabFragManager(Activity iActivity, FragmentManager iFm)
         {
@@ -50,16 +50,16 @@ namespace LettreForAndroid.UI
         // 탭 레이아웃 설정
         public void SetupTabLayout()
         {
-            var viewPager = activity.FindViewById<ViewPager>(Resource.Id.pager);
-            _TabLayout = activity.FindViewById<TabLayout>(Resource.Id.sliding_tabs);
-            _Adapter = new CustomPagerAdapter(activity.BaseContext, fm);
+            var viewPager = activity.FindViewById<ViewPager>(Resource.Id.ma_pager);
+            _TabLayout = activity.FindViewById<TabLayout>(Resource.Id.ma_sliding_tabs);
+            _Adapter = new Customma_pagerAdapter(activity.BaseContext, fm);
 
             _Adapter.AddTab(tabFrags);
 
-            // Set adapter to view pager
+            // Set adapter to view ma_pager
             viewPager.Adapter = _Adapter;
 
-            // Setup tablayout with view pager
+            // Setup tablayout with view ma_pager
             _TabLayout.SetupWithViewPager(viewPager);
 
             CountNoti();

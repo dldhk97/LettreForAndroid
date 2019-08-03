@@ -17,7 +17,7 @@ using LettreForAndroid.UI;
 using LettreForAndroid.Receivers;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
-
+using Android.Support.Design.Widget;
 
 namespace LettreForAndroid
 {
@@ -122,6 +122,9 @@ namespace LettreForAndroid
             //탭 레이아웃 세팅
             _TabFragManager = new TabFragManager(this, SupportFragmentManager);
             _TabFragManager.SetupTabLayout();
+
+
+            SetupFloatingButton();
         }
 
         //-------------------------------------------------------------
@@ -130,7 +133,7 @@ namespace LettreForAndroid
          //툴바 적용
         public void SetupToolBar()
         {
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.my_toolbar);
+            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.ma_toolbar);
 
             SetSupportActionBar(toolbar);
             SupportActionBar.Title = "Lettre";
@@ -157,13 +160,31 @@ namespace LettreForAndroid
         }
 
         //---------------------------------------------------------------------
+        //플로팅 버튼 세팅
+        private void SetupFloatingButton()
+        {
+            FloatingActionButton ma_sendButton = FindViewById<FloatingActionButton>(Resource.Id.ma_sendButton);
+            ma_sendButton.Click += (sender, ob) =>
+            {
+                Intent intent = new Intent(this, typeof(DialogueActivity));
+                intent.PutExtra("thread_id", -1);
+                intent.PutExtra("category", -1);
+
+                StartActivity(intent);
+            };
+        }
+
+        //---------------------------------------------------------------------
         //하단 버튼 세팅
 
-        public void SetupBottomBar()
+        private void SetupBottomBar()
         {
-            var dialogueViewBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn1);
             var contactViewBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn2);
-            //연락처 액티비티와 메인액티비티 간 전환 메소드 넣으면 됨.
+            contactViewBtn.Click += (sender, o) =>
+            {
+                Intent intent = new Intent(this, typeof(ContactActivity));
+                StartActivity(intent);
+            };
         }
     }
 }

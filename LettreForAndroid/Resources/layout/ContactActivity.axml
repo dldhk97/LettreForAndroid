@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/ca_ma_root"
+    android:background="@drawable/background_8">
+    <include
+        android:id="@+id/ca_toolbar"
+        layout="@layout/toolbar"
+        android:layout_alignParentTop="true" />
+    <android.support.v7.widget.RecyclerView
+        android:background="#50000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ca_recyclerView1"
+        android:scrollbars="vertical"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/ca_toolbar"
+        android:layout_above="@+id/ca_bottomBarLayout"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/ca_bottomBarLayout"
+        android:layout_alignParentBottom="true"
+        android:background="#30FFFFFF"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <Button
+            android:text="메시지"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/ca_bottomBtn1"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_weight="1"
+            android:textSize="20dp"
+            />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:id="@+id/ca_ma_bottomSpliter"
+            android:background="#80FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"  />
+
+        <Button
+            android:text="연락처"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/ca_bottomBtn2"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="20dp" />
+
+    </LinearLayout>
+</RelativeLayout>

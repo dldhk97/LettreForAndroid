@@ -91,11 +91,11 @@ namespace LettreForAndroid.Receivers
             TabFragManager._Instance.RefreshLayout();
 
             //대화목록(메인) 새로고침
-            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+            for (int i = 0; i < Customma_pagerAdapter._Pages.Count; i++)
             {
-                CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                Customma_pagerAdapter._Pages[i].refreshRecyclerView();
                 if (DialogueActivity._Instance == null)
-                    CustomPagerAdapter._Pages[i].refreshFrag();
+                    Customma_pagerAdapter._Pages[i].refreshFrag();
             }
         }
 

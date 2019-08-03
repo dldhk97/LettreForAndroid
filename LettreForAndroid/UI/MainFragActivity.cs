@@ -337,13 +337,13 @@ namespace LettreForAndroid.UI
                 if (mItemClick != null)
                     mItemClick(this, iPosition);
 
-                Android.Content.Context context = Android.App.Application.Context;
+                Context context = Android.App.Application.Context;
 
-                Android.Content.Intent intent = new Android.Content.Intent(context, typeof(DialogueActivity));
+                Intent intent = new Intent(context, typeof(DialogueActivity));
                 intent.PutExtra("thread_id", _DialogueSet[iPosition].Thread_id);
                 intent.PutExtra("category", _DialogueSet.Lable);
 
-                context.StartActivity(intent);
+                Android.App.Application.Context.StartActivity(intent);
             }
         }
     }

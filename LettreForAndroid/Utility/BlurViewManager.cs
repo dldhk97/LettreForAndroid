@@ -25,18 +25,18 @@ namespace LettreForAndroid.Utility
         //BlurView 적용
         public void SetupBlurView()
         {
-            ViewGroup root = _Activity.FindViewById<ViewGroup>(Resource.Id.root);
-            BlurView mainBlurView = _Activity.FindViewById<BlurView>(Resource.Id.mainBlurView);
+            //ViewGroup ma_root = _Activity.FindViewById<ViewGroup>(Resource.Id.ma_root);
+            //BlurView mainBlurView = _Activity.FindViewById<BlurView>(Resource.Id.mainBlurView);
 
-            float radius = 0.0001F;
+            //float radius = 0.0001F;
 
-            Drawable windowBackground = _Activity.Window.DecorView.Background;
+            //Drawable windowBackground = _Activity.Window.DecorView.Background;
 
-            var topViewSettings = mainBlurView.SetupWith(root)
-                .WindowBackground(windowBackground)
-                .BlurAlgorithm(new RenderScriptBlur(_Activity))
-                .BlurRadius(radius)
-                .SetHasFixedTransformationMatrix(true);
+            //var topViewSettings = mainBlurView.SetupWith(ma_root)
+            //    .WindowBackground(windowBackground)
+            //    .BlurAlgorithm(new RenderScriptBlur(_Activity))
+            //    .BlurRadius(radius)
+            //    .SetHasFixedTransformationMatrix(true);
         }
     }
 }
