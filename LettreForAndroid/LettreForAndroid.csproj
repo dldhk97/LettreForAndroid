@@ -70,7 +70,7 @@
     <Compile Include="Receivers\WAPPushDeliverer.cs" />
     <Compile Include="Receivers\SmsDeliverer.cs" />
     <Compile Include="Receivers\SmsSendService.cs" />
-    <Compile Include="UI\ContactActivity.cs" />
+    <Compile Include="UI\CreateDialogueActivity.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\DialogueActivity.cs" />
     <Compile Include="MainActivity.cs" />
@@ -280,7 +280,22 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\ContactActivity.axml">
+    <AndroidResource Include="Resources\anim\slide_left_out.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\anim\slide_right_in.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\anim\slide_left_in.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\anim\slide_right_out.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\CreateDialogueActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

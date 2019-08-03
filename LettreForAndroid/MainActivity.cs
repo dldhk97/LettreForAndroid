@@ -65,7 +65,6 @@ namespace LettreForAndroid
                     Setup();
                     break;
             }
-
         }
 
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
@@ -82,18 +81,15 @@ namespace LettreForAndroid
                 MessageDBManager.Get().CategorizeLocally(
                     MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
             }
-            else
-            {
-                //레이블 DB가 없는 경우. 정상적인 사용이 불가능.
-            }
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
-            CreateNotificationChannel();            //Notification을 위한 채널 등록
+            CreateNotificationChannel(); 
 
             SetupLayout();
         }
 
+        //Notification을 위한 채널 등록
         private void CreateNotificationChannel()
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
@@ -113,18 +109,15 @@ namespace LettreForAndroid
 
         public void SetupLayout()
         {
-            //툴바 세팅
             SetupToolBar();
 
-            //하단 바 설정
-            SetupBottomBar();
+            SetupDialogueLayout();
 
-            //탭 레이아웃 세팅
-            _TabFragManager = new TabFragManager(this, SupportFragmentManager);
-            _TabFragManager.SetupTabLayout();
-
+            SetupContactLayout();
 
             SetupFloatingButton();
+
+            SetupBottomBar();
         }
 
         //-------------------------------------------------------------
@@ -160,6 +153,24 @@ namespace LettreForAndroid
         }
 
         //---------------------------------------------------------------------
+        //대화 레이아웃 세팅
+
+        private void SetupDialogueLayout()
+        {
+            //탭 레이아웃 및 뷰페이저 세팅
+            _TabFragManager = new TabFragManager(this, SupportFragmentManager);
+            _TabFragManager.SetupTabLayout();
+        }
+
+        //---------------------------------------------------------------------
+        //연락처 레이아웃 세팅
+
+        private void SetupContactLayout()
+        {
+            
+        }
+
+        //---------------------------------------------------------------------
         //플로팅 버튼 세팅
         private void SetupFloatingButton()
         {
@@ -170,20 +181,61 @@ namespace LettreForAndroid
                 intent.PutExtra("thread_id", -1);
                 intent.PutExtra("category", -1);
 
-                StartActivity(intent);
+                //StartActivity(intent);
             };
         }
 
         //---------------------------------------------------------------------
         //하단 버튼 세팅
-
+        private enum MAINPAGETYPE {DIALOGUE = 1, CONTACT };
+        int _CurrentPage = 1;
         private void SetupBottomBar()
         {
-            var contactViewBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn2);
-            contactViewBtn.Click += (sender, o) =>
+            var dialogueBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn1);
+            var contactBtn = FindViewById<Button>(Resource.Id.ma_bottomBtn2);
+            var dialogueLayout = FindViewById<RelativeLayout>(Resource.Id.ma_dialogueLayout);
+            var contactLayout = FindViewById<RelativeLayout>(Resource.Id.ma_contactLayout);
+
+            contactBtn.Click += (sender, o) =>
             {
-                Intent intent = new Intent(this, typeof(ContactActivity));
-                StartActivity(intent);
+                if (_CurrentPage == (int)MAINPAGETYPE.CONTACT)
+                    return;
+                _CurrentPage = (int)MAINPAGETYPE.CONTACT;
+
+                Android.Views.Animations.Animation anim_left_out = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_left_out);
+                Android.Views.Animations.Animation anim_left_in = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_left_in);
+                anim_left_out.AnimationEnd += (sender2, e) =>
+                  {
+                      dialogueLayout.Visibility = ViewStates.Gone;
+                  };
+
+                contactLayout.Visibility = ViewStates.Visible;
+                contactBtn.SetTypeface(contactBtn.Typeface, Android.Graphics.TypefaceStyle.Bold);
+                dialogueBtn.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
+
+                dialogueLayout.StartAnimation(anim_left_out);
+                contactLayout.StartAnimation(anim_left_in);
+            };
+
+            dialogueBtn.Click += (sender, o) =>
+            {
+                if (_CurrentPage == (int)MAINPAGETYPE.DIALOGUE)
+                    return;
+                _CurrentPage = (int)MAINPAGETYPE.DIALOGUE;
+
+                Android.Views.Animations.Animation anim_right_out = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_right_out);
+                Android.Views.Animations.Animation anim_right_in = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_right_in);
+                anim_right_out.AnimationEnd += (sender2, e) =>
+                {
+                    contactLayout.Visibility = ViewStates.Gone;
+                };
+
+                dialogueLayout.Visibility = ViewStates.Visible;
+                dialogueBtn.SetTypeface(contactBtn.Typeface, Android.Graphics.TypefaceStyle.Bold);
+                contactBtn.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
+
+                dialogueLayout.StartAnimation(anim_right_out);
+                contactLayout.StartAnimation(anim_right_in);
             };
         }
     }
