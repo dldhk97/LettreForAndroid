@@ -39,7 +39,7 @@ namespace LettreForAndroid.UI
 
         public static TabFragManager _Instance;
         TabLayout _TabLayout;
-        Customma_pagerAdapter _Adapter;
+        CustomPagerAdapter _Adapter;
 
         public TabFragManager(Activity iActivity, FragmentManager iFm)
         {
@@ -52,7 +52,7 @@ namespace LettreForAndroid.UI
         {
             var viewPager = activity.FindViewById<ViewPager>(Resource.Id.ma_pager);
             _TabLayout = activity.FindViewById<TabLayout>(Resource.Id.ma_sliding_tabs);
-            _Adapter = new Customma_pagerAdapter(activity.BaseContext, fm);
+            _Adapter = new CustomPagerAdapter(activity.BaseContext, fm);
 
             _Adapter.AddTab(tabFrags);
 

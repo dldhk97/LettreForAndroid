@@ -35,7 +35,7 @@ namespace LettreForAndroid.UI
         List<RecyclerItem> _RecyclerItems;
 
         RecyclerView _RecyclerView;
-        Button _ma_sendButton;
+        Button da_sendButton;
         EditText _MsgBox;
 
         SmsManager _SmsManager;
@@ -99,9 +99,9 @@ namespace LettreForAndroid.UI
                 if (_Instance != null)
                     _Instance.RefreshRecyclerView();
 
-                for (int i = 0; i < Customma_pagerAdapter._Pages.Count; i++)
+                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
                 {
-                    Customma_pagerAdapter._Pages[i].refreshRecyclerView();
+                    CustomPagerAdapter._Pages[i].refreshRecyclerView();
                 }
             }
             else
@@ -131,7 +131,7 @@ namespace LettreForAndroid.UI
         //툴바 설정
         private void SetupToolbar()
         {
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.ma_toolbar);
+            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.da_toolbar);
 
             SetSupportActionBar(toolbar);
 
@@ -163,12 +163,12 @@ namespace LettreForAndroid.UI
         //UI
         private void SetupRecyclerView()
         {
-            _ma_sendButton = FindViewById<Button>(Resource.Id.da_sendBtn);
+            da_sendButton = FindViewById<Button>(Resource.Id.da_sendBtn);
             _MsgBox = FindViewById<EditText>(Resource.Id.da_msgBox);
 
             _RecyclerView = FindViewById<RecyclerView>(Resource.Id.da_recyclerView1);
 
-            _ma_sendButton.Click += ma_sendButton_Click;
+            da_sendButton.Click += da_sendButton_Click;
 
             RefreshRecyclerView();
 
@@ -176,11 +176,11 @@ namespace LettreForAndroid.UI
             TabFragManager._Instance.RefreshLayout();
 
             //대화목록(메인) 새로고침
-            for (int i = 0; i < Customma_pagerAdapter._Pages.Count; i++)
+            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
             {
-                Customma_pagerAdapter._Pages[i].refreshRecyclerView();
+                CustomPagerAdapter._Pages[i].refreshRecyclerView();
                 if (DialogueActivity._Instance == null)
-                    Customma_pagerAdapter._Pages[i].refreshFrag();
+                    CustomPagerAdapter._Pages[i].refreshFrag();
             }
         }
 
@@ -222,7 +222,7 @@ namespace LettreForAndroid.UI
         }
 
         //전송 버튼 클릭
-        private void ma_sendButton_Click(object sender, EventArgs e)
+        private void da_sendButton_Click(object sender, EventArgs e)
         {
             string msgBody = _MsgBox.Text;
 

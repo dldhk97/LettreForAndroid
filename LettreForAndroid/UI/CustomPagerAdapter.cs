@@ -13,13 +13,13 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.UI
 {
-    public class Customma_pagerAdapter : FragmentPagerAdapter
+    public class CustomPagerAdapter : FragmentPagerAdapter
     {
         private List<TabFrag> _Tabs = new List<TabFrag>();
         public static List<MainFragActivity> _Pages = new List<MainFragActivity>();
         readonly Context _Context;
 
-        public Customma_pagerAdapter(Context context, FragmentManager fm) : base(fm)
+        public CustomPagerAdapter(Context context, FragmentManager fm) : base(fm)
         {
             this._Context = context;
         }

@@ -70,7 +70,7 @@
     <Compile Include="Receivers\WAPPushDeliverer.cs" />
     <Compile Include="Receivers\SmsDeliverer.cs" />
     <Compile Include="Receivers\SmsSendService.cs" />
-    <Compile Include="UI\CreateDialogueActivity.cs" />
+    <Compile Include="UI\NewDialogueActivity.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\DialogueActivity.cs" />
     <Compile Include="MainActivity.cs" />
@@ -295,7 +295,12 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\CreateDialogueActivity.axml">
+    <AndroidResource Include="Resources\layout\NewDialogueActivity.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\ContactView.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

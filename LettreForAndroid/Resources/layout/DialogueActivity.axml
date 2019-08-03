@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/da_ma_root"
+    android:id="@+id/da_root"
     android:background="@drawable/background_8">
     <include
-        android:id="@+id/ma_toolbar"
+        android:id="@+id/da_toolbar"
         layout="@layout/toolbar"
         android:layout_alignParentTop="true" />
     <android.support.v7.widget.RecyclerView
@@ -15,7 +15,7 @@
         android:id="@+id/da_recyclerView1"
         android:scrollbars="vertical"
         android:layout_centerInParent="true"
-        android:layout_below="@+id/ma_toolbar"
+        android:layout_below="@+id/da_toolbar"
         android:layout_above="@+id/da_bottomLayout"/>
     <RelativeLayout
         android:id="@+id/da_bottomLayout"

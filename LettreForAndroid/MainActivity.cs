@@ -177,11 +177,11 @@ namespace LettreForAndroid
             FloatingActionButton ma_sendButton = FindViewById<FloatingActionButton>(Resource.Id.ma_sendButton);
             ma_sendButton.Click += (sender, ob) =>
             {
-                Intent intent = new Intent(this, typeof(DialogueActivity));
+                Intent intent = new Intent(this, typeof(NewDialogueActivity));
                 intent.PutExtra("thread_id", -1);
                 intent.PutExtra("category", -1);
 
-                //StartActivity(intent);
+                StartActivity(intent);
             };
         }
 
