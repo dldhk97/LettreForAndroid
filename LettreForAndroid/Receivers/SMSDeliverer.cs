@@ -87,16 +87,8 @@ namespace LettreForAndroid.Receivers
             if (DialogueActivity._Instance != null)
                 DialogueActivity._Instance.RefreshRecyclerView();
 
-            //탭 새로고침
+            //탭, 메인 새로고침
             TabFragManager._Instance.RefreshLayout();
-
-            //대화목록(메인) 새로고침
-            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
-            {
-                CustomPagerAdapter._Pages[i].refreshRecyclerView();
-                if (DialogueActivity._Instance == null)
-                    CustomPagerAdapter._Pages[i].refreshFrag();
-            }
         }
 
         

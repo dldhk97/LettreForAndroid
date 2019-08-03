@@ -80,7 +80,8 @@
             android:background="?android:attr/selectableItemBackground"
             android:layout_weight="1"
             android:textSize="20dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:clickable="true"  />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
@@ -96,7 +97,8 @@
             android:id="@+id/ma_bottomBtn2"
             android:background="?android:attr/selectableItemBackground"
             android:layout_weight="1"
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            android:clickable="true" />
 
     </LinearLayout>
 </RelativeLayout>

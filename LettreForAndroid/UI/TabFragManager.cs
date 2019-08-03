@@ -104,7 +104,7 @@ namespace LettreForAndroid.UI
         public void RefreshLayout()
         {
             CountNoti();
-            //모든 탭에 커스텀 뷰 다시 적용
+            //모든 탭 새로고침
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {
                 TabLayout.Tab tab = _TabLayout.GetTabAt(i);
@@ -112,6 +112,14 @@ namespace LettreForAndroid.UI
                 tab.SetCustomView(null);
                 tab.SetCustomView(_Adapter.GetTabView(i));
 
+            }
+
+            //대화목록 새로고침
+            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+            {
+                CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                if (DialogueActivity._Instance == null)
+                    CustomPagerAdapter._Pages[i].refreshFrag();
             }
         }
     }

@@ -167,7 +167,8 @@ namespace LettreForAndroid
 
         private void SetupContactLayout()
         {
-            
+            ContactViewManager contactManager = new ContactViewManager();
+            contactManager.SetContactViewLayout(this);
         }
 
         //---------------------------------------------------------------------
@@ -196,6 +197,7 @@ namespace LettreForAndroid
             var dialogueLayout = FindViewById<RelativeLayout>(Resource.Id.ma_dialogueLayout);
             var contactLayout = FindViewById<RelativeLayout>(Resource.Id.ma_contactLayout);
 
+            //연락처 버튼 클릭 시
             contactBtn.Click += (sender, o) =>
             {
                 if (_CurrentPage == (int)MAINPAGETYPE.CONTACT)
@@ -217,6 +219,7 @@ namespace LettreForAndroid
                 contactLayout.StartAnimation(anim_left_in);
             };
 
+            //메시지 버튼 클릭 시
             dialogueBtn.Click += (sender, o) =>
             {
                 if (_CurrentPage == (int)MAINPAGETYPE.DIALOGUE)

@@ -25,7 +25,12 @@ namespace LettreForAndroid.UI
             SetContentView(Resource.Layout.NewDialogueActivity);
 
             SetupToolbar();
+
+            SetupContactLayout();
         }
+
+        //---------------------------------------------------------------------
+        //연락처 레이아웃 세팅
 
         //툴바 설정
         private void SetupToolbar()
@@ -37,6 +42,15 @@ namespace LettreForAndroid.UI
             SupportActionBar.Title = "새 대화";
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.SetHomeButtonEnabled(true);
+        }
+
+        //---------------------------------------------------------------------
+        //연락처 레이아웃 세팅
+
+        private void SetupContactLayout()
+        {
+            ContactViewManager contactManager = new ContactViewManager();
+            contactManager.SetContactViewLayout(this);
         }
     }
 }

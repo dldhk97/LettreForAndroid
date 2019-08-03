@@ -12,4 +12,13 @@
         android:layout_height="match_parent"
         android:id="@+id/cv_recyclerview"
         android:layout_below="@+id/cv_searchEditText" />
+    <TextView
+        android:text="연락처가 비어있습니다"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#FFFFFFFF"
+        android:id="@+id/cv_guideText"
+        android:visibility="gone"
+        android:gravity="center"
+        android:textSize="20dp"  />
 </RelativeLayout>

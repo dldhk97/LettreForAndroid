@@ -70,6 +70,7 @@
     <Compile Include="Receivers\WAPPushDeliverer.cs" />
     <Compile Include="Receivers\SmsDeliverer.cs" />
     <Compile Include="Receivers\SmsSendService.cs" />
+    <Compile Include="UI\ContactViewManager.cs" />
     <Compile Include="UI\NewDialogueActivity.cs" />
     <Compile Include="UI\CustomPagerAdapter.cs" />
     <Compile Include="UI\DialogueActivity.cs" />
@@ -301,6 +302,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\ContactView.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\contact_frag.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

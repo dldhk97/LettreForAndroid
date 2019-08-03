@@ -23,13 +23,19 @@ namespace LettreForAndroid.Utility
     {
 
         private static ContactDBManager _Instance = null;
-        private List<Contact> _ContactList = new List<Contact>();
+        private List<Contact> _ContactList;
 
         //객체 생성시 DB에서 연락처 다 불러옴
         ContactDBManager()
         {
             Load();
         }
+
+        public List<Contact> ContactList
+        {
+            get { return _ContactList; }
+        }
+
 
         public static ContactDBManager Get()
         {
@@ -59,8 +65,12 @@ namespace LettreForAndroid.Utility
             return null;
         }
 
-        private void Load()
+        public void Load()
         {
+            if (_ContactList != null)
+                _ContactList.Clear();
+            _ContactList = new List<Contact>();
+
             ContentResolver cr = Application.Context.ContentResolver;
 
             string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
