@@ -30,6 +30,7 @@ namespace LettreForAndroid.UI
 
         int _CurCategory;
         long _CurThread_id;
+        string _CurAddress;
         Dialogue _CurDialogue;
 
         List<RecyclerItem> _RecyclerItems;
@@ -53,12 +54,7 @@ namespace LettreForAndroid.UI
             //현페이지의 카테고리와 쓰레드ID 설정, 이것으로 어느 대화인지 특정할 수 있다.
             _CurCategory = Intent.GetIntExtra("category", -1);
             _CurThread_id = Intent.GetLongExtra("thread_id", -1);
-
-            //대화 정보가 없음.
-            if(_CurCategory == -1 && _CurThread_id == -1)
-            {
-
-            }
+            _CurAddress = Intent.GetStringExtra("address");
 
             SetupRecyclerView();
 
@@ -86,6 +82,12 @@ namespace LettreForAndroid.UI
                 values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
                 values.Put(Telephony.TextBasedSmsColumns.Read, 1);
                 values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.SENT);
+                //대화가 사용자에 의해 새로 생긴 경우
+                if (_CurDialogue.Thread_id == -1)
+                {
+                    _CurThread_id = MessageDBManager.Get().GetThreadId(_CurDialogue.Address);
+                    _CurDialogue.Thread_id = _CurThread_id;
+                }
                 values.Put(Telephony.TextBasedSmsColumns.ThreadId, _CurDialogue.Thread_id);
                 ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
 
@@ -107,7 +109,8 @@ namespace LettreForAndroid.UI
             else
             {
                 //문자 전송 실패시
-                throw new Exception("문자 전송 실패시 코드 짜라");
+                Toast.MakeText(this, "문자 전송에 실패하였습니다.", ToastLength.Long).Show();
+                //throw new Exception("문자 전송 실패시 코드 짜라");
             }
         }
 
@@ -178,39 +181,47 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
-
-            //대화를 모두 읽음으로 처리
-            _CurDialogue.UnreadCnt = 0;
-            foreach (TextMessage msg in _CurDialogue.TextMessageList)
+            //대화가 있었던 경우
+            if(_CurCategory != -1 && _CurThread_id != -1)
             {
-                if(msg.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)
+                _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
+
+                //대화를 모두 읽음으로 처리
+                _CurDialogue.UnreadCnt = 0;
+                foreach (TextMessage msg in _CurDialogue.TextMessageList)
                 {
-                    msg.ReadState = (int)TextMessage.MESSAGE_READSTATE.READ;
-                    MessageDBManager.Get().ChangeReadState(msg, (int)TextMessage.MESSAGE_READSTATE.READ);
+                    if (msg.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)
+                    {
+                        msg.ReadState = (int)TextMessage.MESSAGE_READSTATE.READ;
+                        MessageDBManager.Get().ChangeReadState(msg, (int)TextMessage.MESSAGE_READSTATE.READ);
+                    }
                 }
+            }
+            else
+            {
+                _CurDialogue = new Dialogue();
+                _CurDialogue.Address = _CurAddress;
+                _CurDialogue.Contact = ContactDBManager.Get().getContactByAddress(_CurAddress);
+                _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
+                _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+                _CurDialogue.UnreadCnt = 0;
+                _CurDialogue.Thread_id = -1;
+
+                //throw new Exception("신규 대화인데, 어째서인지 대화 클래스가 사라졌다?"); 
             }
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
             _RecyclerItems = groupByDate(_CurDialogue);
 
-            //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
-            if (_RecyclerItems.Count > 0)
-            {
-                LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
-                layoutManager.ReverseLayout = true;
-                layoutManager.StackFromEnd = true;
+            //리사이클러 뷰 내용안에 표시함
+            LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
+            layoutManager.ReverseLayout = true;
+            layoutManager.StackFromEnd = true;
 
-                RecyclerItemAdpater Adapter = new RecyclerItemAdpater(_RecyclerItems, _CurDialogue.Contact);
-                _RecyclerView.SetAdapter(Adapter);
-                _RecyclerView.SetLayoutManager(layoutManager);
-                _RecyclerView.ScrollToPosition(0);
-            }
-            else
-            {
-                //문자가 없으면... 여긴 버그 영역임...
-                throw new Exception("어케들어왔노");
-            }
+            RecyclerItemAdpater Adapter = new RecyclerItemAdpater(_RecyclerItems, _CurDialogue.Contact);
+            _RecyclerView.SetAdapter(Adapter);
+            _RecyclerView.SetLayoutManager(layoutManager);
+            _RecyclerView.ScrollToPosition(0);
         }
 
         //전송 버튼 클릭
@@ -271,6 +282,8 @@ namespace LettreForAndroid.UI
         {
             string prevTime = "NULL";
             List<RecyclerItem> recyclerItems = new List<RecyclerItem>();
+            if (iDialogue.Count <= 0)
+                return recyclerItems;
 
             for (int i = 0; i < iDialogue.Count; i++)
             {

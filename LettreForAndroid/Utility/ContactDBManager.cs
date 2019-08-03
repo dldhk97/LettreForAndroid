@@ -23,7 +23,7 @@ namespace LettreForAndroid.Utility
     {
 
         private static ContactDBManager _Instance = null;
-        private List<Contact> _ContactList;
+        private List<Contact> _ContactList = new List<Contact>();
 
         //객체 생성시 DB에서 연락처 다 불러옴
         ContactDBManager()
@@ -57,7 +57,7 @@ namespace LettreForAndroid.Utility
         {
             for(int i =0; i < _ContactList.Count; i++)
             {
-                if(_ContactList[i].Address.Replace("-","") == address)
+                if(_ContactList[i].Address.Replace("-","") == address.Replace("-",""))
                 {
                     return _ContactList[i];
                 }
@@ -69,7 +69,6 @@ namespace LettreForAndroid.Utility
         {
             if (_ContactList != null)
                 _ContactList.Clear();
-            _ContactList = new List<Contact>();
 
             ContentResolver cr = Application.Context.ContentResolver;
 

@@ -127,12 +127,12 @@ namespace LettreForAndroid.UI
         {
             if(GetItemViewType(iPosition) == VIEW_TYPE_CONTACT)
             {
-                ContactHolder a = iHolder as ContactHolder;
-                a.name.Text = _ContactList[iPosition].Name;
+                ContactHolder ch = iHolder as ContactHolder;
+                ch.name.Text = _ContactList[iPosition].Name;
                 if (_ContactList[iPosition].PhotoThumnail_uri != null)
-                    a.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_ContactList[iPosition].PhotoThumnail_uri));
+                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_ContactList[iPosition].PhotoThumnail_uri));
                 else
-                    a.photoThumnail.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
             }
         }
 
@@ -142,10 +142,38 @@ namespace LettreForAndroid.UI
             get { return _ContactList.Count; }
         }
 
-        // 메세지를 클릭했을 때 발생하는 메소드
+        // 연락처를 클릭했을 때 발생하는 메소드
         void OnClick(int iPosition)
         {
-            
+            //해당 연락처와의 대화가 있었는지 탐색
+            Contact objContact = _ContactList[iPosition];
+            Dialogue objDialogue = null;
+            foreach(Dialogue dialogue in MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.ALL].DialogueList.Values)
+            {
+                if(dialogue.Contact != null)
+                {
+                    if (dialogue.Contact.Address == objContact.Address)
+                    {
+                        objDialogue = dialogue;
+                        break;
+                    }
+                }
+                
+            }
+
+            //연락처와의 대화 페이지를 보여준다.
+            Context context = Application.Context;
+            Intent intent = new Intent(context, typeof(DialogueActivity));
+
+            //기존 대화가 존재하면 기존 대화를 보여준다.
+            if (objDialogue != null)
+            {
+                intent.PutExtra("thread_id", objDialogue.Thread_id);
+            }
+            intent.PutExtra("category", (int)Dialogue.LableType.COMMON);        //연락처로부터 나온 대화이므로, 레이블은 일반 대화임.
+            intent.PutExtra("address", objContact.Address);
+
+            Application.Context.StartActivity(intent);
         }
 
     }

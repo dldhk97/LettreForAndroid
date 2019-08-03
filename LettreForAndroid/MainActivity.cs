@@ -25,6 +25,7 @@ namespace LettreForAndroid
     public class MainActivity : AppCompatActivity
     {
         TabFragManager _TabFragManager;
+        ContactViewManager _ContactManager;
 
         const int REQUEST_DEFAULTPACKCOMPLETE = 1;
         const int REQUEST_WELCOMEACTIVITYCOMPLETE = 2;
@@ -167,8 +168,8 @@ namespace LettreForAndroid
 
         private void SetupContactLayout()
         {
-            ContactViewManager contactManager = new ContactViewManager();
-            contactManager.SetContactViewLayout(this);
+            _ContactManager = new ContactViewManager();
+            _ContactManager.SetContactViewLayout(this);
         }
 
         //---------------------------------------------------------------------
@@ -203,6 +204,9 @@ namespace LettreForAndroid
                 if (_CurrentPage == (int)MAINPAGETYPE.CONTACT)
                     return;
                 _CurrentPage = (int)MAINPAGETYPE.CONTACT;
+
+                ContactDBManager.Get().Load();
+                _ContactManager.Refresh();
 
                 Android.Views.Animations.Animation anim_left_out = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_left_out);
                 Android.Views.Animations.Animation anim_left_in = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_left_in);
