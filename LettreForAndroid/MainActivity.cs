@@ -202,7 +202,7 @@ namespace LettreForAndroid
                     return;
                 _CurrentPage = (int)MAINPAGETYPE.CONTACT;
 
-                ContactDBManager.Get().Load();
+                ContactDBManager.Get().Refresh();
                 _ContactManager.Refresh();
 
                 Android.Views.Animations.Animation anim_left_out = Android.Views.Animations.AnimationUtils.LoadAnimation(BaseContext, Resource.Animation.slide_left_out);

@@ -104,7 +104,7 @@ namespace LettreForAndroid.Utility
                     if(objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();
-                        objDialogue.Contact = ContactDBManager.Get().getContactByAddress(objSms.Address);
+                        objDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(objSms.Address);
                         objDialogue.Thread_id = objSms.Thread_id;
                         objDialogue.Address = objSms.Address;
 

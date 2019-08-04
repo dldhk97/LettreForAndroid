@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cv_recyclerview"
-        android:layout_below="@+id/cv_searchEditText" />
+        android:layout_below="@+id/cv_searchEditText"
+        android:scrollIndicators="none"
+        android:scrollbars="vertical" />
     <TextView
         android:text="연락처가 비어있습니다"
         android:layout_width="match_parent"

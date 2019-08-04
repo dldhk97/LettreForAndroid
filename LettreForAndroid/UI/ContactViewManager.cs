@@ -45,7 +45,7 @@ namespace LettreForAndroid.UI
 
         public void Refresh()
         {
-            List<Contact> _ContactList = ContactDBManager.Get().ContactList;
+            Dictionary<long, Contact> _ContactList = ContactDBManager.Get().ContactList;
 
             //연락처가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_ContactList.Count > 0)
@@ -65,8 +65,6 @@ namespace LettreForAndroid.UI
             }
         }
     }
-
-    
 
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
@@ -100,21 +98,22 @@ namespace LettreForAndroid.UI
         private const int VIEW_TYPE_CONTACT = 1;
         
         // 현 페이지 대화 목록
-        public List<Contact> _ContactList;
+        public Dictionary<long, Contact> _ContactList;
         private List<Contact> _FilteredItem;
 
         // Load the adapter with the data set (photo album) at construction time:
-        public RecyclerContactAdpater(List<Contact> iContactList)
+        public RecyclerContactAdpater(Dictionary<long, Contact> iContactList)
         {
             _ContactList = iContactList;
             _FilteredItem = new List<Contact>();
         }
 
-        public void UpdateContactList(List<Contact> iContactList)
+        public void UpdateContactList(Dictionary<long, Contact> iContactList)
         {
             _ContactList = iContactList;
             _FilteredItem.Clear();
-            _FilteredItem.AddRange(_ContactList);
+            _FilteredItem.AddRange(_ContactList.Values.ToList());
+            SortItem();
         }
 
         public override int GetItemViewType(int position)
@@ -127,25 +126,39 @@ namespace LettreForAndroid.UI
             {
                 return -1;
             }
-
         }
 
         public void Filter(string targetStr)
         {
             _FilteredItem.Clear();
-            if (targetStr.Length != 0)
+            if (targetStr.Length == 0)
             {
-                foreach(Contact objContact in _ContactList)
+                _FilteredItem.AddRange(_ContactList.Values.ToList());
+            }
+            else
+            {
+                foreach(Contact objContact in _ContactList.Values.ToList())
                 {
-                    string address = objContact.Address;
-                    string name = objContact.Name;
-                    if (address.Contains(targetStr) || name.Contains(targetStr))
+                    string address = objContact.PrimaryContactData.Address;
+                    string name = objContact.PrimaryContactData.Name.ToLower();
+                    if (address.Contains(targetStr) || name.Contains(targetStr.ToLower()))
                     {
                         _FilteredItem.Add(objContact);
                     }
                 }
             }
+            SortItem();
             NotifyDataSetChanged();
+        }
+
+        private void SortItem()
+        {
+            _FilteredItem.Sort(delegate (Contact A, Contact B)
+            {
+                if (string.Compare(A.PrimaryContactData.Name, B.PrimaryContactData.Name) > 0) return 1;
+                else if (string.Compare(A.PrimaryContactData.Name, B.PrimaryContactData.Name) < 0) return -1;
+                return 0;
+            });
         }
 
         // 뷰 홀더 생성
@@ -167,9 +180,9 @@ namespace LettreForAndroid.UI
             if(GetItemViewType(iPosition) == VIEW_TYPE_CONTACT)
             {
                 ContactHolder ch = iHolder as ContactHolder;
-                ch.name.Text = _FilteredItem[iPosition].Name;
-                if (_FilteredItem[iPosition].PhotoThumnail_uri != null)
-                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_FilteredItem[iPosition].PhotoThumnail_uri));
+                ch.name.Text = _FilteredItem[iPosition].PrimaryContactData.Name;
+                if (_FilteredItem[iPosition].PrimaryContactData.PhotoThumnail_uri != null)
+                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_FilteredItem[iPosition].PrimaryContactData.PhotoThumnail_uri));
                 else
                     ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
             }
@@ -185,7 +198,7 @@ namespace LettreForAndroid.UI
         void OnClick(int iPosition)
         {
             //해당 연락처와의 대화가 있었는지 탐색
-            Contact objContact = _FilteredItem[iPosition];
+            ContactData objContact = _FilteredItem[iPosition].PrimaryContactData;
             Dialogue objDialogue = null;
             foreach(Dialogue dialogue in MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.ALL].DialogueList.Values)
             {

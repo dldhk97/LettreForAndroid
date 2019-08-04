@@ -201,7 +201,7 @@ namespace LettreForAndroid.UI
             {
                 _CurDialogue = new Dialogue();
                 _CurDialogue.Address = _CurAddress;
-                _CurDialogue.Contact = ContactDBManager.Get().getContactByAddress(_CurAddress);
+                _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(_CurAddress);
                 _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
                 _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
                 _CurDialogue.UnreadCnt = 0;
@@ -357,7 +357,7 @@ namespace LettreForAndroid.UI
              };
         }
 
-        public void bind(List<RecyclerItem> list, int iPosition, Contact iContact)
+        public void bind(List<RecyclerItem> list, int iPosition, ContactData iContact)
         {
             MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
@@ -436,10 +436,10 @@ namespace LettreForAndroid.UI
         // 현 페이지 대화 목록
         public List<RecyclerItem> mRecyclerItem;
 
-        Contact mContact;
+        ContactData mContact;
 
         // Load the adapter with the data set (photo album) at construction time:
-        public RecyclerItemAdpater(List<RecyclerItem> iRecyclerItem, Contact iContact)
+        public RecyclerItemAdpater(List<RecyclerItem> iRecyclerItem, ContactData iContact)
         {
             mRecyclerItem = iRecyclerItem;
             mContact = iContact;

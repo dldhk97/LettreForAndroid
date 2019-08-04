@@ -23,19 +23,18 @@ namespace LettreForAndroid.Utility
     {
 
         private static ContactDBManager _Instance = null;
-        private List<Contact> _ContactList = new List<Contact>();
+        private Dictionary<long, Contact> _ContactList = new Dictionary<long, Contact>();
 
         //객체 생성시 DB에서 연락처 다 불러옴
         ContactDBManager()
         {
-            Load();
+            Refresh();
         }
 
-        public List<Contact> ContactList
+        public Dictionary<long, Contact> ContactList
         {
             get { return _ContactList; }
         }
-
 
         public static ContactDBManager Get()
         {
@@ -43,62 +42,132 @@ namespace LettreForAndroid.Utility
                 _Instance = new ContactDBManager();
             return _Instance;
         }
-        public Contact this[int i]
-        {
-            get { return _ContactList[i]; }
-        }
 
         public int Count
         {
             get { return _ContactList.Count; }
         }
 
-        public Contact getContactByAddress(string address)
+        public ContactData getContactDataByAddress(string address)
         {
-            for(int i =0; i < _ContactList.Count; i++)
+            foreach(Contact objContact in _ContactList.Values)
             {
-                if(_ContactList[i].Address.Replace("-","") == address.Replace("-",""))
+                if (objContact.PrimaryContactData.Address.Replace("-", "") == address.Replace("-", ""))
                 {
-                    return _ContactList[i];
+                    return objContact.PrimaryContactData;
                 }
             }
             return null;
         }
 
-        public void Load()
+        public void Refresh()
         {
-            if (_ContactList != null)
-                _ContactList.Clear();
+            LoadRawContact();
+            LoadContactData();
+        }
 
+        private void LoadContactData()
+        {
             ContentResolver cr = Application.Context.ContentResolver;
 
-            string id_code = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
-            string phoneNumber_code = ContactsContract.CommonDataKinds.Phone.Number;
-            string name_code = ContactsContract.Contacts.InterfaceConsts.DisplayName;
-            string photoThumbnail_uri_code = ContactsContract.Contacts.InterfaceConsts.PhotoThumbnailUri;
+            string column_id = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.Id;
+            string column_rawContact_id = ContactsContract.Contacts.InterfaceConsts.NameRawContactId;
+            string column_contact_id = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.ContactId;
+            string column_address = ContactsContract.CommonDataKinds.Phone.Number;
+            string column_name = ContactsContract.Contacts.InterfaceConsts.DisplayName;
+            string column_isPrimary = ContactsContract.CommonDataKinds.StructuredPostal.InterfaceConsts.IsPrimary;
+            string column_photoThumbnail_uri = ContactsContract.Contacts.InterfaceConsts.PhotoThumbnailUri;
 
             Uri uri = ContactsContract.CommonDataKinds.Phone.ContentUri;
 
             //SQLITE 조건문 설정
-            string[] projection = { id_code, phoneNumber_code, name_code, photoThumbnail_uri_code };      //연락처 DB에서 ID, 번호, 이름, 사진을 빼냄.
+            string[] projection = { column_id, column_rawContact_id, column_contact_id, column_address, column_name, column_isPrimary, column_photoThumbnail_uri }; 
 
             ICursor cursor = cr.Query(uri, projection, null, null, null);   //쿼리
-
-            Contact result = null;
 
             if (cursor != null && cursor.Count > 0)
             {
                 while(cursor.MoveToNext())
                 {
-                    result = new Contact();
-                    result.Id = cursor.GetString(cursor.GetColumnIndex(projection[0]));
-                    result.Address = cursor.GetString(cursor.GetColumnIndex(projection[1]));
-                    result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
-                    result.PhotoThumnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
-                    _ContactList.Add(result);
-                    Android.Util.Log.Debug("AAAA", result.Address + " : " + result.Name);
+                    long id = cursor.GetLong(cursor.GetColumnIndex(projection[0]));
+                    long rawContact_id = cursor.GetLong(cursor.GetColumnIndex(projection[1]));
+                    long contact_id = cursor.GetLong(cursor.GetColumnIndex(projection[2]));
+                    string address = cursor.GetString(cursor.GetColumnIndex(projection[3]));
+                    string name = cursor.GetString(cursor.GetColumnIndex(projection[4]));
+                    int isPrimary = cursor.GetInt(cursor.GetColumnIndex(projection[5]));
+                    string photoThumbnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[6]));
+
+                    ContactData objContact = new ContactData(id, rawContact_id, contact_id, address, name, isPrimary, photoThumbnail_uri);
+
+                    //Android.Util.Log.Debug("Contact : ", id.ToString() + "," + rawContact_id.ToString() + "," + contact_id.ToString() + "," + address + "," + name);
+
+                    if (isPrimary == 1)
+                    {
+                        _ContactList[contact_id].RawContacts[rawContact_id].PrimaryContact = objContact;
+                    }
+
+                    //_RawContactList[rawContact_id].Contacts.Add(objContact);
+                    _ContactList[contact_id].RawContacts[rawContact_id].ContactDatas.Add(objContact);
                 }
             }
+            cursor.Close();
+
+            //PrimaryContact가 없는 연락처는 제거한다.
+            List<Contact> deleteTarget = new List<Contact>();
+            foreach(Contact objContact in _ContactList.Values)
+            {
+                if(objContact.PrimaryContactData == null)
+                {
+                    deleteTarget.Add(objContact);
+                }
+            }
+            foreach(Contact objContact in deleteTarget)
+            {
+                _ContactList.Remove(objContact.Contact_id);
+            }
+        }
+
+        private void LoadRawContact()
+        {
+            if (_ContactList != null)
+            {
+                _ContactList = new Dictionary<long, Contact>();
+            }
+
+            ContentResolver cr = Application.Context.ContentResolver;
+
+            Uri uri = ContactsContract.RawContacts.ContentUri;
+
+            string column_id = ContactsContract.RawContacts.InterfaceConsts.Id;
+            string column_contact_id = ContactsContract.RawContacts.InterfaceConsts.ContactId;
+            string column_account_name = ContactsContract.RawContacts.InterfaceConsts.AccountName;
+            string column_display_name = ContactsContract.RawContacts.InterfaceConsts.DisplayNamePrimary;
+
+            //SQLITE 조건문 설정
+            string[] projection = { column_id, column_contact_id, column_account_name, column_display_name,  };
+
+            ICursor cursor = cr.Query(uri, projection, null, null, null);   //쿼리
+
+            if (cursor != null && cursor.Count > 0)
+            {
+                while (cursor.MoveToNext())
+                {
+                    long id = cursor.GetLong(cursor.GetColumnIndex(projection[0]));
+                    long contact_id = cursor.GetLong(cursor.GetColumnIndex(projection[1]));
+                    string account_name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
+                    string display_name = cursor.GetString(cursor.GetColumnIndex(projection[3]));
+
+                    //Contact가 신규면 생성
+                    if(_ContactList.ContainsKey(contact_id) == false)
+                    {
+                        _ContactList.Add(contact_id, new Contact(contact_id));
+                    }
+                    _ContactList[contact_id].RawContacts.Add(id, new RawContact(id, contact_id, account_name, display_name));       //탐색한 RawContact삽입
+
+                    //Android.Util.Log.Debug("Raw Contact : ", id.ToString() + "," + contact_id.ToString() + "," + account_name + "," + display_name);
+                }
+            }
+            cursor.Close();
         }
 
     }

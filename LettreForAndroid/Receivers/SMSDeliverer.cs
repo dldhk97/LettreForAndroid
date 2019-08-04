@@ -38,7 +38,7 @@ namespace LettreForAndroid.Receivers
                 string displayName = objMsg.Address;
 
                 //연락처에 없으면 일상 대화가 아니므로, 서버에 보낸다.
-                if (ContactDBManager.Get().getContactByAddress(objMsg.Address) == null)
+                if (ContactDBManager.Get().getContactDataByAddress(objMsg.Address) == null)
                     LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 데이터 받은 후 레이블 DB에 저장
                 else
                     displayName = MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.COMMON][objMsg.Thread_id].DisplayName;       //연락처에 있으면 표시될 이름 변경
