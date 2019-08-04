@@ -20,35 +20,47 @@ namespace LettreForAndroid.UI
     {
         RecyclerView _RecyclerView;
         TextView _GuideText;
+        EditText _EditText;
+
+        LinearLayoutManager _LayoutManager;
+        RecyclerContactAdpater _Adapter;
+
         public void SetContactViewLayout(Activity activity)
         {
             _RecyclerView = activity.FindViewById<RecyclerView>(Resource.Id.cv_recyclerview);
             _GuideText = activity.FindViewById<TextView>(Resource.Id.cv_guideText);
+            _EditText = activity.FindViewById<EditText>(Resource.Id.cv_searchEditText);
+
+            _LayoutManager = new LinearLayoutManager(Application.Context);
+            _Adapter = new RecyclerContactAdpater(ContactDBManager.Get().ContactList);
+
+            _EditText.AfterTextChanged += (sender, e) =>
+            {
+                _Adapter.Filter(_EditText.Text);
+            };
 
             Refresh();
         }
+
 
         public void Refresh()
         {
             List<Contact> _ContactList = ContactDBManager.Get().ContactList;
 
-            //문자가 있으면 리사이클러 뷰 내용안에 표시하도록 함
+            //연락처가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_ContactList.Count > 0)
             {
-                LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
+                _Adapter.UpdateContactList(_ContactList);
 
-                RecyclerContactAdpater Adapter = new RecyclerContactAdpater(_ContactList);
-                _RecyclerView.SetAdapter(Adapter);
-                _RecyclerView.SetLayoutManager(layoutManager);
+                _RecyclerView.SetAdapter(_Adapter);
+                _RecyclerView.SetLayoutManager(_LayoutManager);
                 _RecyclerView.ScrollToPosition(0);
 
                 _GuideText.Visibility = ViewStates.Gone;
             }
             else
             {
-                //문자가 없으면... 여긴 버그 영역임...
-                //throw new Exception("어케들어왔노");
-
+                //연락처가 없는 경우
                 _GuideText.Visibility = ViewStates.Visible;
             }
         }
@@ -89,16 +101,25 @@ namespace LettreForAndroid.UI
         
         // 현 페이지 대화 목록
         public List<Contact> _ContactList;
+        private List<Contact> _FilteredItem;
 
         // Load the adapter with the data set (photo album) at construction time:
-        public RecyclerContactAdpater(List<Contact> iContact)
+        public RecyclerContactAdpater(List<Contact> iContactList)
         {
-            _ContactList = iContact;
+            _ContactList = iContactList;
+            _FilteredItem = new List<Contact>();
+        }
+
+        public void UpdateContactList(List<Contact> iContactList)
+        {
+            _ContactList = iContactList;
+            _FilteredItem.Clear();
+            _FilteredItem.AddRange(_ContactList);
         }
 
         public override int GetItemViewType(int position)
         {
-            if (_ContactList[position].GetType().Name == "Contact")
+            if (_FilteredItem[position].GetType().Name == "Contact")
             {
                 return VIEW_TYPE_CONTACT;
             }
@@ -107,6 +128,24 @@ namespace LettreForAndroid.UI
                 return -1;
             }
 
+        }
+
+        public void Filter(string targetStr)
+        {
+            _FilteredItem.Clear();
+            if (targetStr.Length != 0)
+            {
+                foreach(Contact objContact in _ContactList)
+                {
+                    string address = objContact.Address;
+                    string name = objContact.Name;
+                    if (address.Contains(targetStr) || name.Contains(targetStr))
+                    {
+                        _FilteredItem.Add(objContact);
+                    }
+                }
+            }
+            NotifyDataSetChanged();
         }
 
         // 뷰 홀더 생성
@@ -128,9 +167,9 @@ namespace LettreForAndroid.UI
             if(GetItemViewType(iPosition) == VIEW_TYPE_CONTACT)
             {
                 ContactHolder ch = iHolder as ContactHolder;
-                ch.name.Text = _ContactList[iPosition].Name;
-                if (_ContactList[iPosition].PhotoThumnail_uri != null)
-                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_ContactList[iPosition].PhotoThumnail_uri));
+                ch.name.Text = _FilteredItem[iPosition].Name;
+                if (_FilteredItem[iPosition].PhotoThumnail_uri != null)
+                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_FilteredItem[iPosition].PhotoThumnail_uri));
                 else
                     ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
             }
@@ -139,14 +178,14 @@ namespace LettreForAndroid.UI
         // Return the number of photos available in the photo album:
         public override int ItemCount
         {
-            get { return _ContactList.Count; }
+            get { return _FilteredItem.Count; }
         }
 
-        // 연락처를 클릭했을 때 발생하는 메소드
+        // 연락처를 클릭했을 때 대화액티비티를 보여준다.
         void OnClick(int iPosition)
         {
             //해당 연락처와의 대화가 있었는지 탐색
-            Contact objContact = _ContactList[iPosition];
+            Contact objContact = _FilteredItem[iPosition];
             Dialogue objDialogue = null;
             foreach(Dialogue dialogue in MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.ALL].DialogueList.Values)
             {

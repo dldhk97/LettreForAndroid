@@ -96,6 +96,7 @@ namespace LettreForAndroid.Utility
                     result.Name = cursor.GetString(cursor.GetColumnIndex(projection[2]));
                     result.PhotoThumnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[3]));
                     _ContactList.Add(result);
+                    Android.Util.Log.Debug("AAAA", result.Address + " : " + result.Name);
                 }
             }
         }
