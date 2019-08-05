@@ -12,6 +12,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using LettreForAndroid.Class;
+using System.Text.RegularExpressions;
 
 namespace LettreForAndroid.Utility
 {
@@ -48,7 +49,7 @@ namespace LettreForAndroid.Utility
             return _Instance;
         }
 
-        private const string _ServerIP = "192.168.0.5";                                  //아이피는 서버에 맞게 설정
+        private const string _ServerIP = "192.168.209.105";                                  //아이피는 서버에 맞게 설정
         //private const string mServerIP = "59.151.215.129";
         private const int _Port = 10101;                                                //포트 설정            
         private TimeSpan _Timeout = new TimeSpan(0, 0, 2);                                //타임아웃 시간 설정
@@ -86,15 +87,9 @@ namespace LettreForAndroid.Utility
         {
             List<string[]> toSendData = new List<string[]>();
 
-            //대화목록에서 대화 각각을 살펴본다.
             foreach (Dialogue objDialogue in dialogues.DialogueList.Values)
             {
-                //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
-                foreach (TextMessage objMessage in objDialogue.TextMessageList)
-                {
-                    toSendData.Add(new string[] { objMessage.Address, objMessage.Msg });
-                }
-
+                toSendData.AddRange(ConvertToSendData(objDialogue.TextMessageList));
             }
 
             //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
@@ -103,26 +98,30 @@ namespace LettreForAndroid.Utility
 
         public List<string[]> GetLablesFromServer(Dialogue dialogue)
         {
-            List<string[]> toSendData = new List<string[]>();
-
-            //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
-            foreach (TextMessage objMessage in dialogue.TextMessageList)
-            {
-                toSendData.Add(new string[] { objMessage.Address, objMessage.Msg });
-            }
-
+            List<string[]> toSendData = ConvertToSendData(dialogue.TextMessageList);
             //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
             return SendAndReceiveData(toSendData);
         }
 
         public List<string[]> GetLableFromServer(TextMessage message)
         {
-            List<string[]> toSendData = new List<string[]>();
-
-            toSendData.Add(new string[] { message.Address, message.Msg });
-
+            List<string[]> toSendData = ConvertToSendData(new List<TextMessage>() { message });
             //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
             return SendAndReceiveData(toSendData);
+        }
+
+        private List<string[]> ConvertToSendData(List<TextMessage> messageList)
+        {
+            List<string[]> toSendData = new List<string[]>();
+
+            //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
+            foreach (TextMessage objMessage in messageList)
+            {
+                string ProcessedMsg = Regex.Replace(objMessage.Msg, "[0-9]", "");
+                toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
+            }
+
+            return toSendData;
         }
 
         //데이터를 여러개 보낼 때(어플 -> 서버)
