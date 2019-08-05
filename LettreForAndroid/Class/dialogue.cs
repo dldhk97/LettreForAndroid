@@ -197,6 +197,22 @@ namespace LettreForAndroid.Class
         private int type;           //1은 상대방이 보낸 것, 2는 내가 보낸 것
         private long thread_id;   //대화방 고유 ID?
 
+        public TextMessage()
+        {
+
+        }
+
+        public TextMessage(string id, string address, string msg, int readState, long time, int type, long thread_id)
+        {
+            this.id = id;
+            this.address = address;
+            this.msg = msg;
+            this.readState = readState;
+            this.time = time;
+            this.type = type;
+            this.thread_id = thread_id;
+        }
+
         public string Id
         {
             get { return id; }

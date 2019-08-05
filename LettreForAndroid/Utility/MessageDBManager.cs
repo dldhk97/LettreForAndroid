@@ -72,7 +72,6 @@ namespace LettreForAndroid.Utility
         public void Load()
         {
             ResetDialogueSet();
-            TextMessage objSms = new TextMessage();
 
             ContentResolver cr = Application.Context.ContentResolver;
 
@@ -90,18 +89,19 @@ namespace LettreForAndroid.Utility
 
                 while(cursor.MoveToNext())
                 {
-                    objSms = new TextMessage();
-                    objSms.Id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
+                    string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
                     string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    objSms.Address = address != "" ? address : "Unknown";
-                    objSms.Msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
-                    objSms.ReadState = cursor.GetInt(cursor.GetColumnIndex("read"));
-                    objSms.Time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
-                    objSms.Thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
-                    objSms.Type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
+                    address = address != "" ? address : "알 수 없음";
+                    string msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
+                    int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
+                    long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
+                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
+
+                    TextMessage objSms = new TextMessage(id, address, msg, readState, time, type, thread_id);
 
                     //탐색한 메세지의 Thread_id가 이전과 다르다면 새 대화임.
-                    if(objSms.Thread_id != prevThreadId)
+                    if (objSms.Thread_id != prevThreadId)
                     {
                         objDialogue = new Dialogue();
                         objDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(objSms.Address);

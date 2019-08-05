@@ -117,7 +117,7 @@ namespace LettreForAndroid.Utility
             //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
             foreach (TextMessage objMessage in messageList)
             {
-                string ProcessedMsg = Regex.Replace(objMessage.Msg, "[0-9]", "");
+                string ProcessedMsg = Regex.Replace(objMessage.Msg, "[0-9]", " ");       //메시지 내용의 숫자를 제외함.
                 toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
             }
 

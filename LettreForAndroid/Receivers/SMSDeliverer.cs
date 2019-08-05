@@ -31,7 +31,7 @@ namespace LettreForAndroid.Receivers
 
             foreach (var msg in msgs)
             {
-                TextMessage objMsg = ConvertToTM(msg);  //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
+                TextMessage objMsg = ConvertToTextMessage(msg);  //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
 
                 UpdateMessage(context, objMsg);                 //DB에 저장
 
@@ -51,7 +51,7 @@ namespace LettreForAndroid.Receivers
             RefreshUI();
         }
 
-        private TextMessage ConvertToTM(SmsMessage msg)
+        private TextMessage ConvertToTextMessage(SmsMessage msg)
         {
             TextMessage objMessage = new TextMessage();
             objMessage.Address = msg.OriginatingAddress;
