@@ -205,16 +205,16 @@ namespace LettreForAndroid.UI
                 //연락처에 있는 사람이면
                 if (dialogue.Contact != null)
                 {
-                    //연락처에 사진이 있다면 사진으로 대체
+                    ////연락처에 사진이 있다면 사진으로 대체
                     if (dialogue.Contact.PhotoThumnail_uri != null)
                         mProfileImage.SetImageURI(Android.Net.Uri.Parse(dialogue.Contact.PhotoThumnail_uri));
                     else
-                        mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                        mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
                 }
                 else
                 {
                     //연락처에 사진이 없으면 기본사진으로 설정
-                    mProfileImage.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
                 }
 
                 //이름 혹은 연락처 표시, 문자 내용 표시

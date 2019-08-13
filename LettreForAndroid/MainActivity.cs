@@ -130,7 +130,7 @@ namespace LettreForAndroid
             Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.ma_toolbar);
 
             SetSupportActionBar(toolbar);
-            SupportActionBar.Title = "Lettre";
+            SupportActionBar.Title = Resources.GetString(Resource.String.app_name);
         }
         //툴바에 메뉴 추가
         public override bool OnCreateOptionsMenu(IMenu menu)
