@@ -82,7 +82,7 @@ namespace LettreForAndroid.Utility
             List<string[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogueSet);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.
-            if (receivedData == null)
+            if (receivedData == null || receivedData.Count == 0)
                 return;
 
             //받은 결과값들을 하나하나 DB에 넣는다.

@@ -49,8 +49,8 @@ namespace LettreForAndroid.Utility
             return _Instance;
         }
 
-        private const string _ServerIP = "192.168.209.105";                                  //아이피는 서버에 맞게 설정
-        //private const string mServerIP = "59.151.215.129";
+        //private const string _ServerIP = "192.168.209.105";                                  //아이피는 서버에 맞게 설정
+        private const string _ServerIP = "59.151.215.129";
         private const int _Port = 10101;                                                //포트 설정            
         private TimeSpan _Timeout = new TimeSpan(0, 0, 2);                                //타임아웃 시간 설정
 
