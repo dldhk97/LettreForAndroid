@@ -91,6 +91,7 @@
     <Compile Include="Utility\NotificationHandler.cs" />
     <Compile Include="Utility\PermissionManager.cs" />
     <Compile Include="UI\DefaultPackActivity.cs" />
+    <Compile Include="Utility\SpamFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
