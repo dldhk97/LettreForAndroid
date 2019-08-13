@@ -6,8 +6,10 @@
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        card_view:cardBackgroundColor="#00000000"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:foreground="?android:attr/selectableItemBackground"
+        card_view:cardBackgroundColor="@color/colorBackground"
+        card_view:cardElevation="4dp"
+        card_view:cardCornerRadius="4dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -16,7 +18,7 @@
 
             <TextView
                 android:text="카테고리"
-                android:textColor="#FFFFFFFF"
+                android:textColor="@color/textColorDark"
                 android:layout_width="55dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/dfa_categoryTV"
@@ -54,7 +56,7 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textSize="12dp"
-                        android:textColor="#FFFFFFFF"
+                        android:textColor="@color/textColorDark"
                         android:text="010-XXXX-XXXX"
                         android:id="@+id/dfa_addressTV"
                         android:textStyle="bold"
@@ -85,7 +87,7 @@
                             android:layout_centerInParent="true"
                             android:textStyle="bold"
                             android:textSize="10dp"
-                            android:textColor="@android:color/white"
+                            android:textColor="@color/textColor"
                             android:textAlignment="center"
                             android:paddingBottom="2dp" />
                     </RelativeLayout>
@@ -103,7 +105,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="#FFFFFFFF"
+                        android:textColor="@color/textColorDark"
                         android:text="this is text messages. Do a barrel roll. adsasdasdasdasd"
                         android:id="@+id/dfa_msgTV"
                         android:layout_marginLeft="4dp"
@@ -116,7 +118,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="10dp"
-                        android:textColor="#FFFFFFFF"
+                        android:textColor="@color/textColorDark"
                         android:text="6월 24일 오전 00:00"
                         android:id="@+id/dfa_timeTV"
                         android:layout_gravity="right|bottom"

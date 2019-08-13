@@ -2,17 +2,16 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:layout_height="match_parent">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:id="@+id/wa_Title"
         android:text="레뜨레를 기본앱으로 설정 해주세요!"
-        android:textColor="@android:color/white"
+        android:textColor="@color/textColor"
         android:gravity="center"
         android:layout_gravity="top"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:textSize="20dp"
         android:textStyle="bold" />
     <ImageView

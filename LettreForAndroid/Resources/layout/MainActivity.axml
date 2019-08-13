@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_8"
+    android:background="@color/colorBackground"
     android:id="@+id/ma_root">
 
     <include
@@ -15,7 +15,6 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/ma_toolbar"
         android:layout_above="@+id/ma_bottomBarLayout"
-        android:background="#50000000"
         android:id="@+id/ma_mainLayout">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -26,6 +25,7 @@
                 android:id="@+id/ma_sliding_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
                 app:tabMaxWidth="0dp"
                 app:tabGravity="fill"
                 app:tabMode="scrollable"

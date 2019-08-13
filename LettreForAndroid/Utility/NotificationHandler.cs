@@ -31,7 +31,7 @@ namespace LettreForAndroid.Utility
                 .SetPriority((int)NotificationPriority.Max)
                 .SetVibrate(new long[0])
                 //.SetFullScreenIntent(intent, true)
-                .SetSmallIcon(Resource.Mipmap.main_icon);
+                .SetSmallIcon(Resource.Drawable.drawable_main_icon);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.From(context);
             notificationManager.Notify(notifId, builder.Build());
