@@ -5,11 +5,12 @@
     android:layout_height="wrap_content">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:foreground="?android:attr/selectableItemBackground"
-        card_view:cardBackgroundColor="@color/colorBackground"
-        card_view:cardElevation="4dp"
-        card_view:cardCornerRadius="4dp">
+        card_view:cardBackgroundColor="@color/colorBackgroundLight"
+        card_view:cardElevation="3dp"
+        android:layout_margin="3dp"
+        card_view:cardCornerRadius="1dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -18,7 +19,7 @@
 
             <TextView
                 android:text="카테고리"
-                android:textColor="@color/textColorDark"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_width="55dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/dfa_categoryTV"
@@ -26,23 +27,16 @@
                 android:layout_centerInParent="true"
                 android:textSize="14dp"
                 android:singleLine="true"
-                android:textAlignment="center" />
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:id="@+id/dfa_splitterV"
-                android:background="#80FFFFFF"
-                android:layout_gravity="center"
-                android:layout_toRightOf="@+id/dfa_categoryTV"
-                android:layout_margin="2dp"/>
+                android:textAlignment="center"
+                android:textStyle="bold" />
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/dfa_contentLL"
-                android:layout_marginLeft="4dp"
+                android:layout_marginLeft="7dp"
                 android:minWidth="150dp"
-                android:layout_toRightOf="@+id/dfa_splitterV">
+                android:layout_toRightOf="@+id/dfa_categoryTV">
 
                 <RelativeLayout
                     android:orientation="horizontal"
@@ -110,9 +104,10 @@
                         android:id="@+id/dfa_msgTV"
                         android:layout_marginLeft="4dp"
                         android:layout_marginRight="4dp"
-                        android:singleLine="true"
                         android:layout_alignParentLeft="true"
-                        android:layout_alignParentTop="true" />
+                        android:layout_alignParentTop="true"
+                        android:layout_marginTop="3dp"
+                        android:maxLines="2" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -121,10 +116,9 @@
                         android:textColor="@color/textColorDark"
                         android:text="6월 24일 오전 00:00"
                         android:id="@+id/dfa_timeTV"
-                        android:layout_gravity="right|bottom"
                         android:singleLine="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentRight="true" />
+                        android:layout_below="@+id/dfa_msgTV"
+                        android:layout_alignRight="@+id/dfa_msgTV" />
 
                 </RelativeLayout>
             </LinearLayout>

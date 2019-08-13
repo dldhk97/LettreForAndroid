@@ -13,7 +13,7 @@
         android:text="메시지가 존재하지 않습니다"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/textColorDark"
         android:id="@+id/fragPage_textView1"
         android:visibility="gone"
         android:gravity="center"

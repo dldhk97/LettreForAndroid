@@ -104,7 +104,6 @@ namespace LettreForAndroid.UI
         public class DialogueFragAllHolder : RecyclerView.ViewHolder
         {
             public TextView mCategoryText { get; private set; }
-            public View mSpliter { get; private set; }
             public TextView mAddress { get; private set; }
             public TextView mMsg { get; private set; }
             public TextView mTime { get; private set; }
@@ -115,7 +114,6 @@ namespace LettreForAndroid.UI
             public DialogueFragAllHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
             {
                 mCategoryText = iItemView.FindViewById<TextView>(Resource.Id.dfa_categoryTV);
-                mSpliter = iItemView.FindViewById<View>(Resource.Id.dfa_splitterV);
                 mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfa_addressTV);
                 mMsg = iItemView.FindViewById<TextView>(Resource.Id.dfa_msgTV);
                 mTime = iItemView.FindViewById<TextView>(Resource.Id.dfa_timeTV);

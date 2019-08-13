@@ -56,9 +56,9 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/dd9_send_36dp_2x_2"
+        android:src="@drawable/da_add_36_2x"
         android:layout_alignParentRight="true"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@color/colorPrimaryDark"
         app:fabSize="normal"
         android:scaleType="centerCrop"
         android:clickable="true"
@@ -69,7 +69,7 @@
         android:layout_height="50dp"
         android:id="@+id/ma_bottomBarLayout"
         android:layout_alignParentBottom="true"
-        android:background="#30FFFFFF"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal"
         android:weightSum="2">
         <Button
