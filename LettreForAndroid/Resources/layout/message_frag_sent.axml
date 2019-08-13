@@ -11,19 +11,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/message_frag_rec"
+        android:background="@drawable/message_frag_rec_sent"
         android:layout_margin="8dp"
         android:layout_alignParentRight="true"
+        android:elevation="3dp"
         >
 
         <TextView
             android:id="@+id/mfs_msgTV"
-            android:text="hi man, how are you?"
+            android:text="보낸 메시지"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="240dp"
             android:padding="8dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/textColorDark"
             android:layout_marginTop="2dp"
         />
 

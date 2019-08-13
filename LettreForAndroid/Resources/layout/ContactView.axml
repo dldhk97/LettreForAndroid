@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <EditText
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/cv_searchEditText"
-        android:layout_marginHorizontal="5dp" />
+        android:background="@color/colorPrimary"
+        android:id="@+id/cv_top_RL">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/cv_searchEditText"
+            android:layout_marginHorizontal="5dp"/>
+    </RelativeLayout>
+    
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cv_recyclerview"
-        android:layout_below="@+id/cv_searchEditText"
+        android:layout_below="@+id/cv_top_RL"
         android:scrollIndicators="none"
         android:scrollbars="vertical" />
     <TextView
         android:text="연락처가 비어있습니다"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FFFFFFFF"
+        android:textColor="@color/textColorDark"
         android:id="@+id/cv_guideText"
         android:visibility="gone"
         android:gravity="center"
