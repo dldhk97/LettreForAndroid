@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp"
+    android:paddingRight="8dp">
 
     <ImageButton
         android:id="@+id/mfr_profileIB"
@@ -60,12 +62,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:layout_gravity="right"
-                android:layout_margin="3dp"/>
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"/>
 
         </LinearLayout>
     </LinearLayout>
-    
-
-    
 
 </RelativeLayout>

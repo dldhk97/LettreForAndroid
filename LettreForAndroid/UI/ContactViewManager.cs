@@ -184,7 +184,7 @@ namespace LettreForAndroid.UI
                 if (_FilteredItem[iPosition].PrimaryContactData.PhotoThumnail_uri != null)
                     ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse(_FilteredItem[iPosition].PrimaryContactData.PhotoThumnail_uri));
                 else
-                    ch.photoThumnail.SetImageURI(Android.Net.Uri.Parse("@drawable/dd9_send_256"));
+                    ch.photoThumnail.SetImageResource(Resource.Drawable.profile_icon);
             }
         }
 

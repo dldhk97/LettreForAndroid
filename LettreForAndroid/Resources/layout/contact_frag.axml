@@ -12,14 +12,16 @@
         android:padding="4dp">
 
         <ImageButton
-            android:src="@drawable/dd9_send_256"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/cf_profileIB"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
-            android:background="@drawable/design_fab_background"
-            android:scaleType="centerCrop" />
+                android:src="@drawable/profile_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/cf_profileIB"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:background="@drawable/design_fab_background"
+                android:backgroundTint="@color/colorPrimary"
+                android:scaleType="centerCrop"
+                android:padding="5dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
