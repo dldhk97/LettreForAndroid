@@ -44,6 +44,19 @@ namespace LettreForAndroid.UI
             SupportActionBar.SetHomeButtonEnabled(true);
         }
 
+        //툴바 버튼 클릭 시
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            //돌아가기 클릭 시
+            if (item.ItemId == Android.Resource.Id.Home)
+            {
+                Finish();
+                OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);     //창 닫을때 페이드효과
+                //OverridePendingTransition(0, 0);     //창 닫을때 효과 없음
+            }
+            return base.OnOptionsItemSelected(item);
+        }
+
         //---------------------------------------------------------------------
         //연락처 레이아웃 세팅
 

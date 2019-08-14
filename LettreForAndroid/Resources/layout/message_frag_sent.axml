@@ -5,16 +5,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp">
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/mfs_msg_tailIV"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/message_frag_rec_sent_tail"
+        android:layout_alignParentRight="true"
+        android:elevation="3dp"/>
 
     <LinearLayout
+        android:id="@+id/mfs_msg_LL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/message_frag_rec_sent"
-        android:layout_margin="8dp"
-        android:layout_alignParentRight="true"
         android:elevation="3dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toLeftOf="@+id/mfs_msg_tailIV"
         >
 
         <TextView
