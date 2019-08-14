@@ -16,46 +16,9 @@
         android:layout_centerInParent="true"
         android:layout_below="@+id/da_toolbar"
         android:layout_above="@+id/da_bottomLayout"/>
-    <RelativeLayout
+    <include
         android:id="@+id/da_bottomLayout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/colorPrimary"
-        android:layout_alignParentBottom="true">
-        <ImageButton
-            android:src="@drawable/da_add_36_2x"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/da_attachBtn"
-            android:background="?android:attr/selectableItemBackground"
-            android:scaleType="centerCrop"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true" 
-        />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/da_msgBox"
-            android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
-            android:layout_toRightOf="@+id/da_attachBtn"
-            android:layout_toLeftOf="@+id/da_sendBtn"
-            android:layout_marginLeft="3dp" 
-            
-        />
-        <Button
-            android:layout_width="55dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/da_sendBtn"
-            android:background="?android:attr/selectableItemBackground"
-            android:scaleType="centerCrop"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:text="전송"
-            android:textSize="17sp"
-            android:textStyle="bold" 
-        />
-    </RelativeLayout>
+        layout="@layout/DialogBottomLayout"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

@@ -36,10 +36,9 @@ namespace LettreForAndroid.UI
         List<RecyclerItem> _RecyclerItems;
 
         RecyclerView _RecyclerView;
-        Button da_sendButton;
+        Button _SendButton;
         EditText _MsgBox;
 
-        SmsManager _SmsManager;
 
         SmsSentReceiver _SmsSentReceiver;
 
@@ -54,13 +53,11 @@ namespace LettreForAndroid.UI
             //현페이지의 카테고리와 쓰레드ID 설정, 이것으로 어느 대화인지 특정할 수 있다.
             _CurCategory = Intent.GetIntExtra("category", -1);
             _CurThread_id = Intent.GetLongExtra("thread_id", -1);
-            _CurAddress = Intent.GetStringExtra("address");
+            _CurAddress = Intent.GetStringExtra("address");         //연락처에 있는 대상 중, 신규 대화인 경우 address가 포함되어 온다.
 
-            SetupRecyclerView();
+            SetupLayout();
 
             SetupToolbar();
-
-            _SmsManager = SmsManager.Default;
 
             //브로드캐스트 리시버 초기화
             _SmsSentReceiver = new SmsSentReceiver();
@@ -74,22 +71,8 @@ namespace LettreForAndroid.UI
             //문자 전송 성공
             if (resultCode.Equals((int)Result.Ok))
             {
-                //문자를 DB에 저장
-                ContentValues values = new ContentValues();
-                values.Put(Telephony.TextBasedSmsColumns.Address, _CurDialogue.Address);
-                values.Put(Telephony.TextBasedSmsColumns.Body, _MsgBox.Text);
-                DateTimeUtillity dtu = new DateTimeUtillity();
-                values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
-                values.Put(Telephony.TextBasedSmsColumns.Read, 1);
-                values.Put(Telephony.TextBasedSmsColumns.Type, (int)TextMessage.MESSAGE_TYPE.SENT);
-                //대화가 사용자에 의해 새로 생긴 경우
-                if (_CurDialogue.Thread_id == -1)
-                {
-                    _CurThread_id = MessageDBManager.Get().GetThreadId(_CurDialogue.Address);
-                    _CurDialogue.Thread_id = _CurThread_id;
-                }
-                values.Put(Telephony.TextBasedSmsColumns.ThreadId, _CurDialogue.Thread_id);
-                ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
+                //DB에 삽입
+                MessageDBManager.Get().InsertMessage(_CurDialogue.Address, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
 
                 //입력칸 비우기
                 _MsgBox.Text = string.Empty;
@@ -164,14 +147,14 @@ namespace LettreForAndroid.UI
 
         //-----------------------------------------------------------------
         //UI
-        private void SetupRecyclerView()
+        private void SetupLayout()
         {
-            da_sendButton = FindViewById<Button>(Resource.Id.da_sendBtn);
-            _MsgBox = FindViewById<EditText>(Resource.Id.da_msgBox);
+            _SendButton = FindViewById<Button>(Resource.Id.dbl_sendBtn);
+            _MsgBox = FindViewById<EditText>(Resource.Id.dbl_msgBox);
 
             _RecyclerView = FindViewById<RecyclerView>(Resource.Id.da_recyclerView1);
 
-            da_sendButton.Click += da_sendButton_Click;
+            _SendButton.Click += _SendButton_Click;
 
             RefreshRecyclerView();
 
@@ -181,7 +164,7 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            //대화가 있었던 경우
+            //기존 대화가 있거나 내가 대화를 시작한 경우
             if(_CurCategory != -1 && _CurThread_id != -1)
             {
                 _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
@@ -197,6 +180,7 @@ namespace LettreForAndroid.UI
                     }
                 }
             }
+            //연락처에 있는 대상 중 신규 대화인 경우
             else
             {
                 _CurDialogue = new Dialogue();
@@ -205,7 +189,8 @@ namespace LettreForAndroid.UI
                 _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
                 _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
                 _CurDialogue.UnreadCnt = 0;
-                _CurDialogue.Thread_id = -1;
+                _CurDialogue.Thread_id = MessageDBManager.Get().GetThreadId(_CurAddress);
+                _CurThread_id = _CurDialogue.Thread_id;
 
                 //throw new Exception("신규 대화인데, 어째서인지 대화 클래스가 사라졌다?"); 
             }
@@ -225,35 +210,15 @@ namespace LettreForAndroid.UI
         }
 
         //전송 버튼 클릭
-        private void da_sendButton_Click(object sender, EventArgs e)
+        private void _SendButton_Click(object sender, EventArgs e)
         {
             string msgBody = _MsgBox.Text;
 
             if (msgBody != string.Empty)
-                sendSms(_CurDialogue.Address, _MsgBox.Text);
-        }
-
-        public void sendSms(string address, string msg)
-        {
-            //권한 체크
-            if (PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
             {
-                Toast.MakeText(this, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
-                PermissionManager.RequestPermission(
-                    this,
-                    PermissionManager.sendSMSPermission,
-                    "버튼을 눌러 권한을 승인해주세요.",
-                    (int)PermissionManager.REQUESTS.SENDSMS
-                    );
+                MessageSender.SendSms(this, _CurDialogue.Address, msgBody);
             }
-            else
-            {
-                //권한이 있다면 바로 발송
-                var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsSentReceiver.FILTER_SENT), 0);
-                //var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsDeliverer.FILTER_DELIVERED), 0);
-
-                _SmsManager.SendTextMessage(address, null, msg, piSent, null);
-            }
+                
         }
 
         //-----------------------------------------------------------------
@@ -266,7 +231,7 @@ namespace LettreForAndroid.UI
                     if (PermissionManager.HasPermission(this, PermissionManager.sendSMSPermission))
                     {
                         //권한 취득했으면 다시 전송요청
-                        sendSms(_CurDialogue.Address, _MsgBox.Text);
+                        MessageSender.SendSms(this, _CurDialogue.Address, _MsgBox.Text);
                     }
                     else
                     {

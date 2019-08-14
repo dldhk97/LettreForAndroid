@@ -11,13 +11,24 @@ using Android.Views;
 using Android.Widget;
 using Android.Support.V7.App;
 
+using LettreForAndroid.Class;
+using LettreForAndroid.Utility;
+using LettreForAndroid.Receivers;
+
 using Toolbar = Android.Support.V7.Widget.Toolbar;
+using Android.Provider;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "NewDialogueActivity", Theme = "@style/BasicTheme")]
+    [Activity(Label = "NewDialogueActivity", Theme = "@style/BasicTheme", NoHistory = true)]
     class NewDialogueActivity : AppCompatActivity
     {
+        Button _SendButton;
+        EditText _MsgBox;
+        EditText _AddressBox;
+
+        SmsSentReceiver _SmsSentReceiver;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -27,6 +38,12 @@ namespace LettreForAndroid.UI
             SetupToolbar();
 
             SetupContactLayout();
+
+            SetupBottomLayout();
+
+            //브로드캐스트 리시버 초기화
+            _SmsSentReceiver = new SmsSentReceiver();
+            _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
         }
 
         //---------------------------------------------------------------------
@@ -64,6 +81,83 @@ namespace LettreForAndroid.UI
         {
             ContactViewManager contactManager = new ContactViewManager();
             contactManager.SetContactViewLayout(this);
+        }
+
+        //-----------------------------------------------------------------
+        //UI
+
+        private void SetupBottomLayout()
+        {
+            _SendButton = FindViewById<Button>(Resource.Id.dbl_sendBtn);
+            _MsgBox = FindViewById<EditText>(Resource.Id.dbl_msgBox);
+            _AddressBox = FindViewById<EditText>(Resource.Id.cv_searchEditText);
+
+            _SendButton.Click += _SendButton_Click;
+        }
+
+        private void _SendButton_Click(object sender, EventArgs e)
+        {
+            string msgBody = _MsgBox.Text;
+            string address = _AddressBox.Text;
+
+            if(address == string.Empty || msgBody == string.Empty)
+            {
+                return;
+            }
+
+            MessageSender.SendSms(this, address, msgBody);
+        }
+
+        //-----------------------------------------------------------------
+        //Message Sent
+
+        //문자 전송 이후 호출됨
+        private void _SmsSentReceiver_SentCompleteEvent(int resultCode)
+        {
+            //문자 전송 성공
+            if (resultCode.Equals((int)Result.Ok))
+            {
+                //DB에 삽입
+                MessageDBManager.Get().InsertMessage(_AddressBox.Text, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
+
+                //DB 새로고침
+                MessageDBManager.Get().Refresh();
+
+                Context context = Android.App.Application.Context;
+
+                long thread_id = MessageDBManager.Get().GetThreadId(_AddressBox.Text);
+
+                Intent intent = new Intent(context, typeof(DialogueActivity));
+                intent.PutExtra("thread_id", thread_id);
+                intent.PutExtra("category", (int)Dialogue.LableType.UNKNOWN);
+
+                Android.App.Application.Context.StartActivity(intent);
+            }
+            else
+            {
+                //문자 전송 실패시
+                Toast.MakeText(this, "문자 전송에 실패하였습니다.", ToastLength.Long).Show();
+                //throw new Exception("문자 전송 실패시 코드 짜라");
+            }
+        }
+
+        //-----------------------------------------------------------------
+        //Receiver
+
+        //Resume됬을때는 리시버 다시 등록
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            IntentFilter ifr = new IntentFilter(SmsSentReceiver.FILTER_SENT);
+            RegisterReceiver(_SmsSentReceiver, ifr);
+        }
+
+        //멈추면 리시버 해제
+        protected override void OnPause()
+        {
+            base.OnPause();
+            UnregisterReceiver(_SmsSentReceiver);
         }
     }
 }

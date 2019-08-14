@@ -279,7 +279,53 @@ namespace LettreForAndroid.Utility
             return true;
         }
 
+        //-------------------------------------------
+        //Insert Sent Message
+        public void InsertMessage(string address, string msgBody, int readState, int type)
+        {
+            //문자를 DB에 저장
+            ContentValues values = new ContentValues();
+            values.Put(Telephony.TextBasedSmsColumns.Address, address);
+            values.Put(Telephony.TextBasedSmsColumns.Body, msgBody);
+            DateTimeUtillity dtu = new DateTimeUtillity();
+            values.Put(Telephony.TextBasedSmsColumns.Date, dtu.getCurrentMilTime());
+            values.Put(Telephony.TextBasedSmsColumns.Read, readState);
+            values.Put(Telephony.TextBasedSmsColumns.Type, type);
+            long thread_id = GetThreadId(address);
+            values.Put(Telephony.TextBasedSmsColumns.ThreadId, thread_id);
+            Application.Context.ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
+        }
+
     }
+
+    public static class MessageSender
+    {
+        static SmsManager _SmsManager = SmsManager.Default;
+
+        public static void SendSms(Activity activity, string address, string msg)
+        {
+            //권한 체크
+            if (PermissionManager.HasPermission(Application.Context, PermissionManager.sendSMSPermission) == false)
+            {
+                Toast.MakeText(activity, "메시지 발송을 위한 권한이 없습니다.", ToastLength.Long).Show();
+                PermissionManager.RequestPermission(
+                    activity,
+                    PermissionManager.sendSMSPermission,
+                    "버튼을 눌러 권한을 승인해주세요.",
+                    (int)PermissionManager.REQUESTS.SENDSMS
+                    );
+            }
+            else
+            {
+                //권한이 있다면 바로 발송
+                var piSent = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsSentReceiver.FILTER_SENT), 0);
+                //var piDelivered = PendingIntent.GetBroadcast(Application.Context, 0, new Intent(SmsDeliverer.FILTER_DELIVERED), 0);
+
+                _SmsManager.SendTextMessage(address, null, msg, piSent, null);
+            }
+        }
+    }
+
 
     
 
