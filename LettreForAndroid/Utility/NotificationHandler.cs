@@ -16,13 +16,13 @@ namespace LettreForAndroid.Utility
 {
     class NotificationHandler
     {
-        public static void Notification(Context context, string channelID, string title, string msg, string ticker, int notifId)
+        public static void Notification(Context context, string channelID, string title, string msg, string address, string ticker, int notifId)
         {
             var intent = new Intent(context, typeof(DialogueActivity));
-            //intent.PutExtra("thread_id", _DialogueSet[iPosition].Thread_id);
-            //intent.PutExtra("category", _DialogueSet.Lable);
+            intent.PutExtra("address", address);
+            PendingIntent dialogueActivityIntent = PendingIntent.GetActivity(context, 0, intent, PendingIntentFlags.UpdateCurrent);
 
-            Android.Support.V4.App.NotificationCompat.Builder builder = new Android.Support.V4.App.NotificationCompat.Builder(context, channelID)
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
                 .SetContentTitle(title)
                 .SetContentText(msg)
                 .SetTicker(ticker)
@@ -30,8 +30,8 @@ namespace LettreForAndroid.Utility
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetPriority((int)NotificationPriority.Max)
                 .SetVibrate(new long[0])
-                //.SetFullScreenIntent(intent, true)
-                .SetSmallIcon(Resource.Drawable.drawable_main_icon);
+                .SetFullScreenIntent(dialogueActivityIntent, true)
+                .SetSmallIcon(Resource.Drawable.ic_notification);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.From(context);
             notificationManager.Notify(notifId, builder.Build());

@@ -22,15 +22,14 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "DialogueActivity", Theme = "@style/FadeInOutActivity")]
+    [Activity(Label = "DialogueActivity", Theme = "@style/FadeInOutActivity", NoHistory = true)]
     [IntentFilter(new[] { "android.intent.action.SEND", "android.intent.action.SENDTO" }, Categories = new[] { "android.intent.category.DEFAULT", "android.intent.category.BROWSABLE" }, DataSchemes = new[] { "sms", "smsto", "mms", "mmsto" })]
     public class DialogueActivity : AppCompatActivity
     {
         public static DialogueActivity _Instance;
 
-        int _CurCategory;
-        long _CurThread_id;
         string _CurAddress;
+        long _CurThread_id;
         Dialogue _CurDialogue;
 
         List<RecyclerItem> _RecyclerItems;
@@ -38,7 +37,6 @@ namespace LettreForAndroid.UI
         RecyclerView _RecyclerView;
         Button _SendButton;
         EditText _MsgBox;
-
 
         SmsSentReceiver _SmsSentReceiver;
 
@@ -50,67 +48,39 @@ namespace LettreForAndroid.UI
 
             _Instance = this;
 
-            //현페이지의 카테고리와 쓰레드ID 설정, 이것으로 어느 대화인지 특정할 수 있다.
-            _CurCategory = Intent.GetIntExtra("category", -1);
-            _CurThread_id = Intent.GetLongExtra("thread_id", -1);
-            _CurAddress = Intent.GetStringExtra("address");         //연락처에 있는 대상 중, 신규 대화인 경우 address가 포함되어 온다.
+            _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
+            _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
+
+            _CurDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);              //thread_id로 기존에 대화가 존재하는지 찾는다.
+            if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
+            {
+                _CurDialogue = CreateNewDialogue(_CurAddress);
+            }
 
             SetupLayout();
 
             SetupToolbar();
 
-            //브로드캐스트 리시버 초기화
-            _SmsSentReceiver = new SmsSentReceiver();
+            _SmsSentReceiver = new SmsSentReceiver();                                   //브로드캐스트 리시버 초기화
             _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
         }
 
-
-        //문자 전송 이후 호출됨
-        private void _SmsSentReceiver_SentCompleteEvent(int resultCode)
+        private Dialogue CreateNewDialogue(string address)
         {
-            //문자 전송 성공
-            if (resultCode.Equals((int)Result.Ok))
-            {
-                //DB에 삽입
-                MessageDBManager.Get().InsertMessage(_CurDialogue.Address, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
+            Dialogue dialogue = new Dialogue();
+            dialogue.Address = address;
+            dialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
 
-                //입력칸 비우기
-                _MsgBox.Text = string.Empty;
-
-                //DB 새로고침
-                MessageDBManager.Get().Refresh();
-
-                //UI 업데이트
-                if (_Instance != null)
-                    _Instance.RefreshRecyclerView();
-
-                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
-                {
-                    CustomPagerAdapter._Pages[i].refreshRecyclerView();
-                }
-            }
+            if(dialogue.Contact != null)
+                dialogue.DisplayName = dialogue.Contact.Name;
             else
-            {
-                //문자 전송 실패시
-                Toast.MakeText(this, "문자 전송에 실패하였습니다.", ToastLength.Long).Show();
-                //throw new Exception("문자 전송 실패시 코드 짜라");
-            }
-        }
+                dialogue.DisplayName = address;
 
-        //Resume됬을때는 리시버 다시 등록
-        protected override void OnResume()
-        {
-            base.OnResume();
+            dialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+            dialogue.UnreadCnt = 0;
+            dialogue.Thread_id = MessageDBManager.Get().GetThreadId(address);
 
-            IntentFilter ifr = new IntentFilter(SmsSentReceiver.FILTER_SENT);
-            RegisterReceiver(_SmsSentReceiver, ifr);
-        }
-
-        //멈추면 리시버 해제
-        protected override void OnPause()
-        {
-            base.OnPause();
-            UnregisterReceiver(_SmsSentReceiver);
+            return dialogue;
         }
 
         //-----------------------------------------------------------------
@@ -164,35 +134,17 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            //기존 대화가 있거나 내가 대화를 시작한 경우
-            if(_CurCategory != -1 && _CurThread_id != -1)
-            {
-                _CurDialogue = MessageDBManager.Get().DialogueSets[_CurCategory][_CurThread_id];      //이 페이지에 해당되는 대화를 불러옴
+            _CurDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);      //이 페이지에 해당되는 대화를 불러옴
 
-                //대화를 모두 읽음으로 처리
-                _CurDialogue.UnreadCnt = 0;
-                foreach (TextMessage msg in _CurDialogue.TextMessageList)
+            //대화를 모두 읽음으로 처리
+            _CurDialogue.UnreadCnt = 0;
+            foreach (TextMessage msg in _CurDialogue.TextMessageList)
+            {
+                if (msg.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)
                 {
-                    if (msg.ReadState == (int)TextMessage.MESSAGE_READSTATE.UNREAD)
-                    {
-                        msg.ReadState = (int)TextMessage.MESSAGE_READSTATE.READ;
-                        MessageDBManager.Get().ChangeReadState(msg, (int)TextMessage.MESSAGE_READSTATE.READ);
-                    }
+                    msg.ReadState = (int)TextMessage.MESSAGE_READSTATE.READ;
+                    MessageDBManager.Get().ChangeReadState(msg, (int)TextMessage.MESSAGE_READSTATE.READ);
                 }
-            }
-            //연락처에 있는 대상 중 신규 대화인 경우
-            else
-            {
-                _CurDialogue = new Dialogue();
-                _CurDialogue.Address = _CurAddress;
-                _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(_CurAddress);
-                _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
-                _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
-                _CurDialogue.UnreadCnt = 0;
-                _CurDialogue.Thread_id = MessageDBManager.Get().GetThreadId(_CurAddress);
-                _CurThread_id = _CurDialogue.Thread_id;
-
-                //throw new Exception("신규 대화인데, 어째서인지 대화 클래스가 사라졌다?"); 
             }
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
@@ -269,7 +221,61 @@ namespace LettreForAndroid.UI
 
             return recyclerItems;
         }
+
+        //-----------------------------------------------------------------
+        //리시버
+
+        //문자 전송 이후 호출됨
+        private void _SmsSentReceiver_SentCompleteEvent(int resultCode)
+        {
+            //문자 전송 성공
+            if (resultCode.Equals((int)Result.Ok))
+            {
+                //DB에 삽입
+                MessageDBManager.Get().InsertMessage(_CurDialogue.Address, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
+
+                //입력칸 비우기
+                _MsgBox.Text = string.Empty;
+
+                //DB 새로고침
+                MessageDBManager.Get().Refresh();
+
+                //UI 업데이트
+                if (_Instance != null)
+                    _Instance.RefreshRecyclerView();
+
+                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+                {
+                    CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                }
+            }
+            else
+            {
+                //문자 전송 실패시
+                Toast.MakeText(this, "문자 전송에 실패하였습니다.", ToastLength.Long).Show();
+                //throw new Exception("문자 전송 실패시 코드 짜라");
+            }
+        }
+
+        //Resume됬을때는 리시버 다시 등록
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            IntentFilter ifr = new IntentFilter(SmsSentReceiver.FILTER_SENT);
+            RegisterReceiver(_SmsSentReceiver, ifr);
+        }
+
+        //멈추면 리시버 해제
+        protected override void OnPause()
+        {
+            base.OnPause();
+            UnregisterReceiver(_SmsSentReceiver);
+        }
+
     }
+
+
 
 
     //----------------------------------------------------------------------

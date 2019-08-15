@@ -125,11 +125,8 @@ namespace LettreForAndroid.UI
 
                 Context context = Android.App.Application.Context;
 
-                long thread_id = MessageDBManager.Get().GetThreadId(_AddressBox.Text);
-
                 Intent intent = new Intent(context, typeof(DialogueActivity));
-                intent.PutExtra("thread_id", thread_id);
-                intent.PutExtra("category", (int)Dialogue.LableType.UNKNOWN);
+                intent.PutExtra("address", _AddressBox.Text);
 
                 Android.App.Application.Context.StartActivity(intent);
             }

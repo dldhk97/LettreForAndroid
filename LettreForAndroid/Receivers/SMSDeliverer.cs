@@ -43,7 +43,7 @@ namespace LettreForAndroid.Receivers
                 else
                     displayName = MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.COMMON][objMsg.Thread_id].DisplayName;       //연락처에 있으면 표시될 이름 변경
 
-                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, "Ticker", 101);       //알림 표시
+                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101);       //알림 표시
             }
 
             MessageDBManager.Get().Refresh();           //메세지 DB 새로고침

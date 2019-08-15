@@ -50,7 +50,7 @@ namespace LettreForAndroid.Class
             get { return dialogueList.Values.ToList()[index]; }
         }
 
-        public bool IsContains(long thread_id)
+        public bool IsContain(long thread_id)
         {
             return dialogueList.ContainsKey(thread_id);
         }

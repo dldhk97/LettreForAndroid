@@ -145,6 +145,16 @@ namespace LettreForAndroid.Utility
             return Telephony.Threads.GetOrCreateThreadId(Application.Context, address);      //make new Thread_id
         }
 
+        public Dialogue FindDialogue(long thread_id)
+        {
+            DialogueSet allDialogues = _DialogueSets[(int)Dialogue.LableType.ALL];
+
+            if (allDialogues.IsContain(thread_id))
+                return allDialogues[thread_id];
+
+            return null;
+        }
+
         public void ChangeReadState(TextMessage msg, int readState)
         {
             ContentValues values = new ContentValues();

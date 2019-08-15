@@ -338,8 +338,7 @@ namespace LettreForAndroid.UI
                 Context context = Android.App.Application.Context;
 
                 Intent intent = new Intent(context, typeof(DialogueActivity));
-                intent.PutExtra("thread_id", _DialogueSet[iPosition].Thread_id);
-                intent.PutExtra("category", _DialogueSet.Lable);
+                intent.PutExtra("address", _DialogueSet[iPosition].Address);
 
                 Android.App.Application.Context.StartActivity(intent);
             }
