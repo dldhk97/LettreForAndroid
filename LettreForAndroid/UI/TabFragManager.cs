@@ -63,7 +63,7 @@ namespace LettreForAndroid.UI
             // Setup tablayout with view ma_pager
             _TabLayout.SetupWithViewPager(viewPager);
 
-            CountNoti();
+            UpdateNotiCount();
 
             //모든 탭에 커스텀 뷰 적용
             for (int i = 0; i < _TabLayout.TabCount; i++)
@@ -76,7 +76,7 @@ namespace LettreForAndroid.UI
             _TabLayout.TabUnselected += TabLayout_TabUnselected;
         }
 
-        private void CountNoti()
+        private void UpdateNotiCount()
         {
             for(int i = 0; i < tabFrags.Count; i++)
             {
@@ -102,9 +102,9 @@ namespace LettreForAndroid.UI
             tv.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
         }
 
-        public void RefreshLayout()
+        public void RefreshTabLayout()
         {
-            CountNoti();
+            UpdateNotiCount();
             //모든 탭 새로고침
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {

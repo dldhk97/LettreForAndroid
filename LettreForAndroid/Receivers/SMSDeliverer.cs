@@ -88,7 +88,7 @@ namespace LettreForAndroid.Receivers
                 DialogueActivity._Instance.RefreshRecyclerView();
 
             //탭, 메인 새로고침
-            TabFragManager._Instance.RefreshLayout();
+            TabFragManager._Instance.RefreshTabLayout();
         }
 
         

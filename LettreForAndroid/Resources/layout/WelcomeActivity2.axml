@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LettreForAndroid.UI.NonSwipeableViewPager
+        android:id="@+id/wa_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </LettreForAndroid.UI.NonSwipeableViewPager>
+
+    <RelativeLayout
+        android:id="@+id/wa_layoutDots"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true" >
+
+        <Button
+            android:id="@+id/wa_nextBtn"
+            android:text="계속"
+            android:textSize="20dp"
+            android:textColor="@color/textColor"
+            android:background="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -17,6 +17,7 @@
         android:background="@drawable/design_fab_background"
         android:backgroundTint="@color/colorPrimary"
         android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
         android:padding="5dp"
         android:elevation="3dp"/>
     <LinearLayout

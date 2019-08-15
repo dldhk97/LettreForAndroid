@@ -27,6 +27,7 @@ namespace LettreForAndroid
         TabFragManager _TabFragManager;
         ContactViewManager _ContactManager;
 
+        const int REQUEST_NEWWELCOMECOMPLETE = 0;
         const int REQUEST_DEFAULTPACKCOMPLETE = 1;
         const int REQUEST_WELCOMEACTIVITYCOMPLETE = 2;
 
@@ -36,22 +37,8 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.MainActivity);
 
-            string thisPackName = PackageName;
-            string defulatPackName = Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this);
+            StartActivityForResult(typeof(WelcomeActivity2), REQUEST_NEWWELCOMECOMPLETE);
 
-            //기본앱이 아니면 Welcompage Activity 시작
-            if (!thisPackName.Equals(defulatPackName))
-            {
-                StartActivityForResult(typeof(DefaultPackActivity), REQUEST_DEFAULTPACKCOMPLETE);
-            }
-            else if(!LableDBManager.Get().IsDBExist())
-            {
-                StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
-            }
-            else
-            {
-                Setup();
-            }
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
@@ -64,6 +51,24 @@ namespace LettreForAndroid
                     break;
                 case REQUEST_WELCOMEACTIVITYCOMPLETE:
                     Setup();
+                    break;
+                case REQUEST_NEWWELCOMECOMPLETE:
+                    //임시
+                    //기본앱이 아니면 Welcompage Activity 시작
+                    string thisPackName = PackageName;
+                    string defulatPackName = Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this);
+                    if (!thisPackName.Equals(defulatPackName))
+                    {
+                        StartActivityForResult(typeof(DefaultPackActivity), REQUEST_DEFAULTPACKCOMPLETE);
+                    }
+                    else if (!LableDBManager.Get().IsDBExist())
+                    {
+                        StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
+                    }
+                    else
+                    {
+                        Setup();
+                    }
                     break;
             }
         }

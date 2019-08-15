@@ -129,7 +129,7 @@ namespace LettreForAndroid.UI
             RefreshRecyclerView();
 
             //탭 새로고침
-            TabFragManager._Instance.RefreshLayout();
+            TabFragManager._Instance.RefreshTabLayout();
         }
 
         public void RefreshRecyclerView()
