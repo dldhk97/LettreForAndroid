@@ -22,7 +22,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "DialogueActivity", Theme = "@style/FadeInOutActivity", NoHistory = true)]
+    [Activity(Label = "DialogueActivity", Theme = "@style/FadeInOutActivity")]
     [IntentFilter(new[] { "android.intent.action.SEND", "android.intent.action.SENDTO" }, Categories = new[] { "android.intent.category.DEFAULT", "android.intent.category.BROWSABLE" }, DataSchemes = new[] { "sms", "smsto", "mms", "mmsto" })]
     public class DialogueActivity : AppCompatActivity
     {

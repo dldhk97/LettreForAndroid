@@ -65,7 +65,14 @@ namespace LettreForAndroid.UI
 
         public void AddTab(List<TabFrag> iTabFrags)
         {
-            for(int i = 0; i < iTabFrags.Count; i++)
+            iTabFrags.Sort(delegate (TabFrag A, TabFrag B)
+            {
+                if (A.Position > B.Position) return 1;
+                if (A.Position < B.Position) return -1;
+                return 0;
+            });
+
+            for (int i = 0; i < iTabFrags.Count; i++)
                 _Tabs.Add(iTabFrags[i]);
         }
     }
