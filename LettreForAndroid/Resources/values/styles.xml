@@ -12,6 +12,14 @@
 
     </style>
 
+    <style name="FadeInOutActivity" parent="BasicTheme">
+      <item name="android:windowAnimationStyle">@style/FadeAnimation.Activity</item>
+    </style>
+
+    <style name="NulltActivity" parent="BasicTheme">
+      <item name="android:windowAnimationStyle">@style/NullAnimation.Activity</item>
+    </style>
+
     <!-- 툴바 스타일 -->
     <style name="BasicToolBarStyle" parent="BasicTheme">
       <item name="android:textColorPrimary">@android:color/white</item>
@@ -23,14 +31,6 @@
     <style name="BasicPopupMenuStyle" parent="BasicTheme">
       <item name="android:colorBackground">@android:color/white</item>
       <item name="android:textColor">@android:color/black</item>
-    </style>
-
-    <style name="FadeInOutActivity" parent="BasicTheme">
-      <item name="android:windowAnimationStyle">@style/FadeAnimation.Activity</item>
-    </style>
-
-    <style name="NulltActivity" parent="BasicTheme">
-      <item name="android:windowAnimationStyle">@style/NullAnimation.Activity</item>
     </style>
 
     <!-- Activity Animation -->

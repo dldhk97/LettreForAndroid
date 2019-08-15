@@ -8,6 +8,9 @@
   <color name="textColorDark">#616161</color>
   <color name="colorBackground">#f5f5f5</color>
   <color name="colorBackgroundLight">#FFFFFF</color>
-  <color name="colorBackground_welcome1">#4Fc3f7</color>
-  <color name="colorBackground_welcome2">#8bf6ff</color>
+  <color name="colorBackground_welcome1">#4fabf7</color>
+  <color name="colorBackground_welcome2">#6acfe5</color>
+  <color name="colorBackground_welcome3">#5e8bf2</color>
+  <color name="colorBackground_welcome4">#4fc3f7</color>
+  <color name="colorBackground_welcome5">#5ea6e9</color>
 </resources>

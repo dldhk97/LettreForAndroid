@@ -11,6 +11,13 @@
         android:layout_height="match_parent" >
     </LettreForAndroid.UI.NonSwipeableViewPager>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FFF"
+        android:alpha="0.5"
+        android:layout_above="@+id/wa_layoutDots"/>
+
     <RelativeLayout
         android:id="@+id/wa_layoutDots"
         android:layout_width="match_parent"
@@ -23,9 +30,10 @@
             android:textSize="20dp"
             android:textColor="@color/textColor"
             android:background="@null"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true" />
 
     </RelativeLayout>
