@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Content.Res;
 using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Provider;
 using Android.Runtime;
 using Android.Support.V4.View;
 using Android.Support.V7.App;
@@ -15,7 +17,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
-
+using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.UI
@@ -26,32 +28,48 @@ namespace LettreForAndroid.UI
         private NonSwipeableViewPager _ViewPager;
         private Button _NextBtn;
 
-        private enum WELCOME_SCREEN { WELCOME = 0, PRIVACY, PERMISSION, PACKAGE, CATEGORIZE };
+        private enum WELCOME_SCREEN { WELCOME = 0, PRIVACY, PERMISSION, PACKAGE, CATEGORIZE, MACHINE };
 
         List<Screen> _Screens = new List<Screen>()
         {
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512, "환영합니다!", 
-                "계속 버튼을 눌러 진행해주세요", Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome1)),
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.privacy_icon, "개인정보취급방침 동의", 
-                "개인정보 취급방침 내용과, 동의 버튼 다이얼로그 표시", Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome2)),
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.permission_icon, "권한이 필요합니다!", 
-                "메시지 수발신, 연락처 조회 등의 권한이 필요합니다.", Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome3)),
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512, "기본앱으로 지정해주세요!",
-                "메시지 수신을 위해 기본앱으로 지정해야 합니다.", Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome4)),
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.categorize_icon, "카테고리 분류",
-                "문자 메시지들을 분류합니다.", Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome5)),
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512, 
+                Application.Context.Resources.GetString(Resource.String.welcome_screen1_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen1_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome1)),
+
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.privacy_icon,
+                Application.Context.Resources.GetString(Resource.String.welcome_screen2_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen2_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome2)),
+
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.permission_icon,
+                Application.Context.Resources.GetString(Resource.String.welcome_screen3_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen3_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome3)),
+
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512,
+                Application.Context.Resources.GetString(Resource.String.welcome_screen4_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen4_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome4)),
+
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.categorize_icon,
+                Application.Context.Resources.GetString(Resource.String.welcome_screen5_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen5_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome5)),
+
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.machine_icon,
+                Application.Context.Resources.GetString(Resource.String.welcome_screen6_primaryText),
+                Application.Context.Resources.GetString(Resource.String.welcome_screen6_secondaryText),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome6)),
         };
+
+        bool _IsFirst = true;
+        bool _HasPermission = false;
+        bool _IsDefaultPackage = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            //처음이 아닌 경우
-            if(DataStorageManager.loadBoolData(this, "isFirst", false) == false)
-            {
-                //권한이 다 있나?
-                //기본앱으로 되어있나?
-            }
 
             SetContentView(Resource.Layout.WelcomeActivity2);
 
@@ -64,6 +82,24 @@ namespace LettreForAndroid.UI
             _ViewPager.Adapter = adapter;
 
             _NextBtn.Click += _NextBtn_Click;
+
+            //처음이 아닌 경우
+            _IsFirst = DataStorageManager.loadBoolData(this, "isFirst", true);
+            if (_IsFirst == false)
+            {
+                if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions));
+                    _HasPermission = true;
+
+                if (PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
+                    _IsDefaultPackage = true;
+
+                if (_HasPermission == false)
+                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
+                else if (_IsDefaultPackage == false)
+                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
+                else
+                    Finish();
+            }
 
         }
 
@@ -83,20 +119,218 @@ namespace LettreForAndroid.UI
                     _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
                     break;
                 case (int)WELCOME_SCREEN.PERMISSION:
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    GetEsentialPermissionAsync();
                     break;
                 case (int)WELCOME_SCREEN.PACKAGE:
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    RequestSetAsDefaultAsync();
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
-                    Finish();
+                    CreateLableDBAction();
+                    break;
+                case (int)WELCOME_SCREEN.MACHINE:
+                    AskMachineSupport();
                     break;
             }
+        }
+
+        //---------------------------------------------------------------------------------
+        // 권한 부여
+
+        //권한 체크와 승인, 이후 기본앱 설정
+        void GetEsentialPermissionAsync()
+        {
+            //권한이 이미 승인되어있다면
+            if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
+            {
+                //처음왔거나, 기본앱설정도 해야된다면 계속 진행.
+                if (_IsFirst || _IsDefaultPackage == false)
+                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                else
+                    Finish();
+                return;
+            }
+
+            PermissionManager.RequestPermission(
+                this,
+                PermissionManager.essentialPermissions,
+                "레뜨레 사용을 위해 승인을 눌러주세요.",
+                (int)PermissionManager.REQUESTS.ESSENTIAL
+                );
+        }
+
+        //권한 요청 후 결과가 나왔을 때
+        public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        {
+            switch (requestCode)
+            {
+                case (int)PermissionManager.REQUESTS.ESSENTIAL:
+                    {
+                        //모두 승인이 되었는지 확인
+                        bool isAllGranted = true;
+                        foreach (Permission grantResult in grantResults)
+                        {
+                            if (grantResult == Permission.Denied)
+                            {
+                                isAllGranted = false;
+                                break;
+                            }
+                        }
+
+                        if (isAllGranted)
+                        {
+                            Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
+                            //처음왔거나, 기본앱설정도 해야된다면 계속 진행. 권한만 설정해야되는 경우였다면 Finish.
+                            if (_IsFirst || _IsDefaultPackage == false)
+                                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                            else
+                                Finish();
+                        }
+                        else
+                        {
+                            Toast.MakeText(this, "권한이 거절당했습니다. 다시 시도해주세요.", ToastLength.Short).Show();
+                        }
+                    }
+                    break;
+            }
+        }
+
+        //---------------------------------------------------------------------
+        // 기본앱 설정
+
+        const int REQUEST_DEFAULTPACK = 2;
+
+        async Task RequestSetAsDefaultAsync()
+        {
+            //기본앱으로 이미 지정이 되어있나?
+            if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
+            {
+                //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
+                if (_IsFirst)
+                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                else
+                    Finish();
+                return;
+            }
+            else
+            {
+                await SetAsDefaultAsync();
+            }
+        }
+
+        async Task SetAsDefaultAsync()
+        {
+            Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
+            intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, this.PackageName);
+            StartActivityForResult(intent, REQUEST_DEFAULTPACK);
+        }
+
+        protected override async void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            switch (requestCode)
+            {
+                case REQUEST_DEFAULTPACK:
+                    if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
+                    {
+                        Toast.MakeText(this, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
+                        //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
+                        if (_IsFirst)
+                            _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                        else
+                            Finish();
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다.\n다시 시도해주세요.", ToastLength.Short).Show();
+                    }
+                    break;
+            }
+        }
+
+        //---------------------------------------------------------------------
+        // 레이블 DB 생성 (서버 통신)
+
+        private void CreateLableDBAction()
+        {
+            if (CreateLableDB())
+            {
+                Toast.MakeText(this, "메시지 분류가 완료되었습니다.", ToastLength.Short).Show();
+                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+            }
+            else
+            {
+                Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+                builder.SetTitle("메시지 분류에 실패했습니다.");
+                builder.SetMessage("다시 시도하시겠습니까?");
+                builder.SetPositiveButton("예", (senderAlert, args) =>
+                {
+                    CreateLableDBAction();
+                });
+                builder.SetNegativeButton("아니오", (senderAlert, args) =>
+                {
+                    Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+                    builder2.SetTitle("메시지 분류에 실패했습니다.");
+                    builder2.SetMessage("메시지 분류를 나중에 하시겠습니까?");
+                    builder2.SetPositiveButton("예", (senderAlert2, args2) =>
+                    {
+                        _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    });
+                    builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
+                    {
+                    });
+                    Dialog dialog2 = builder2.Create();
+                    dialog2.Show();
+                });
+                Dialog dialog = builder.Create();
+                dialog.Show();
+            }
+        }
+
+        private bool CreateLableDB()
+        {
+            //미분류 메시지가 하나도 없는 경우
+            if (MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN].Count <= 0)
+                return true;
+
+            //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
+            LableDBManager.Get().CreateLableDB(
+            MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
+
+            if (LableDBManager.Get().IsDBExist())
+            {
+                return true;
+            }
+            else
+            {
+                Toast.MakeText(this, "레이블 DB 생성에 실패했습니다.", ToastLength.Short).Show();
+                return false;
+            }
+        }
+
+        //---------------------------------------------------------------------
+        // 기계학습 요청
+
+        private void AskMachineSupport()
+        {
+            Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder2.SetTitle("기계학습 지원 요청");
+            builder2.SetMessage("기계학습 지원을 하시겠습니까?");
+            builder2.SetPositiveButton("예", (senderAlert2, args2) =>
+            {
+                Finish();
+                DataStorageManager.saveBoolData(this, "isFirst", false);        //isFirst 해제
+            });
+            builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
+            {
+                Finish();
+                DataStorageManager.saveBoolData(this, "isFirst", false);        //isFirst 해제
+            });
+            Dialog dialog2 = builder2.Create();
+            dialog2.Show();
         }
     }
 
     //----------------------------------------------------------------------------------------------
-    // UI
+    // UI, 뷰페이저
 
     public class NonSwipeableViewPager : ViewPager
     {

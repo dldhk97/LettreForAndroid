@@ -53,22 +53,7 @@ namespace LettreForAndroid
                     Setup();
                     break;
                 case REQUEST_NEWWELCOMECOMPLETE:
-                    //임시
-                    //기본앱이 아니면 Welcompage Activity 시작
-                    string thisPackName = PackageName;
-                    string defulatPackName = Android.Provider.Telephony.Sms.GetDefaultSmsPackage(this);
-                    if (!thisPackName.Equals(defulatPackName))
-                    {
-                        StartActivityForResult(typeof(DefaultPackActivity), REQUEST_DEFAULTPACKCOMPLETE);
-                    }
-                    else if (!LableDBManager.Get().IsDBExist())
-                    {
-                        StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
-                    }
-                    else
-                    {
-                        Setup();
-                    }
+                    Setup();
                     break;
             }
         }

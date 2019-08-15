@@ -49,7 +49,7 @@ namespace LettreForAndroid.UI
             }
             else
             {
-                Android.App.AlertDialog.Builder builder = new Android.App.AlertDialog.Builder(this);
+                Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
                 builder.SetTitle("레이블 DB 생성에 실패했습니다.");
                 builder.SetMessage("다시 시도하시겠습니까?");
                 builder.SetPositiveButton("예", (senderAlert, args) =>

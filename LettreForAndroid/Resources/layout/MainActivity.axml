@@ -74,6 +74,7 @@
         android:weightSum="2">
         <Button
             android:text="메시지"
+            android:textColor="@color/textColor"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ma_bottomBtn1"
@@ -92,6 +93,7 @@
 
         <Button
             android:text="연락처"
+            android:textColor="@color/textColor"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ma_bottomBtn2"
