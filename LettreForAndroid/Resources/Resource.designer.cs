@@ -4411,17 +4411,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0191
 			public const int BasicAlertDialogStyle = 2131362193;
 			
-			// aapt resource value: 0x7f0a0193
-			public const int BasicPopupMenuStyle = 2131362195;
+			// aapt resource value: 0x7f0a0192
+			public const int BasicEditTextStyle = 2131362194;
+			
+			// aapt resource value: 0x7f0a0194
+			public const int BasicPopupMenuStyle = 2131362196;
 			
 			// aapt resource value: 0x7f0a018e
 			public const int BasicTheme = 2131362190;
 			
-			// aapt resource value: 0x7f0a0192
-			public const int BasicToolBarStyle = 2131362194;
+			// aapt resource value: 0x7f0a0193
+			public const int BasicToolBarStyle = 2131362195;
 			
-			// aapt resource value: 0x7f0a0196
-			public const int BottomBtnStyle = 2131362198;
+			// aapt resource value: 0x7f0a0197
+			public const int BottomBtnStyle = 2131362199;
 			
 			// aapt resource value: 0x7f0a0000
 			public const int CardView = 2131361792;
@@ -4432,14 +4435,14 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0003
 			public const int CardView_Light = 2131361795;
 			
-			// aapt resource value: 0x7f0a0194
-			public const int FadeAnimation_Activity = 2131362196;
+			// aapt resource value: 0x7f0a0195
+			public const int FadeAnimation_Activity = 2131362197;
 			
 			// aapt resource value: 0x7f0a018f
 			public const int FadeInOutActivity = 2131362191;
 			
-			// aapt resource value: 0x7f0a0195
-			public const int NullAnimation_Activity = 2131362197;
+			// aapt resource value: 0x7f0a0196
+			public const int NullAnimation_Activity = 2131362198;
 			
 			// aapt resource value: 0x7f0a0190
 			public const int NulltActivity = 2131362192;

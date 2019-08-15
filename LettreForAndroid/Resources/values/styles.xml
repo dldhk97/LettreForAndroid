@@ -11,6 +11,7 @@
         <item name="actionMenuTextColor">@color/textColorDark</item>
 
         <item name="alertDialogTheme">@style/BasicAlertDialogStyle</item>
+        <item name="editTextStyle">@style/BasicEditTextStyle</item>
     </style>
 
     <style name="FadeInOutActivity" parent="BasicTheme">
@@ -25,6 +26,14 @@
     <style name="BasicAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
       <item name="colorAccent">@color/colorAccent</item>
       <item name="android:textColor">@color/textColorDark</item>
+    </style>
+
+    <!-- 에디트텍스트 스타일 -->
+    <style name="BasicEditTextStyle" parent="Widget.AppCompat.EditText">
+      <item name="colorControlNormal">@color/textColor</item>
+      <item name="colorControlActivated">@color/textColor</item>
+      <item name="android:textCursorDrawable">@color/textColor</item>
+      <item name="colorAccent">@color/textColor</item>
     </style>
 
     <!-- 툴바 스타일 -->

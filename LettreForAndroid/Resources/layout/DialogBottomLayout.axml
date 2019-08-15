@@ -25,7 +25,8 @@
             android:layout_toRightOf="@+id/dbl_attachBtn"
             android:layout_toLeftOf="@+id/dbl_sendBtn"
             android:layout_marginLeft="3dp" 
-            
+            android:theme="@style/BasicEditTextStyle"
+            android:textCursorDrawable="@null"
         />
         <Button
             android:layout_width="55dp"
