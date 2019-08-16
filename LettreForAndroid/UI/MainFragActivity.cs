@@ -209,12 +209,12 @@ namespace LettreForAndroid.UI
                     if (dialogue.Contact.PhotoThumnail_uri != null)
                         mProfileImage.SetImageURI(Android.Net.Uri.Parse(dialogue.Contact.PhotoThumnail_uri));
                     else
-                        mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
+                        mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
                 }
                 else
                 {
                     //연락처에 사진이 없으면 기본사진으로 설정
-                    mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
+                    mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
                 }
 
                 //이름 혹은 연락처 표시, 문자 내용 표시

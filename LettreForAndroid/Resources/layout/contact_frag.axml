@@ -11,17 +11,24 @@
         android:layout_height="match_parent"
         android:padding="4dp">
 
-        <ImageButton
-                android:src="@drawable/profile_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+        <android.support.v7.widget.CardView
+            android:id="@+id/cf_profileCV"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="27dp">
+
+            <ImageButton
                 android:id="@+id/cf_profileIB"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
-                android:background="@drawable/design_fab_background"
-                android:backgroundTint="@color/colorPrimary"
-                android:scaleType="centerCrop"
-                android:padding="5dp"/>
+                android:src="@drawable/profile_icon_256_background"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"/>
+        </android.support.v7.widget.CardView>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +39,7 @@
             android:id="@+id/cf_nameTV"
             android:textStyle="bold"
             android:singleLine="true"
-            android:layout_toRightOf="@+id/cf_profileIB"
+            android:layout_toRightOf="@+id/cf_profileCV"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"  />
     </RelativeLayout>

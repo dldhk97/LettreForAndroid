@@ -134,7 +134,9 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            _CurDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);      //이 페이지에 해당되는 대화를 불러옴
+            Dialogue updatedDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);      //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
+            if (updatedDialogue != null)
+                _CurDialogue = updatedDialogue;
 
             //대화를 모두 읽음으로 처리
             _CurDialogue.UnreadCnt = 0;
@@ -340,12 +342,12 @@ namespace LettreForAndroid.UI
                 if (iContact.PhotoThumnail_uri != null)
                     mProfileImage.SetImageURI(Android.Net.Uri.Parse(iContact.PhotoThumnail_uri));
                 else
-                    mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
+                    mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
             }
             else
             {
                 //연락처에 사진이 없으면 기본사진으로 설정
-                mProfileImage.SetImageResource(Resource.Drawable.profile_icon);
+                mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
             }
             mMsg.Text = message.Msg;
 
