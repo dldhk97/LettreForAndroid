@@ -28,8 +28,6 @@ namespace LettreForAndroid
         ContactViewManager _ContactManager;
 
         const int REQUEST_NEWWELCOMECOMPLETE = 0;
-        const int REQUEST_DEFAULTPACKCOMPLETE = 1;
-        const int REQUEST_WELCOMEACTIVITYCOMPLETE = 2;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -46,12 +44,6 @@ namespace LettreForAndroid
             base.OnActivityResult(requestCode, resultCode, data);
             switch (requestCode)
             {
-                case REQUEST_DEFAULTPACKCOMPLETE:
-                    StartActivityForResult(typeof(WelcomeActivity), REQUEST_WELCOMEACTIVITYCOMPLETE);
-                    break;
-                case REQUEST_WELCOMEACTIVITYCOMPLETE:
-                    Setup();
-                    break;
                 case REQUEST_NEWWELCOMECOMPLETE:
                     Setup();
                     break;

@@ -79,7 +79,6 @@
     <Compile Include="UI\TabFragManager.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\WelcomeActivity.cs" />
     <Compile Include="UI\WelcomeActivity2.cs" />
     <Compile Include="Utility\ContactDBManager.cs" />
     <Compile Include="Utility\LableDBManager.cs" />
@@ -90,7 +89,6 @@
     <Compile Include="Utility\NetworkManager.cs" />
     <Compile Include="Utility\NotificationHandler.cs" />
     <Compile Include="Utility\PermissionManager.cs" />
-    <Compile Include="UI\DefaultPackActivity.cs" />
     <Compile Include="Utility\SpamFilter.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,11 +162,6 @@
     <AndroidResource Include="Resources\drawable\dd9_send_256.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\DefaultPackActivity.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\layout\DialogueActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
@@ -219,11 +212,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\message_frag_header.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\layout\WelcomeActivity.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
