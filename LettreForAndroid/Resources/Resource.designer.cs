@@ -2424,26 +2424,26 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f020053
 			public const int avd_hide_password = 2130837587;
 			
-			// aapt resource value: 0x7f02007c
-			public const int avd_hide_password_1 = 2130837628;
-			
 			// aapt resource value: 0x7f02007d
-			public const int avd_hide_password_2 = 2130837629;
+			public const int avd_hide_password_1 = 2130837629;
 			
 			// aapt resource value: 0x7f02007e
-			public const int avd_hide_password_3 = 2130837630;
+			public const int avd_hide_password_2 = 2130837630;
+			
+			// aapt resource value: 0x7f02007f
+			public const int avd_hide_password_3 = 2130837631;
 			
 			// aapt resource value: 0x7f020054
 			public const int avd_show_password = 2130837588;
 			
-			// aapt resource value: 0x7f02007f
-			public const int avd_show_password_1 = 2130837631;
-			
 			// aapt resource value: 0x7f020080
-			public const int avd_show_password_2 = 2130837632;
+			public const int avd_show_password_1 = 2130837632;
 			
 			// aapt resource value: 0x7f020081
-			public const int avd_show_password_3 = 2130837633;
+			public const int avd_show_password_2 = 2130837633;
+			
+			// aapt resource value: 0x7f020082
+			public const int avd_show_password_3 = 2130837634;
 			
 			// aapt resource value: 0x7f020055
 			public const int categorize_icon = 2130837589;
@@ -2526,11 +2526,11 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f02006f
 			public const int notification_icon_background = 2130837615;
 			
-			// aapt resource value: 0x7f02007a
-			public const int notification_template_icon_bg = 2130837626;
-			
 			// aapt resource value: 0x7f02007b
-			public const int notification_template_icon_low_bg = 2130837627;
+			public const int notification_template_icon_bg = 2130837627;
+			
+			// aapt resource value: 0x7f02007c
+			public const int notification_template_icon_low_bg = 2130837628;
 			
 			// aapt resource value: 0x7f020070
 			public const int notification_tile_bg = 2130837616;
@@ -2551,16 +2551,19 @@ namespace LettreForAndroid
 			public const int profile_icon_256_background = 2130837621;
 			
 			// aapt resource value: 0x7f020076
-			public const int Search_256 = 2130837622;
+			public const int progresbar = 2130837622;
 			
 			// aapt resource value: 0x7f020077
-			public const int tooltip_frame_dark = 2130837623;
+			public const int Search_256 = 2130837623;
 			
 			// aapt resource value: 0x7f020078
-			public const int tooltip_frame_light = 2130837624;
+			public const int tooltip_frame_dark = 2130837624;
 			
 			// aapt resource value: 0x7f020079
-			public const int transparent_btn = 2130837625;
+			public const int tooltip_frame_light = 2130837625;
+			
+			// aapt resource value: 0x7f02007a
+			public const int transparent_btn = 2130837626;
 			
 			static Drawable()
 			{
@@ -3001,8 +3004,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0900c3
 			public const int ma_toolbar = 2131296451;
 			
-			// aapt resource value: 0x7f0900fd
-			public const int masked = 2131296509;
+			// aapt resource value: 0x7f0900fe
+			public const int masked = 2131296510;
 			
 			// aapt resource value: 0x7f0900e6
 			public const int media_actions = 2131296486;
@@ -3271,20 +3274,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f09006e
 			public const int title_template = 2131296366;
 			
-			// aapt resource value: 0x7f0900ff
-			public const int toolbar_category = 2131296511;
-			
 			// aapt resource value: 0x7f090100
-			public const int toolbar_deposit = 2131296512;
-			
-			// aapt resource value: 0x7f090102
-			public const int toolbar_search = 2131296514;
-			
-			// aapt resource value: 0x7f0900fe
-			public const int toolbar_select = 2131296510;
+			public const int toolbar_category = 2131296512;
 			
 			// aapt resource value: 0x7f090101
-			public const int toolbar_settings = 2131296513;
+			public const int toolbar_deposit = 2131296513;
+			
+			// aapt resource value: 0x7f090103
+			public const int toolbar_search = 2131296515;
+			
+			// aapt resource value: 0x7f0900ff
+			public const int toolbar_select = 2131296511;
+			
+			// aapt resource value: 0x7f090102
+			public const int toolbar_settings = 2131296514;
 			
 			// aapt resource value: 0x7f09003d
 			public const int top = 2131296317;
@@ -3322,17 +3325,17 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f090016
 			public const int view_offset_helper = 2131296278;
 			
-			// aapt resource value: 0x7f0900fc
-			public const int visible = 2131296508;
-			
-			// aapt resource value: 0x7f0900fa
-			public const int wa_layoutDots = 2131296506;
+			// aapt resource value: 0x7f0900fd
+			public const int visible = 2131296509;
 			
 			// aapt resource value: 0x7f0900fb
-			public const int wa_nextBtn = 2131296507;
+			public const int wa_layoutDots = 2131296507;
 			
-			// aapt resource value: 0x7f0900f9
-			public const int wa_viewpager = 2131296505;
+			// aapt resource value: 0x7f0900fc
+			public const int wa_nextBtn = 2131296508;
+			
+			// aapt resource value: 0x7f0900fa
+			public const int wa_viewpager = 2131296506;
 			
 			// aapt resource value: 0x7f09003b
 			public const int withText = 2131296315;
@@ -3346,11 +3349,14 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0900f6
 			public const int ws_primaryTV = 2131296502;
 			
+			// aapt resource value: 0x7f0900f8
+			public const int ws_progressBar = 2131296504;
+			
 			// aapt resource value: 0x7f0900f5
 			public const int ws_rootRL = 2131296501;
 			
-			// aapt resource value: 0x7f0900f8
-			public const int ws_secondaryTV = 2131296504;
+			// aapt resource value: 0x7f0900f9
+			public const int ws_secondaryTV = 2131296505;
 			
 			static Id()
 			{
@@ -3637,7 +3643,7 @@ namespace LettreForAndroid
 			public const int welcome_screen = 2130968651;
 			
 			// aapt resource value: 0x7f04004c
-			public const int WelcomeActivity2 = 2130968652;
+			public const int WelcomeActivity = 2130968652;
 			
 			static Layout()
 			{

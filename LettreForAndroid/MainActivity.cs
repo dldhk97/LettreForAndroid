@@ -35,7 +35,7 @@ namespace LettreForAndroid
 
             SetContentView(Resource.Layout.MainActivity);
 
-            StartActivityForResult(typeof(WelcomeActivity2), REQUEST_NEWWELCOMECOMPLETE);
+            StartActivityForResult(typeof(WelcomeActivity), REQUEST_NEWWELCOMECOMPLETE);
 
         }
 

@@ -69,7 +69,7 @@ namespace LettreForAndroid.Utility
             try
             {
                 // 연결 시도
-                //m_CurrentSocket.Connect(mServerIP, mPort);    //타임아웃이 긴 기존의 연결메소드
+                //_CurrentSocket.Connect(_ServerIP, _Port);    //타임아웃이 긴 기존의 연결메소드
                 var ep = new IPEndPoint(IPAddress.Parse(_ServerIP), _Port);
                 _CurrentSocket.connect(ep, _Timeout);
 

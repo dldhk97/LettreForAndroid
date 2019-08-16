@@ -22,8 +22,8 @@ using LettreForAndroid.Utility;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "WelcomeActivity2", Theme = "@style/BasicTheme")]
-    class WelcomeActivity2 : AppCompatActivity
+    [Activity(Label = "WelcomeActivity", Theme = "@style/BasicTheme")]
+    class WelcomeActivity : AppCompatActivity
     {
         private NonSwipeableViewPager _ViewPager;
         private Button _NextBtn;
@@ -71,16 +71,14 @@ namespace LettreForAndroid.UI
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(Resource.Layout.WelcomeActivity2);
+            SetContentView(Resource.Layout.WelcomeActivity);
 
             //뷰페이저 설정
             _ViewPager = FindViewById<NonSwipeableViewPager>(Resource.Id.wa_viewpager);
             _NextBtn = FindViewById<Button>(Resource.Id.wa_nextBtn);
 
             WelcomeScreenAdapter adapter = new WelcomeScreenAdapter(this, _Screens);
-
             _ViewPager.Adapter = adapter;
-
             _NextBtn.Click += _NextBtn_Click;
 
             //처음이 아닌 경우
@@ -113,10 +111,10 @@ namespace LettreForAndroid.UI
             switch (_ViewPager.CurrentItem)
             {
                 case (int)WELCOME_SCREEN.WELCOME:
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    MoveToNextScreen();
                     break;
                 case (int)WELCOME_SCREEN.PRIVACY:
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    MoveToNextScreen();
                     break;
                 case (int)WELCOME_SCREEN.PERMISSION:
                     GetEsentialPermissionAsync();
@@ -125,12 +123,17 @@ namespace LettreForAndroid.UI
                     RequestSetAsDefaultAsync();
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
-                    CreateLableDBAction();
+                    Categorize();
                     break;
                 case (int)WELCOME_SCREEN.MACHINE:
                     AskMachineSupport();
                     break;
             }
+        }
+
+        private void MoveToNextScreen()
+        {
+            RunOnUiThread(() => { _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true); });
         }
 
         //---------------------------------------------------------------------------------
@@ -144,7 +147,7 @@ namespace LettreForAndroid.UI
             {
                 //처음왔거나, 기본앱설정도 해야된다면 계속 진행.
                 if (_IsFirst || _IsDefaultPackage == false)
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    MoveToNextScreen();
                 else
                     Finish();
                 return;
@@ -181,7 +184,7 @@ namespace LettreForAndroid.UI
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
                             //처음왔거나, 기본앱설정도 해야된다면 계속 진행. 권한만 설정해야되는 경우였다면 Finish.
                             if (_IsFirst || _IsDefaultPackage == false)
-                                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                                MoveToNextScreen();
                             else
                                 Finish();
                         }
@@ -206,7 +209,7 @@ namespace LettreForAndroid.UI
             {
                 //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
                 if (_IsFirst)
-                    _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                    MoveToNextScreen();
                 else
                     Finish();
                 return;
@@ -234,7 +237,7 @@ namespace LettreForAndroid.UI
                         Toast.MakeText(this, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
                         //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
                         if (_IsFirst)
-                            _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                            MoveToNextScreen();
                         else
                             Finish();
                     }
@@ -249,61 +252,112 @@ namespace LettreForAndroid.UI
         //---------------------------------------------------------------------
         // 레이블 DB 생성 (서버 통신)
 
-        private void CreateLableDBAction()
+        public event EventHandler<CategorizeEventArgs> _OnCategorizeComplete;
+
+        private void Categorize()
         {
-            if (CreateLableDB())
+            //이벤트 등록
+            _OnCategorizeComplete -= WelcomeActivity_OnCategorizeComplete;
+            _OnCategorizeComplete += WelcomeActivity_OnCategorizeComplete;
+
+            //프로그레스바 표기
+            _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
+            _ViewPager.Adapter.NotifyDataSetChanged();
+
+            //서버와 연결 시도
+            Thread thread = new Thread(CreateLableDB);
+            thread.Start();
+        }
+
+        private void WelcomeActivity_OnCategorizeComplete(object sender, EventArgs e)
+        {
+            CategorizeEventArgs resultArgs = e as CategorizeEventArgs;
+            bool isSucceed = false;
+            string toastMessage = string.Empty;
+
+            //프로그레스바 숨기기
+            _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Invisible;
+            RunOnUiThread(() => { _ViewPager.Adapter.NotifyDataSetChanged(); });
+
+            switch (resultArgs.Result)
             {
-                Toast.MakeText(this, "메시지 분류가 완료되었습니다.", ToastLength.Short).Show();
-                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                case (int)CategorizeEventArgs.RESULT.EXIST:
+                    toastMessage = "메시지 분류가 이미 되어있습니다.";
+                    isSucceed = true;
+                    break;
+                case (int)CategorizeEventArgs.RESULT.SUCCESS:
+                    toastMessage = "메시지 분류가 완료되었습니다.";
+                    isSucceed = true;
+                    break;
+                case (int)CategorizeEventArgs.RESULT.FAIL:
+                    toastMessage = "메시지 분류에 실패했습니다.";
+                    ShowRetryDialog();
+                    break;
+                case (int)CategorizeEventArgs.RESULT.EMPTY:
+                    toastMessage = "분류할 메시지가 없습니다.";
+                    isSucceed = true;
+                    break;
             }
-            else
+
+            RunOnUiThread(() => { Toast.MakeText(this, toastMessage, ToastLength.Short).Show(); });
+
+            if (isSucceed)
             {
-                Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
-                builder.SetTitle("메시지 분류에 실패했습니다.");
-                builder.SetMessage("다시 시도하시겠습니까?");
-                builder.SetPositiveButton("예", (senderAlert, args) =>
+                MoveToNextScreen();
+            }
+            
+        }
+
+        private void ShowRetryDialog()
+        {
+            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder.SetTitle("메시지 분류에 실패했습니다.");
+            builder.SetMessage("다시 시도하시겠습니까?");
+            builder.SetPositiveButton("예", (senderAlert, args) =>
+            {
+                Categorize();
+            });
+            builder.SetNegativeButton("아니오", (senderAlert, args) =>
+            {
+                Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+                builder2.SetTitle("메시지를 나중에 분류할 수 있습니다.");
+                builder2.SetMessage("메시지 분류를 미루시겠습니까?");
+                builder2.SetPositiveButton("예", (senderAlert2, args2) =>
                 {
-                    CreateLableDBAction();
+                    MoveToNextScreen();
                 });
-                builder.SetNegativeButton("아니오", (senderAlert, args) =>
+                builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>{ });
+                RunOnUiThread(() =>
                 {
-                    Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
-                    builder2.SetTitle("메시지 분류에 실패했습니다.");
-                    builder2.SetMessage("메시지 분류를 나중에 하시겠습니까?");
-                    builder2.SetPositiveButton("예", (senderAlert2, args2) =>
-                    {
-                        _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
-                    });
-                    builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
-                    {
-                    });
                     Dialog dialog2 = builder2.Create();
                     dialog2.Show();
                 });
+            });
+            RunOnUiThread(() => 
+            {
                 Dialog dialog = builder.Create();
                 dialog.Show();
-            }
+            });
         }
 
-        private bool CreateLableDB()
+        private void CreateLableDB()
         {
+            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : Creating Lable DB", ToastLength.Short).Show(); });
             //미분류 메시지가 하나도 없는 경우
             if (MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN].Count <= 0)
-                return true;
+            {
+                _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.EMPTY));
+                return;
+            }
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
             LableDBManager.Get().CreateLableDB(
             MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
 
             if (LableDBManager.Get().IsDBExist())
-            {
-                return true;
-            }
+                _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.SUCCESS));
             else
-            {
-                Toast.MakeText(this, "레이블 DB 생성에 실패했습니다.", ToastLength.Short).Show();
-                return false;
-            }
+                _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.FAIL));
         }
 
         //---------------------------------------------------------------------
@@ -329,6 +383,10 @@ namespace LettreForAndroid.UI
         }
     }
 
+
+
+
+    //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------
     // UI, 뷰페이저
 
@@ -372,11 +430,13 @@ namespace LettreForAndroid.UI
             TextView primaryTV = view.FindViewById<TextView>(Resource.Id.ws_primaryTV);
             ImageView imageView = view.FindViewById<ImageView>(Resource.Id.ws_imageView);
             TextView secondaryTV = view.FindViewById<TextView>(Resource.Id.ws_secondaryTV);
+            ProgressBar progressBar = view.FindViewById<ProgressBar>(Resource.Id.ws_progressBar);
 
             rootRL.SetBackgroundColor(_Screens[position].BackgroundColor);
             primaryTV.Text = _Screens[position].PrimaryText;
             imageView.SetImageResource(_Screens[position].Image);
             secondaryTV.Text = _Screens[position].SecondaryText;
+            progressBar.Visibility = _Screens[position].ProgressBarViewStates;
 
             var viewPager = container.JavaCast<NonSwipeableViewPager>();
             viewPager.AddView(view);
@@ -389,7 +449,16 @@ namespace LettreForAndroid.UI
             var viewPager = container.JavaCast<NonSwipeableViewPager>();
             viewPager.RemoveView(view as View);
         }
+
+        public override int GetItemPosition(Java.Lang.Object @object)
+        {
+            return PositionNone;
+        }
     }
+
+    //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+    // ViewPage의 Screen
 
     public class Screen
     {
@@ -398,6 +467,7 @@ namespace LettreForAndroid.UI
         string primaryText;
         string secondaryText;
         Android.Graphics.Color backgroundColor;
+        ViewStates progressBarViewStates;
 
         public Screen(int layout, int image, string primaryText, string secondaryText, Android.Graphics.Color backgroundColor)
         {
@@ -406,6 +476,7 @@ namespace LettreForAndroid.UI
             this.primaryText = primaryText;
             this.secondaryText = secondaryText;
             this.backgroundColor = backgroundColor;
+            this.progressBarViewStates = ViewStates.Invisible;
         }
 
         public int Layout { get { return layout; } }
@@ -413,7 +484,27 @@ namespace LettreForAndroid.UI
         public string PrimaryText { get { return primaryText; } }
         public string SecondaryText { get { return secondaryText; } }
         public Android.Graphics.Color BackgroundColor { get { return backgroundColor; } }
+        public ViewStates ProgressBarViewStates { set { this.progressBarViewStates = value; } get { return progressBarViewStates; } }
 
     }
+
+    //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+    // Categorize EventArgs
+
+    public class CategorizeEventArgs : EventArgs
+    {
+        public enum RESULT { EXIST = 0, SUCCESS, FAIL, EMPTY }
+        private int result;
+
+        public CategorizeEventArgs(int result)
+        {
+            this.result = result;
+        }
+
+        public int Result { get { return result; } }
+    }
+
+
 
 }

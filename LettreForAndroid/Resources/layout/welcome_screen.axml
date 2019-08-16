@@ -25,6 +25,14 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:id="@+id/ws_imageView" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ws_progressBar"
+            android:indeterminate="true"
+            android:background="@android:color/transparent"
+            android:indeterminateTint="@color/textColor"
+            android:visibility="invisible" />
         <TextView
             android:id="@+id/ws_secondaryTV"
             android:layout_width="wrap_content"
@@ -32,7 +40,7 @@
             android:text="SecondaryTV"
             android:textColor="@color/textColor"
             android:textSize="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:paddingLeft="40dp"
             android:paddingRight="40dp"
             android:textAlignment="center" />
