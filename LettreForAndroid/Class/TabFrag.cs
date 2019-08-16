@@ -15,7 +15,7 @@ namespace LettreForAndroid.Class
     public class TabFrag
     {
         private string tabTitle;    //탭에 표시될 제목
-        private int category;       //탭의 코드, 전체 0, 대화 1, 택배 2, 카드 3, 인증 4, 공공기관 5, 통신사 6, SPAM 7
+        private int category;       //탭의 코드, 전체 0, 대화 1, 택배 2, 카드 3, 인증 4, 공공기관 5, 통신사 6, 기타 7, 미분류 8
         private int position;       //위치
         private int notiCount;      //알림 카운트
 

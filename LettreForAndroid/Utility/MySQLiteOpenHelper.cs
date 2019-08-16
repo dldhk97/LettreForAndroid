@@ -30,7 +30,7 @@ namespace LettreForAndroid.Utility
         private const string COLUMN_Lable_IDENTIFICATION = "lable_identification";
         private const string COLUMN_Lable_PUBLIC = "lable_public";
         private const string COLUMN_Lable_AGENCY = "lable_agency";
-        //private const string COLUMN_Lable_SPAM = "lable_spam";
+        private const string COLUMN_Lable_ETC = "lable_etc";
 
         public MySQLiteOpenHelper(Context context) : base(context, _DB_NAME, null, _DB_VERSION) { }
 
@@ -53,8 +53,8 @@ namespace LettreForAndroid.Utility
             + COLUMN_Lable_CARD + " integer not null , "
             + COLUMN_Lable_IDENTIFICATION + " integer not null , "
             + COLUMN_Lable_PUBLIC + " integer not null , "
-            + COLUMN_Lable_AGENCY + " integer not null ); ";
-            //+ COLUMN_Lable_SPAM + " integer not null );";
+            + COLUMN_Lable_AGENCY + " integer not null , "
+            + COLUMN_Lable_ETC + " integer not null );";
 
         public const string DeleteQuery = "drop table if exists " + _TABLE_NAME;
 
@@ -72,7 +72,7 @@ namespace LettreForAndroid.Utility
             values.Put(COLUMN_Lable_IDENTIFICATION, dialogue.Lables[4]);
             values.Put(COLUMN_Lable_PUBLIC, dialogue.Lables[5]);
             values.Put(COLUMN_Lable_AGENCY, dialogue.Lables[6]);
-            //values.Put(COLUMN_Lable_SPAM, dialogue.Lables[7]);
+            values.Put(COLUMN_Lable_ETC, dialogue.Lables[7]);
 
             db.InsertWithOnConflict(_TABLE_NAME, null, values, Conflict.Replace);
 
@@ -94,7 +94,7 @@ namespace LettreForAndroid.Utility
                 COLUMN_Lable_IDENTIFICATION,
                 COLUMN_Lable_PUBLIC,
                 COLUMN_Lable_AGENCY,
-                //COLUMN_Lable_SPAM
+                COLUMN_Lable_ETC,
             },
             null, null, null, null, null);
 
@@ -107,8 +107,9 @@ namespace LettreForAndroid.Utility
                     Dialogue objDialogue = new Dialogue();
                     objDialogue.Thread_id = cursor.GetLong(0);
                     objDialogue.Address = cursor.GetString(1);
-                    for(int i = 2; i < Dialogue.Lable_COUNT; i++)   //DB의 2~7행까지 데이터를 1~6번 레이블에 저장, 0번과 7번레이블은 사용안됨.
-                        objDialogue.Lables[i-1] = cursor.GetInt(i);
+
+                    for (int i = 0; i < Dialogue.Lable_COUNT - 2; i++)   //DB의 2~8행까지 데이터를 1~7번 레이블에 저장, 0번레이블은 사용안됨.
+                        objDialogue.Lables[i + 1] = cursor.GetInt(i + 2);
                     result.InsertOrUpdate(objDialogue);
                 }
             }

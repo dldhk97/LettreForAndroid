@@ -202,8 +202,8 @@ namespace LettreForAndroid.Utility
                     //-------------------------------------------------------
 
                     //레이블 수신
-                    int[] receive_lables = new int[6];
-                    for (int j = 0; j < 6; j++)
+                    int[] receive_lables = new int[Dialogue.Lable_COUNT];   //전체, 미분류를 제외한 레이블 수신
+                    for (int j = 0; j < Dialogue.Lable_COUNT - 2; j++)
                     {
                         byte[] receive_lable_byte = new byte[2];
                         _CurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
@@ -222,6 +222,7 @@ namespace LettreForAndroid.Utility
                         receive_lables[3].ToString(),
                         receive_lables[4].ToString(),
                         receive_lables[5].ToString(),
+                        receive_lables[6].ToString(),
                     });
                 }
             }

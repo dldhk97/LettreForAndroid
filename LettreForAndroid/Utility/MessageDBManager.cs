@@ -61,7 +61,7 @@ namespace LettreForAndroid.Utility
             }
 
             _DialogueSets = new List<DialogueSet>();
-            for (int i = 0; i < Dialogue.Lable_COUNT; i++)
+            for (int i = 0; i <= Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets.Add(new DialogueSet());
                 _DialogueSets[i].Lable = i;                 //고유 레이블 붙여줌
@@ -91,7 +91,7 @@ namespace LettreForAndroid.Utility
                 {
                     string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
                     string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    address = address != "" ? address : "알 수 없음";
+                    //address = address != "" ? address : "Unknown";
                     string msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
                     int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
                     long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
@@ -117,7 +117,8 @@ namespace LettreForAndroid.Utility
                         else
                         {
                             //연락처에 없는 대화는, 레이블 분석에 따라 MajorLable이 변경될수 있으므로 여기서 MajorLable을 결정하지 않음. 미분류로 보냄.
-                            objDialogue.DisplayName = objSms.Address;
+                            //objDialogue.DisplayName = objSms.Address;
+                            objDialogue.DisplayName = objDialogue.Address != "" ? objSms.Address : "알 수 없음";
                             objDialogue.MajorLable = (int)Dialogue.LableType.UNKNOWN;
                         }
 
@@ -221,7 +222,7 @@ namespace LettreForAndroid.Utility
         public void CategorizeNewMsg()
         {
             bool isNetworkConnected = true;
-            foreach(Dialogue objDialogue in _DialogueSets[0].DialogueList.Values)
+            foreach(Dialogue objDialogue in _DialogueSets[(int)Dialogue.LableType.ALL].DialogueList.Values)
             {
                 //연락처가 있는 대화는 분류하지 않는다.
                 if (objDialogue.Contact != null)
