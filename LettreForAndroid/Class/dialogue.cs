@@ -26,6 +26,12 @@ namespace LettreForAndroid.Class
             dialogueList = new Dictionary<long, Dialogue>();
         }
 
+        public DialogueSet(int lable)
+        {
+            dialogueList = new Dictionary<long, Dialogue>();
+            this.lable = lable;
+        }
+
         public Dictionary<long, Dialogue> DialogueList
         {
             get { return dialogueList; }
@@ -89,14 +95,14 @@ namespace LettreForAndroid.Class
     //TextMessage집합 개체, 특정 인물(연락처)와 대화
     public class Dialogue
     {
-        public const int Lable_COUNT = 9;
-        public static string[] _LableTypeStr = { "전체", "대화", "택배", "카드", "인증", "공공기관", "통신사", "기타", "미분류" };
-        public enum LableType { ALL = 0, COMMON, DELIVERY, CARD, IDENTIFICATION, PUBLIC, AGENCY, ETC, UNKNOWN };
+        public const int Lable_COUNT = 7;           //시스템 레이블(전체, 미분류)을 제외한 레이블 수
+        public static string[] _LableTypeStr = { "대화", "택배", "카드", "인증", "공공기관", "통신사", "기타", "전체", "미분류" };
+        public enum LableType { COMMON = 0, DELIVERY, CARD, IDENTIFICATION, PUBLIC, AGENCY, ETC, ALL, UNKNOWN };
 
         private ContactData contact;
-        private int majorLable;                 //카테고리
-        private int[] lables = new int[Lable_COUNT];    //레이블별 레이블 수, 0번인 전체는 사용되지 않는다.
-        private string displayName;    //화면상 표시되는 전화번호 혹은 이름
+        private int majorLable;                         //대표 레이블
+        private int[] lables = new int[Lable_COUNT];    //레이블
+        private string displayName;                     //화면상 표시되는 전화번호 혹은 이름
         private int unreadCnt = 0;
         private long thread_id;
         private string address;

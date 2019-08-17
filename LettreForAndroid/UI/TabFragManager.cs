@@ -69,9 +69,9 @@ namespace LettreForAndroid.UI
             //모든 탭에 커스텀 뷰 적용
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {
-                TabLayout.Tab tab = _TabLayout.GetTabAt(i);
+                TabLayout.Tab tab = _TabLayout.GetTabAt(tabFrags[i].Position);
 
-                tab.SetCustomView(_Adapter.GetTabView(i));
+                tab.SetCustomView(_Adapter.GetTabView(tabFrags[i].Position));
             }
             _TabLayout.TabSelected += TabLayout_TabSelected;
             _TabLayout.TabUnselected += TabLayout_TabUnselected;
@@ -79,16 +79,16 @@ namespace LettreForAndroid.UI
 
         private void UpdateNotiCount()
         {
-            for(int i = 0; i < tabFrags.Count; i++)
+            foreach(TabFrag objTab in tabFrags)
             {
                 int totalUnreadCnt = 0;
-                DialogueSet objDialogueSet = MessageDBManager.Get().DialogueSets[i];
+                DialogueSet objDialogueSet = MessageDBManager.Get().DialogueSets[objTab.Category];
 
-                for (int j = 0; j < objDialogueSet.Count; j++)
+                foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
                 {
-                    totalUnreadCnt += objDialogueSet[j].UnreadCnt;
+                    totalUnreadCnt += objDialogue.UnreadCnt;
                 }
-                tabFrags[i].NotiCount = totalUnreadCnt;
+                objTab.NotiCount = totalUnreadCnt;
             }
         }
 
@@ -109,10 +109,10 @@ namespace LettreForAndroid.UI
             //모든 탭 새로고침
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {
-                TabLayout.Tab tab = _TabLayout.GetTabAt(i);
+                TabLayout.Tab tab = _TabLayout.GetTabAt(tabFrags[i].Position);
 
                 tab.SetCustomView(null);
-                tab.SetCustomView(_Adapter.GetTabView(i));
+                tab.SetCustomView(_Adapter.GetTabView(tabFrags[i].Position));
 
             }
 

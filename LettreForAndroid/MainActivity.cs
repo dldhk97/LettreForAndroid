@@ -65,6 +65,8 @@ namespace LettreForAndroid
                     MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
             }
 
+            MessageDBManager.Get().SortAllDialogues();
+
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
             CreateNotificationChannel(); 

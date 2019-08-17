@@ -91,8 +91,8 @@ namespace LettreForAndroid.Utility
                 Dialogue newDialogue = new Dialogue();
                 newDialogue.Address = objStr[0];
 
-                for (int i = 0; i < Dialogue.Lable_COUNT - 2; i++)
-                    newDialogue.Lables[i + 1] = Convert.ToInt32(objStr[i + 1]);
+                for (int i = 0; i < Dialogue.Lable_COUNT; i++)
+                    newDialogue.Lables[i] = Convert.ToInt32(objStr[i + 1]);
 
                 newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
@@ -120,8 +120,8 @@ namespace LettreForAndroid.Utility
                 Dialogue newDialogue = new Dialogue();
                 newDialogue.Address = objStr[0];
 
-                for (int i = 0; i < Dialogue.Lable_COUNT - 2; i++)
-                    newDialogue.Lables[i + 1] = Convert.ToInt32(objStr[i + 1]);
+                for (int i = 0; i < Dialogue.Lable_COUNT; i++)
+                    newDialogue.Lables[i] = Convert.ToInt32(objStr[i + 1]);
 
                 newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
@@ -155,8 +155,8 @@ namespace LettreForAndroid.Utility
             if (dbLables != null)
                 dbLables.CopyTo(newDialogue.Lables, 0);
 
-            for (int i = 0; i < Dialogue.Lable_COUNT - 2; i++)
-                newDialogue.Lables[i + 1] += Convert.ToInt32(receivedData[i + 1]);                 //서버에서 받은 레이블을 누적.
+            for (int i = 0; i < Dialogue.Lable_COUNT; i++)
+                newDialogue.Lables[i] += Convert.ToInt32(receivedData[i + 1]);                 //서버에서 받은 레이블을 누적.
 
             InsertOrUpdate(newDialogue);
             

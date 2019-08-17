@@ -276,7 +276,7 @@ namespace LettreForAndroid.UI
                 {
                     return VIEW_TYPE_ALL;
                 }
-                else if ((int)Dialogue.LableType.ALL < _DialogueSet.Lable && _DialogueSet.Lable < Dialogue.Lable_COUNT)
+                else if ( 0 <= _DialogueSet.Lable && _DialogueSet.Lable <= Dialogue.Lable_COUNT + 2)
                 {
                     return VIEW_TYPE_CATEGORY;
                 }

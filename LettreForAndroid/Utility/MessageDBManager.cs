@@ -61,10 +61,9 @@ namespace LettreForAndroid.Utility
             }
 
             _DialogueSets = new List<DialogueSet>();
-            for (int i = 0; i <= Dialogue.Lable_COUNT; i++)
+            for (int i = 0; i < Dialogue.Lable_COUNT + 2; i++)
             {
-                _DialogueSets.Add(new DialogueSet());
-                _DialogueSets[i].Lable = i;                 //고유 레이블 붙여줌
+                _DialogueSets.Add(new DialogueSet(i));
             }
         }
 
@@ -91,7 +90,6 @@ namespace LettreForAndroid.Utility
                 {
                     string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
                     string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    //address = address != "" ? address : "Unknown";
                     string msg = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
                     int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
                     long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
@@ -117,8 +115,7 @@ namespace LettreForAndroid.Utility
                         else
                         {
                             //연락처에 없는 대화는, 레이블 분석에 따라 MajorLable이 변경될수 있으므로 여기서 MajorLable을 결정하지 않음. 미분류로 보냄.
-                            //objDialogue.DisplayName = objSms.Address;
-                            objDialogue.DisplayName = objDialogue.Address != "" ? objSms.Address : "알 수 없음";
+                            objDialogue.DisplayName = getDisplayNameIfUsual(objDialogue.Address);
                             objDialogue.MajorLable = (int)Dialogue.LableType.UNKNOWN;
                         }
 
@@ -134,8 +131,11 @@ namespace LettreForAndroid.Utility
                 }
             }
             cursor.Close();
+        }
 
-            foreach(DialogueSet dialgoueSet in _DialogueSets)
+        public void SortAllDialogues()
+        {
+            foreach (DialogueSet dialgoueSet in _DialogueSets)
             {
                 dialgoueSet.SortByLastMessageTime();
             }
@@ -307,7 +307,26 @@ namespace LettreForAndroid.Utility
             Application.Context.ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
         }
 
+        public string getDisplayNameIfUsual(string address)
+        {
+            switch (address)
+            {
+                case "":
+                    return "알 수 없음";
+                case "#CMAS#CMASALL":
+                    return "긴급 재난 문자";
+                case "#CMAS#Severe":
+                    return "안전 안내 문자";
+                default:
+                    return address;
+            }
+        }
+
     }
+
+    //--------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------
+    
 
     public static class MessageSender
     {

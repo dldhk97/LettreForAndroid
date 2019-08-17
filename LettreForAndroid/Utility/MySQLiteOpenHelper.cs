@@ -19,18 +19,11 @@ namespace LettreForAndroid.Utility
     public class MySQLiteOpenHelper : SQLiteOpenHelper
     {
         private const string _DB_NAME = "LettreDB";
-        private const int _DB_VERSION = 1;
+        private const int _DB_VERSION = 2;
         private const string _TABLE_NAME = "DialogueTable";
 
-        private const string COLUMN_THREAD_ID = "thread_id";
-        private const string COLUMN_ADDRESS = "address";
-        private const string COLUMN_Lable_COMMON = "lable_common";
-        private const string COLUMN_Lable_DELIVERY = "lable_delivery";
-        private const string COLUMN_Lable_CARD = "lable_card";
-        private const string COLUMN_Lable_IDENTIFICATION = "lable_identification";
-        private const string COLUMN_Lable_PUBLIC = "lable_public";
-        private const string COLUMN_Lable_AGENCY = "lable_agency";
-        private const string COLUMN_Lable_ETC = "lable_etc";
+        private static string[] _ColumnNameStr = { "thread_id", "address", "lable_common", "lable_delivery", "lable_card", "lable_identification", "lable_public", "lable_agency", "lable_etc" };
+        private enum COLUMN_NAME { THREAD_ID = 0, ADDRESS, LABLE_COMMON, LABLE_DELIVERY, LABLE_CARD, LABLE_IDENTIFICATION, LABLE_PUBLIC, LABLE_AGENCY, LABLE_ETC };
 
         public MySQLiteOpenHelper(Context context) : base(context, _DB_NAME, null, _DB_VERSION) { }
 
@@ -45,16 +38,16 @@ namespace LettreForAndroid.Utility
             OnCreate(db);
         }
 
-        public const string CreateQuery = "create table if not exists " + _TABLE_NAME + "("
-            + COLUMN_THREAD_ID + " integer primary key, "                 //안드로이드 SQLite에서는 long 이 integer로 동작하는듯
-            + COLUMN_ADDRESS + " text not null , "
-            + COLUMN_Lable_COMMON + " integer not null , "
-            + COLUMN_Lable_DELIVERY + " integer not null , "
-            + COLUMN_Lable_CARD + " integer not null , "
-            + COLUMN_Lable_IDENTIFICATION + " integer not null , "
-            + COLUMN_Lable_PUBLIC + " integer not null , "
-            + COLUMN_Lable_AGENCY + " integer not null , "
-            + COLUMN_Lable_ETC + " integer not null );";
+        public string CreateQuery = "create table if not exists " + _TABLE_NAME + "("
+            + _ColumnNameStr[(int)COLUMN_NAME.THREAD_ID] + " integer primary key, "                 //안드로이드 SQLite에서는 long 이 integer로 동작하는듯
+            + _ColumnNameStr[(int)COLUMN_NAME.ADDRESS] + " text not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_COMMON] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_DELIVERY] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_CARD] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_IDENTIFICATION] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_PUBLIC] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_AGENCY] + " integer not null , "
+            + _ColumnNameStr[(int)COLUMN_NAME.LABLE_ETC] + " integer not null );";
 
         public const string DeleteQuery = "drop table if exists " + _TABLE_NAME;
 
@@ -64,15 +57,15 @@ namespace LettreForAndroid.Utility
             SQLiteDatabase db = new MySQLiteOpenHelper(context).WritableDatabase;
 
             ContentValues values = new ContentValues();
-            values.Put(COLUMN_THREAD_ID, dialogue.Thread_id);
-            values.Put(COLUMN_ADDRESS, dialogue.Address);
-            values.Put(COLUMN_Lable_COMMON, dialogue.Lables[1]);
-            values.Put(COLUMN_Lable_DELIVERY, dialogue.Lables[2]);
-            values.Put(COLUMN_Lable_CARD, dialogue.Lables[3]);
-            values.Put(COLUMN_Lable_IDENTIFICATION, dialogue.Lables[4]);
-            values.Put(COLUMN_Lable_PUBLIC, dialogue.Lables[5]);
-            values.Put(COLUMN_Lable_AGENCY, dialogue.Lables[6]);
-            values.Put(COLUMN_Lable_ETC, dialogue.Lables[7]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.THREAD_ID], dialogue.Thread_id);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.ADDRESS], dialogue.Address);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_COMMON], dialogue.Lables[0]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_DELIVERY], dialogue.Lables[1]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_CARD], dialogue.Lables[2]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_IDENTIFICATION], dialogue.Lables[3]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_PUBLIC], dialogue.Lables[4]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_AGENCY], dialogue.Lables[5]);
+            values.Put(_ColumnNameStr[(int)COLUMN_NAME.LABLE_ETC], dialogue.Lables[6]);
 
             db.InsertWithOnConflict(_TABLE_NAME, null, values, Conflict.Replace);
 
@@ -86,15 +79,15 @@ namespace LettreForAndroid.Utility
 
             ICursor cursor = db.Query(_TABLE_NAME, new string[]
             {
-                COLUMN_THREAD_ID,
-                COLUMN_ADDRESS,
-                COLUMN_Lable_COMMON,
-                COLUMN_Lable_DELIVERY,
-                COLUMN_Lable_CARD,
-                COLUMN_Lable_IDENTIFICATION,
-                COLUMN_Lable_PUBLIC,
-                COLUMN_Lable_AGENCY,
-                COLUMN_Lable_ETC,
+                _ColumnNameStr[(int)COLUMN_NAME.THREAD_ID],
+                _ColumnNameStr[(int)COLUMN_NAME.ADDRESS],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_COMMON],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_DELIVERY],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_CARD],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_IDENTIFICATION],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_PUBLIC],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_AGENCY],
+                _ColumnNameStr[(int)COLUMN_NAME.LABLE_ETC],
             },
             null, null, null, null, null);
 
@@ -108,8 +101,8 @@ namespace LettreForAndroid.Utility
                     objDialogue.Thread_id = cursor.GetLong(0);
                     objDialogue.Address = cursor.GetString(1);
 
-                    for (int i = 0; i < Dialogue.Lable_COUNT - 2; i++)   //DB의 2~8행까지 데이터를 1~7번 레이블에 저장, 0번레이블은 사용안됨.
-                        objDialogue.Lables[i + 1] = cursor.GetInt(i + 2);
+                    for (int i = 0; i < Dialogue.Lable_COUNT; i++)   //DB의 2~8행까지 데이터를 0~6번 레이블에 저장
+                        objDialogue.Lables[i] = cursor.GetInt(i + 2);
                     result.InsertOrUpdate(objDialogue);
                 }
             }
