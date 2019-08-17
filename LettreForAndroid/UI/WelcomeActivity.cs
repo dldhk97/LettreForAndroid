@@ -108,6 +108,7 @@ namespace LettreForAndroid.UI
 
         private void _NextBtn_Click(object sender, EventArgs e)
         {
+            RunOnUiThread(() => { _NextBtn.Clickable = false; });
             switch (_ViewPager.CurrentItem)
             {
                 case (int)WELCOME_SCREEN.WELCOME:
@@ -133,7 +134,11 @@ namespace LettreForAndroid.UI
 
         private void MoveToNextScreen()
         {
-            RunOnUiThread(() => { _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true); });
+            RunOnUiThread(() => 
+            {
+                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                _NextBtn.Clickable = true;
+            });
         }
 
         //---------------------------------------------------------------------------------
@@ -191,6 +196,7 @@ namespace LettreForAndroid.UI
                         else
                         {
                             Toast.MakeText(this, "권한이 거절당했습니다. 다시 시도해주세요.", ToastLength.Short).Show();
+                            RunOnUiThread(() => { _NextBtn.Clickable = true; });        //버튼 누를 수 있게 풀어줘야 됨.
                         }
                     }
                     break;
@@ -244,6 +250,7 @@ namespace LettreForAndroid.UI
                     else
                     {
                         Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다.\n다시 시도해주세요.", ToastLength.Short).Show();
+                        RunOnUiThread(() => { _NextBtn.Clickable = true; });        //버튼 누를 수 있게 풀어줘야 됨.
                     }
                     break;
             }
@@ -311,6 +318,7 @@ namespace LettreForAndroid.UI
         private void ShowRetryDialog()
         {
             Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder.SetCancelable(false);
             builder.SetTitle("메시지 분류에 실패했습니다.");
             builder.SetMessage("다시 시도하시겠습니까?");
             builder.SetPositiveButton("예", (senderAlert, args) =>
@@ -326,7 +334,10 @@ namespace LettreForAndroid.UI
                 {
                     MoveToNextScreen();
                 });
-                builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>{ });
+                builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
+                {
+                    RunOnUiThread(() => { _NextBtn.Clickable = true; });        //버튼 누를 수 있게 풀어줘야 됨.
+                });
                 RunOnUiThread(() =>
                 {
                     Dialog dialog2 = builder2.Create();
@@ -366,6 +377,7 @@ namespace LettreForAndroid.UI
         private void AskMachineSupport()
         {
             Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder2.SetCancelable(false);
             builder2.SetTitle("기계학습 지원 요청");
             builder2.SetMessage("기계학습 지원을 하시겠습니까?");
             builder2.SetPositiveButton("예", (senderAlert2, args2) =>
@@ -382,9 +394,6 @@ namespace LettreForAndroid.UI
             dialog2.Show();
         }
     }
-
-
-
 
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------

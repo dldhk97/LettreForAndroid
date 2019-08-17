@@ -160,7 +160,6 @@ namespace LettreForAndroid.Utility
 
             InsertOrUpdate(newDialogue);
             
-
             //DB를 메모리에 올림
             Load();
         }

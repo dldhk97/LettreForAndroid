@@ -169,6 +169,7 @@ namespace LettreForAndroid.Utility
         {
             Load();
             CategorizeLocally(_DialogueSets[(int)Dialogue.LableType.ALL]);
+            SortAllDialogues();
         }
         
         //해당 대화집합이 모두 LableDB에 포함되어있다는 가정 하에 문자를 분류해서 메모리에 올림. 네트워크에 연결하지 않음.
