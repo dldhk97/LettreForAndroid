@@ -46,7 +46,7 @@ namespace LettreForAndroid.Receivers
                 NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101);       //알림 표시
             }
 
-            MessageDBManager.Get().Refresh();           //메세지 DB 새로고침
+            MessageDBManager.Get().ReLoad();           //메세지 DB 새로고침
 
             RefreshUI();
         }

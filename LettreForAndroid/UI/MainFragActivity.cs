@@ -81,7 +81,12 @@ namespace LettreForAndroid.UI
         public void refreshRecyclerView()
         {
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
-            _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
+            if (_Category == (int)Dialogue.LableType.ALL)
+                _DialogueSet = MessageDBManager.Get().TotalDialogue;
+            else if (_Category == (int)Dialogue.LableType.UNKNOWN)
+                _DialogueSet = MessageDBManager.Get().UnknownDialogue;
+            else
+                _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
 
             //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_DialogueSet.Count > 0)
@@ -138,16 +143,17 @@ namespace LettreForAndroid.UI
 
                 //날짜 표시
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
+
+                if (dtu.GetNow().Year <= dtu.GetYear(lastMessage.Time))                                  //올해 메시지이면
                 {
-                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
+                    if (dtu.GetDatetime(lastMessage.Time) >= dtu.GetToday())
+                        mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
                     else
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
+                        mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
                 }
                 else
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
+                    mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
                 }
 
                 //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
@@ -223,16 +229,17 @@ namespace LettreForAndroid.UI
 
                 //날짜 표시
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
+
+                if (dtu.GetNow().Year <= dtu.GetYear(lastMessage.Time))                                  //올해 메시지이면
                 {
-                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
+                    if (dtu.GetDatetime(lastMessage.Time) >= dtu.GetToday())
+                        mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
                     else
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
+                        mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
                 }
                 else
                 {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
+                    mTime.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
                 }
 
                 //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정

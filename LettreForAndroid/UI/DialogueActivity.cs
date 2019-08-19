@@ -51,7 +51,7 @@ namespace LettreForAndroid.UI
             _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
 
-            _CurDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);              //thread_id로 기존에 대화가 존재하는지 찾는다.
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);                  //thread_id로 기존에 대화가 존재하는지 찾는다.
             if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
             {
                 _CurDialogue = CreateNewDialogue(_CurAddress);
@@ -207,7 +207,7 @@ namespace LettreForAndroid.UI
             for (int i = 0; i < iDialogue.Count; i++)
             {
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                string objTime = dtu.milisecondToDateTimeStr(iDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
+                string objTime = dtu.MilisecondToDateTimeStr(iDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
 
                 if (prevTime != objTime)
                 {
@@ -240,7 +240,7 @@ namespace LettreForAndroid.UI
                 _MsgBox.Text = string.Empty;
 
                 //DB 새로고침
-                MessageDBManager.Get().Refresh();
+                MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
 
                 //UI 업데이트
                 if (_Instance != null)
@@ -352,7 +352,7 @@ namespace LettreForAndroid.UI
             mMsg.Text = message.Msg;
 
             DateTimeUtillity dtu = new DateTimeUtillity();
-            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
+            mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
         }
     }
 
@@ -390,7 +390,7 @@ namespace LettreForAndroid.UI
             mMsg.Text = message.Msg;
 
             DateTimeUtillity dtu = new DateTimeUtillity();
-            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
+            mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
         }
     }
 

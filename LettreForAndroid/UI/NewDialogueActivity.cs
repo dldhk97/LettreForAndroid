@@ -121,7 +121,8 @@ namespace LettreForAndroid.UI
                 MessageDBManager.Get().InsertMessage(_AddressBox.Text, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
 
                 //DB 새로고침
-                MessageDBManager.Get().Refresh();
+                long thread_id = MessageDBManager.Get().GetThreadId(_AddressBox.Text);
+                MessageDBManager.Get().LoadDialogue(thread_id, true);
 
                 Context context = Android.App.Application.Context;
 
