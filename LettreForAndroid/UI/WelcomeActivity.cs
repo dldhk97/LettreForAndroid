@@ -357,7 +357,7 @@ namespace LettreForAndroid.UI
         private void CreateLableDB()
         {
             //미분류 메시지가 하나도 없는 경우
-            if (MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN].Count <= 0)
+            if (MessageDBManager.Get().UnknownDialogue.Count <= 0)
             {
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.EMPTY));
                 return;
@@ -365,7 +365,7 @@ namespace LettreForAndroid.UI
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
             LableDBManager.Get().CreateLableDB(
-            MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
+            MessageDBManager.Get().UnknownDialogue);
 
             if (LableDBManager.Get().IsDBExist())
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.SUCCESS));
