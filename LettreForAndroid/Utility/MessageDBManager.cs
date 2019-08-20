@@ -216,13 +216,17 @@ namespace LettreForAndroid.Utility
 
         public void ReLoad()
         {
+            //Dialogue Set 초기화
             ResetDialogueSet();
 
+            //Total Dialogue에 추가
             UpdateLastSMS();
             UpdateLastMMS();
 
+            //레이블 DB를 바탕으로 각 다이얼로그에 넣음. 레이블DB가 없으면 Unknown에 넣음.
             Categorize();
 
+            //각 다이얼로그 대화를 날짜순으로 정렬
             SortDialogueSets();
         }
 
@@ -266,16 +270,13 @@ namespace LettreForAndroid.Utility
             if (mmss != null)
                 totalMessages.AddRange(mmss);
 
-            totalMessages = totalMessages.OrderByDescending(i => i.Time).ToList();
-
-            //새로 로드했는데도 없을 때
-            objDialogue = FindDialogue(thread_id);
-            if (objDialogue == null)
-                return null;
-
-            //새로 로드했는데 있으면 그거 반환
-            objDialogue.TextMessageList.Clear();
-            objDialogue.TextMessageList = totalMessages;
+            if(totalMessages.Count > 0)
+            {
+                totalMessages = totalMessages.OrderByDescending(i => i.Time).ToList();
+                if (objDialogue == null)
+                    objDialogue = new Dialogue(totalMessages);
+                objDialogue.TextMessageList = totalMessages;
+            }
             return objDialogue;
         }
 

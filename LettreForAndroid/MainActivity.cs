@@ -57,8 +57,6 @@ namespace LettreForAndroid
             LableDBManager.Get();                           //레이블 DB를 모두 메모리에 올림
             MessageDBManager.Get();                         //메시지를 모두 메모리에 올림
 
-            MessageDBManager.Get().SortDialogueSets();
-
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
             CreateNotificationChannel(); 

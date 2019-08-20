@@ -51,10 +51,10 @@ namespace LettreForAndroid.UI
             _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
 
-            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);                  //thread_id로 기존에 대화가 존재하는지 찾는다.
-            if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);   //thread_id로 기존에 대화가 존재하는지 찾는다.
+            if (_CurDialogue.Address == null)                                                   //대화가 없으면 새로 만든다.
             {
-                _CurDialogue = CreateNewDialogue(_CurAddress);
+                CreateNewDialogue(_CurAddress);
             }
 
             SetupLayout();
@@ -65,22 +65,24 @@ namespace LettreForAndroid.UI
             _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
         }
 
-        private Dialogue CreateNewDialogue(string address)
+        private void CreateNewDialogue(string address)
         {
-            Dialogue dialogue = new Dialogue();
-            dialogue.Address = address;
-            dialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
+            _CurDialogue.Address = address;
+            _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
 
-            if(dialogue.Contact != null)
-                dialogue.DisplayName = dialogue.Contact.Name;
+            if(_CurDialogue.Contact != null)
+            {
+                _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
+                _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+            }
             else
-                dialogue.DisplayName = address;
+            {
+                _CurDialogue.DisplayName = address;
+                _CurDialogue.MajorLable = (int)Dialogue.LableType.UNKNOWN;
+            }
 
-            dialogue.MajorLable = (int)Dialogue.LableType.COMMON;
-            dialogue.UnreadCnt = 0;
-            dialogue.Thread_id = MessageDBManager.Get().GetThreadId(address);
-
-            return dialogue;
+            _CurDialogue.UnreadCnt = 0;
+            _CurDialogue.Thread_id = MessageDBManager.Get().GetThreadId(address);
         }
 
         //-----------------------------------------------------------------
