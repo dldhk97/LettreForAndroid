@@ -52,7 +52,7 @@ namespace LettreForAndroid.UI
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
 
             _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);   //thread_id로 기존에 대화가 존재하는지 찾는다.
-            if (_CurDialogue.Address == null)                                                   //대화가 없으면 새로 만든다.
+            if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
             {
                 CreateNewDialogue(_CurAddress);
             }
@@ -67,6 +67,7 @@ namespace LettreForAndroid.UI
 
         private void CreateNewDialogue(string address)
         {
+            _CurDialogue = new Dialogue();
             _CurDialogue.Address = address;
             _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
 
@@ -136,7 +137,8 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            Dialogue updatedDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);      //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
+            //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
+            Dialogue updatedDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
             if (updatedDialogue != null)
                 _CurDialogue = updatedDialogue;
 
@@ -242,7 +244,7 @@ namespace LettreForAndroid.UI
                 _MsgBox.Text = string.Empty;
 
                 //DB 새로고침
-                MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
+                _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
 
                 //UI 업데이트
                 if (_Instance != null)

@@ -13,6 +13,7 @@ using Android.Telephony;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Java.Lang;
 using LettreForAndroid.Class;
 using LettreForAndroid.UI;
 using LettreForAndroid.Utility;
@@ -46,10 +47,12 @@ namespace LettreForAndroid.Receivers
                 NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101);       //알림 표시
             }
 
-            MessageDBManager.Get().ReLoad();           //메세지 DB 새로고침
+            //메세지 DB 새로고침. 느리다. 최적화나 쓰레딩 필요.
+            MessageDBManager.Get().ReLoad();
 
             RefreshUI();
         }
+
 
         private TextMessage ConvertToTextMessage(SmsMessage msg)
         {
