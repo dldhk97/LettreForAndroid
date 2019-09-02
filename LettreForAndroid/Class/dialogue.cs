@@ -5,7 +5,6 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
-using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -201,7 +200,7 @@ namespace LettreForAndroid.Class
         private string msg;         //메세지(body)
         private int readState;   //0은 읽지않음, 1은 읽음.
         private long time;           //메세지를 받거나 보냈던 시간. 밀리세컨드 값으로 나오며, MMS는 여기 안나옴
-        private int type;           //1은 상대방이 보낸 것, 2는 내가 보낸 것           mms일때 132는 상대방이, 128은 내가보낸 MMS
+        private int type;           //1은 상대방이 보낸 것, 2는 내가 보낸 것
         private long thread_id;   //대화방 고유 ID?
 
         public TextMessage()
@@ -257,32 +256,29 @@ namespace LettreForAndroid.Class
         }
     }
 
-    public class MultiMediaMessage : TextMessage
+    public class MultimediaMessage : TextMessage
     {
-        public enum MEDIA_TYPE { TEXT = 0, IMAGE, VCF }
-
+        private string m_sub;     //MMS의 제목
         private string m_id;
-        private int mediaType;
-        private Bitmap bitmap;
+        private string type;  //MMS일때 가짐. 132는 상대방이 보낸 것, 128은 내가보낸 것.
+        
 
+        public string M_sub
+        {
+            get { return m_sub; }
+            set { m_sub = value; }
+        }
         public string M_id
         {
             get { return m_id; }
             set { m_id = value; }
         }
-
-        public int MediaType
+        public string Type
         {
-            get { return mediaType; }
-            set { mediaType = value; }
+            get { return type; }
+            set { type = value; }
         }
-
-        public Bitmap Bitmap
-        {
-            get { return bitmap; }
-            set { bitmap = value; }
-        }
-
+        
     }
 
 }

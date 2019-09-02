@@ -42,7 +42,7 @@ namespace LettreForAndroid.Utility
                 int resultLable = objdialogue.Lables.ToList().IndexOf(maxValue);
                 return resultLable;
             }
-            return (int)Dialogue.LableType.UNKNOWN;
+            return -1;
         }
 
         public int[] GetLables(long thread_id)

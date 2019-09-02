@@ -120,7 +120,8 @@ namespace LettreForAndroid.UI
                 //DB에 삽입
                 MessageDBManager.Get().InsertMessage(_AddressBox.Text, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
 
-                MessageDBManager.Get().ReLoad();
+                //DB 새로고침
+                MessageDBManager.Get().Refresh();
 
                 Context context = Android.App.Application.Context;
 

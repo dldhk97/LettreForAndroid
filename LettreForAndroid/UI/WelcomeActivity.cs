@@ -85,21 +85,20 @@ namespace LettreForAndroid.UI
             _IsFirst = DataStorageManager.loadBoolData(this, "isFirst", true);
             if (_IsFirst == false)
             {
-                //권한이 있는가?
                 if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions));
                     _HasPermission = true;
 
-                //기본 패키지로 되어있는가?
                 if (PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
                     _IsDefaultPackage = true;
 
-                if (_HasPermission == false)                                            //권한이 없다면, 권한페이지로 이동.
+                if (_HasPermission == false)
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
-                else if (_IsDefaultPackage == false)                                    //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
+                else if (_IsDefaultPackage == false)
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
-                else                                                                    //이미 설정 다되있으면 피니쉬
+                else
                     Finish();
             }
+
         }
 
         public override void OnBackPressed()
@@ -159,7 +158,6 @@ namespace LettreForAndroid.UI
                 return;
             }
 
-            //권한 요청
             PermissionManager.RequestPermission(
                 this,
                 PermissionManager.essentialPermissions,
@@ -186,7 +184,6 @@ namespace LettreForAndroid.UI
                             }
                         }
 
-                        //권한이 취득됬으면
                         if (isAllGranted)
                         {
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
@@ -356,8 +353,9 @@ namespace LettreForAndroid.UI
 
         private void CreateLableDB()
         {
+            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : Creating Lable DB", ToastLength.Short).Show(); });
             //미분류 메시지가 하나도 없는 경우
-            if (MessageDBManager.Get().UnknownDialogue.Count <= 0)
+            if (MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN].Count <= 0)
             {
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.EMPTY));
                 return;
@@ -365,7 +363,7 @@ namespace LettreForAndroid.UI
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
             LableDBManager.Get().CreateLableDB(
-            MessageDBManager.Get().UnknownDialogue);
+            MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
 
             if (LableDBManager.Get().IsDBExist())
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.SUCCESS));

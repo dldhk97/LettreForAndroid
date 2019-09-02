@@ -21,24 +21,24 @@ namespace LettreForAndroid.Utility
         //    return startdate;
         //}
 
-        public DateTime GetNow()
+        public DateTime getNow()
         {
             return DateTime.Now;
         }
 
-        public DateTime GetToday()
+        public DateTime getToday()
         {
             return DateTime.Today;
         }
         
-        public DateTime GetDatetime(long milTime)
+        public DateTime getDatetime(long milTime)
         {
             TimeSpan time = TimeSpan.FromMilliseconds(milTime);
             DateTime startdate = new DateTime(1970, 1, 1) + time;
             return startdate;
         }
 
-        public int GetYear(long milTime)
+        public int getYear(long milTime)
         {
             Java.Text.SimpleDateFormat formatter = new Java.Text.SimpleDateFormat("YYYY");
             string result = (string)formatter.Format(new Java.Sql.Timestamp(milTime));
@@ -51,7 +51,7 @@ namespace LettreForAndroid.Utility
             return (long)(DateTime.Now.ToUniversalTime() - baseDate).TotalMilliseconds;
         }
 
-        public string MilisecondToDateTimeStr(long milTime, string pattern)
+        public string milisecondToDateTimeStr(long milTime, string pattern)
         {
             //날짜 표시
             //string pattern = "yyyy-MM-dd HH:mm:ss";
