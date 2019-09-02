@@ -1,6 +1,8 @@
 # LettreForAndroid
 2019-여름-SIG에 참가하여 개발하게 된 메세지 카테고리 분류 앱입니다.
 
+
+
 # License
 Copyright 2019 Team Lettre
 
