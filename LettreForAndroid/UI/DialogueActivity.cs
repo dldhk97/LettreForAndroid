@@ -51,10 +51,10 @@ namespace LettreForAndroid.UI
             _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
 
-            _CurDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);              //thread_id로 기존에 대화가 존재하는지 찾는다.
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);   //thread_id로 기존에 대화가 존재하는지 찾는다.
             if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
             {
-                _CurDialogue = CreateNewDialogue(_CurAddress);
+                CreateNewDialogue(_CurAddress);
             }
 
             SetupLayout();
@@ -65,22 +65,25 @@ namespace LettreForAndroid.UI
             _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
         }
 
-        private Dialogue CreateNewDialogue(string address)
+        private void CreateNewDialogue(string address)
         {
-            Dialogue dialogue = new Dialogue();
-            dialogue.Address = address;
-            dialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
+            _CurDialogue = new Dialogue();
+            _CurDialogue.Address = address;
+            _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
 
-            if(dialogue.Contact != null)
-                dialogue.DisplayName = dialogue.Contact.Name;
+            if(_CurDialogue.Contact != null)
+            {
+                _CurDialogue.DisplayName = _CurDialogue.Contact.Name;
+                _CurDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+            }
             else
-                dialogue.DisplayName = address;
+            {
+                _CurDialogue.DisplayName = address;
+                _CurDialogue.MajorLable = (int)Dialogue.LableType.UNKNOWN;
+            }
 
-            dialogue.MajorLable = (int)Dialogue.LableType.COMMON;
-            dialogue.UnreadCnt = 0;
-            dialogue.Thread_id = MessageDBManager.Get().GetThreadId(address);
-
-            return dialogue;
+            _CurDialogue.UnreadCnt = 0;
+            _CurDialogue.Thread_id = MessageDBManager.Get().GetThreadId(address);
         }
 
         //-----------------------------------------------------------------
@@ -134,7 +137,8 @@ namespace LettreForAndroid.UI
 
         public void RefreshRecyclerView()
         {
-            Dialogue updatedDialogue = MessageDBManager.Get().FindDialogue(_CurThread_id);      //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
+            //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
+            Dialogue updatedDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
             if (updatedDialogue != null)
                 _CurDialogue = updatedDialogue;
 
@@ -207,7 +211,7 @@ namespace LettreForAndroid.UI
             for (int i = 0; i < iDialogue.Count; i++)
             {
                 DateTimeUtillity dtu = new DateTimeUtillity();
-                string objTime = dtu.milisecondToDateTimeStr(iDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
+                string objTime = dtu.MilisecondToDateTimeStr(iDialogue[i].Time, "yyyy년 MM월 dd일 E요일");
 
                 if (prevTime != objTime)
                 {
@@ -240,7 +244,7 @@ namespace LettreForAndroid.UI
                 _MsgBox.Text = string.Empty;
 
                 //DB 새로고침
-                MessageDBManager.Get().Refresh();
+                _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
 
                 //UI 업데이트
                 if (_Instance != null)
@@ -352,7 +356,7 @@ namespace LettreForAndroid.UI
             mMsg.Text = message.Msg;
 
             DateTimeUtillity dtu = new DateTimeUtillity();
-            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
+            mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
         }
     }
 
@@ -390,7 +394,7 @@ namespace LettreForAndroid.UI
             mMsg.Text = message.Msg;
 
             DateTimeUtillity dtu = new DateTimeUtillity();
-            mTime.Text = dtu.milisecondToDateTimeStr(message.Time, "a hh:mm");
+            mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
         }
     }
 

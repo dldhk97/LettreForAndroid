@@ -55,17 +55,7 @@ namespace LettreForAndroid
         {
             ContactDBManager.Get();                         //연락처를 모두 메모리에 올림
             LableDBManager.Get();                           //레이블 DB를 모두 메모리에 올림
-            MessageDBManager.Get();                         //메시지를 모두 메모리에 올림
-
-            //레이블 DB가 있나?
-            if(LableDBManager.Get().IsDBExist())
-            {
-                MessageDBManager.Get().CategorizeNewMsg(); //메시지 중 레이블이 붙어있지 않은 대화가 있으면, 그 대화 다시 카테고라이즈함.
-                MessageDBManager.Get().CategorizeLocally(
-                    MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.UNKNOWN]);
-            }
-
-            MessageDBManager.Get().SortAllDialogues();
+            MessageDBManager.Get().ReLoad();                         //메시지를 모두 메모리에 올림
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
 
@@ -128,7 +118,7 @@ namespace LettreForAndroid
         {
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-
+                //MessageDBManager.Get().Load2();
             }
             else
             {

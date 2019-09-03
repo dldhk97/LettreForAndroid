@@ -199,19 +199,8 @@ namespace LettreForAndroid.UI
         {
             //해당 연락처와의 대화가 있었는지 탐색
             ContactData objContact = _FilteredItem[iPosition].PrimaryContactData;
-            Dialogue objDialogue = null;
-            foreach(Dialogue dialogue in MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.ALL].DialogueList.Values)
-            {
-                if(dialogue.Contact != null)
-                {
-                    if (dialogue.Contact.Address == objContact.Address)
-                    {
-                        objDialogue = dialogue;
-                        break;
-                    }
-                }
-                
-            }
+            long thread_id = MessageDBManager.Get().GetThreadId(objContact.Address);
+            Dialogue objDialogue = MessageDBManager.Get().FindDialogue(thread_id);
 
             //연락처와의 대화 페이지를 보여준다.
             Context context = Application.Context;

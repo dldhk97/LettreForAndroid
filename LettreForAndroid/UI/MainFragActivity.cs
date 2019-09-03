@@ -41,6 +41,7 @@ namespace LettreForAndroid.UI
             fragment.Arguments = args;
 
             return fragment;
+
         }
 
         //새로운 페이지가 만들어질때 호출됨
@@ -81,12 +82,17 @@ namespace LettreForAndroid.UI
         public void refreshRecyclerView()
         {
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
-            _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
+            if (_Category == (int)Dialogue.LableType.ALL)
+                _DialogueSet = MessageDBManager.Get().TotalDialogue;
+            else if (_Category == (int)Dialogue.LableType.UNKNOWN)
+                _DialogueSet = MessageDBManager.Get().UnknownDialogue;
+            else
+                _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
 
             //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_DialogueSet.Count > 0)
             {
-                DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet);
+                DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet, _Category);
                 _RecyclerView.SetAdapter(adapter);
             }
             else
@@ -100,6 +106,63 @@ namespace LettreForAndroid.UI
         //----------------------------------------------------------------------
         // DialogueFragAll VIEW HOLDER
         // 전체 탭의 프래그먼트
+
+        
+        public static void BindHolder(Dialogue dialogue, TextView address, TextView msgText, TextView timeText, RelativeLayout readStateRL, TextView readStateCnt)
+        {
+            TextMessage lastMessage = dialogue[0];                           //대화 중 가장 마지막 문자
+
+            //이름 혹은 연락처 표시, 문자 내용 표시
+            address.Text = dialogue.DisplayName;
+            if (dialogue[0].GetType() == typeof(MultiMediaMessage))
+            {
+                MultiMediaMessage objMMS = dialogue[0] as MultiMediaMessage;
+                switch (objMMS.MediaType)
+                {
+                    case (int)MultiMediaMessage.MEDIA_TYPE.TEXT:
+                        msgText.Text = objMMS.Msg;
+                        break;
+                    case (int)MultiMediaMessage.MEDIA_TYPE.IMAGE:
+                        msgText.Text = "이미지 MMS";
+                        break;
+                    case (int)MultiMediaMessage.MEDIA_TYPE.VCF:
+                        msgText.Text = "VCF MMS";
+                        break;
+                }
+            }
+            else
+            {
+                msgText.Text = lastMessage.Msg;
+            }
+
+            //날짜 표시
+            DateTimeUtillity dtu = new DateTimeUtillity();
+
+            if (dtu.GetNow().Year <= dtu.GetYear(lastMessage.Time))                                  //올해 메시지이면
+            {
+                if (dtu.GetDatetime(lastMessage.Time) >= dtu.GetToday())
+                    timeText.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
+                else
+                    timeText.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
+            }
+            else
+            {
+                timeText.Text = dtu.MilisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
+            }
+
+            //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
+            if (dialogue.UnreadCnt > 0)
+            {
+                readStateRL.Visibility = ViewStates.Visible;
+                readStateCnt.Text = dialogue.UnreadCnt.ToString();
+            }
+            else
+            {
+                readStateRL.Visibility = ViewStates.Invisible;
+            }
+        }
+        
+
 
         public class DialogueFragAllHolder : RecyclerView.ViewHolder
         {
@@ -128,38 +191,8 @@ namespace LettreForAndroid.UI
 
             public void bind(Dialogue dialogue)
             {
-                TextMessage lastMessage = dialogue[0];                           //대화 중 가장 마지막 문자
-
                 mCategoryText.Text = Dialogue._LableTypeStr[dialogue.MajorLable];   //카테고리 설정
-
-                //이름 혹은 연락처 표시, 문자 내용 표시
-                mAddress.Text = dialogue.DisplayName;
-                mMsg.Text = lastMessage.Msg;
-
-                //날짜 표시
-                DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
-                {
-                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
-                    else
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
-                }
-                else
-                {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
-                }
-
-                //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
-                if (dialogue.UnreadCnt > 0)
-                {
-                    mReadStateRL.Visibility = ViewStates.Visible;
-                    mReadStateCnt.Text = dialogue.UnreadCnt.ToString();
-                }
-                else
-                {
-                    mReadStateRL.Visibility = ViewStates.Invisible;
-                }
+                BindHolder(dialogue, mAddress, mMsg, mTime, mReadStateRL, mReadStateCnt);
             }
         }
 
@@ -200,7 +233,6 @@ namespace LettreForAndroid.UI
 
             public void bind(Dialogue dialogue)
             {
-                TextMessage lastMessage = dialogue[0];
                 //전체 탭이 아닌 경우
                 //연락처에 있는 사람이면
                 if (dialogue.Contact != null)
@@ -217,34 +249,7 @@ namespace LettreForAndroid.UI
                     mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
                 }
 
-                //이름 혹은 연락처 표시, 문자 내용 표시
-                mAddress.Text = dialogue.DisplayName;
-                mMsg.Text = lastMessage.Msg;
-
-                //날짜 표시
-                DateTimeUtillity dtu = new DateTimeUtillity();
-                if (dtu.getNow().Year >= dtu.getYear(lastMessage.Time))                                  //올해 메시지이면
-                {
-                    if (dtu.getDatetime(lastMessage.Time) >= dtu.getToday())
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "a hh:mm");          //오늘 메시지이면
-                    else
-                        mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "MM월 dd일");        //올해인데 오늘 메시지가 아님
-                }
-                else
-                {
-                    mTime.Text = dtu.milisecondToDateTimeStr(lastMessage.Time, "yyyy년 MM월 dd일");    //올해 메시지가 아님
-                }
-
-                //문자 읽음 여부에 따른 상태표시기 표시여부 및 카운트설정
-                if (dialogue.UnreadCnt > 0)
-                {
-                    mReadStateRL.Visibility = ViewStates.Visible;
-                    mReadStateCnt.Text = dialogue.UnreadCnt.ToString();
-                }
-                else
-                {
-                    mReadStateRL.Visibility = ViewStates.Invisible;
-                }
+                BindHolder(dialogue, mAddress, mMsg, mTime, mReadStateRL, mReadStateCnt);
             }
         }
 
@@ -258,11 +263,13 @@ namespace LettreForAndroid.UI
 
             // 현 페이지 대화 목록
             public DialogueSet _DialogueSet;
+            int _Category;
 
             // Load the adapter with the data set (photo album) at construction time:
-            public DialogueSetAdpater(DialogueSet iDialogueSet)
+            public DialogueSetAdpater(DialogueSet iDialogueSet, int iCategory)
             {
                 _DialogueSet = iDialogueSet;
+                _Category = iCategory;
             }
 
             public void updateDialogueSet(DialogueSet iDialogueSet)
@@ -272,11 +279,15 @@ namespace LettreForAndroid.UI
 
             public override int GetItemViewType(int iPosition)
             {
-                if (_DialogueSet.Lable == (int)Dialogue.LableType.ALL)
+                if (_Category == (int)Dialogue.LableType.ALL)
                 {
                     return VIEW_TYPE_ALL;
                 }
-                else if ( 0 <= _DialogueSet.Lable && _DialogueSet.Lable <= Dialogue.Lable_COUNT + 2)
+                else if ( 0 <= _Category && _Category < Dialogue.Lable_COUNT)
+                {
+                    return VIEW_TYPE_CATEGORY;
+                }
+                else if (_Category == (int)Dialogue.LableType.UNKNOWN)
                 {
                     return VIEW_TYPE_CATEGORY;
                 }

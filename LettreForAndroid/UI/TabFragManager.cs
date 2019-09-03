@@ -82,7 +82,14 @@ namespace LettreForAndroid.UI
             foreach(TabFrag objTab in tabFrags)
             {
                 int totalUnreadCnt = 0;
-                DialogueSet objDialogueSet = MessageDBManager.Get().DialogueSets[objTab.Category];
+                DialogueSet objDialogueSet;
+
+                if (objTab.Category == (int)Dialogue.LableType.ALL)
+                    objDialogueSet = MessageDBManager.Get().TotalDialogue;
+                else if (objTab.Category == (int)Dialogue.LableType.UNKNOWN)
+                    objDialogueSet = MessageDBManager.Get().UnknownDialogue;
+                else
+                    objDialogueSet = MessageDBManager.Get().DialogueSets[objTab.Category];
 
                 foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
                 {
