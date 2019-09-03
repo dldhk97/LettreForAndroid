@@ -5,6 +5,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.App;
@@ -16,7 +17,7 @@ namespace LettreForAndroid.Utility
 {
     class NotificationHandler
     {
-        public static void Notification(Context context, string channelID, string title, string msg, string address, string ticker, int notifId)
+        public static void Notification(Context context, string channelID, string title, string msg, string address, string ticker, int notifId, int unreadCnt)
         {
             var intent = new Intent(context, typeof(DialogueActivity));
             intent.PutExtra("address", address);
@@ -26,22 +27,19 @@ namespace LettreForAndroid.Utility
                 .SetContentTitle(title)
                 .SetContentText(msg)
                 .SetTicker(ticker)
-                .SetDefaults((int)NotificationDefaults.Sound)
+                .SetDefaults((int)NotificationDefaults.All)
                 .SetVisibility((int)NotificationVisibility.Public)
-                .SetPriority((int)NotificationPriority.Max)
-                .SetVibrate(new long[0])
+                .SetPriority((int)NotificationPriority.High)
+                .SetVibrate(new long[] { 0, 1000, 500, 1000 })
                 .SetFullScreenIntent(dialogueActivityIntent, true)
-                .SetSmallIcon(Resource.Drawable.ic_notification);
+                .SetSmallIcon(Resource.Drawable.ic_notification)
+                .SetAutoCancel(true)                                           //알림 클릭시 알림 아이콘이 상단바에서 사라짐.
+                .SetNumber(unreadCnt)
+                .SetLights(Color.Blue, 1, 1);                                  //LED 표시
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.From(context);
             notificationManager.Notify(notifId, builder.Build());
         }
-
-        //private int getNotificationIcon()
-        //{
-        //    bool useWhiteIcon = (Android.OS.Build.VERSION.SdkInt >= Android.OS.Build.VERSION_CODES.Lollipop);
-        //    return useWhiteIcon ? Resource.dra.main_icon : R.drawable.ic_launcher;
-        //}
 
     }
 }

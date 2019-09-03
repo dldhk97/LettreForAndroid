@@ -61,15 +61,22 @@ namespace LettreForAndroid.UI
 
             SetupToolbar();
 
-            _SmsSentReceiver = new SmsSentReceiver();                                   //브로드캐스트 리시버 초기화
+            //문자 전송 브로드캐스트 리시버 초기화
+            _SmsSentReceiver = new SmsSentReceiver();
             _SmsSentReceiver.SentCompleteEvent += _SmsSentReceiver_SentCompleteEvent;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _Instance = null;
         }
 
         private void CreateNewDialogue(string address)
         {
             _CurDialogue = new Dialogue();
             _CurDialogue.Address = address;
-            _CurDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(address);
+            _CurDialogue.Contact = ContactDBManager.Get().GetContactDataByAddress(address, false);
 
             if(_CurDialogue.Contact != null)
             {
@@ -237,23 +244,17 @@ namespace LettreForAndroid.UI
             //문자 전송 성공
             if (resultCode.Equals((int)Result.Ok))
             {
-                //DB에 삽입
+                //메시지를 DB에 삽입
                 MessageDBManager.Get().InsertMessage(_CurDialogue.Address, _MsgBox.Text, 1, (int)TextMessage.MESSAGE_TYPE.SENT);
 
                 //입력칸 비우기
                 _MsgBox.Text = string.Empty;
 
-                //DB 새로고침
-                _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
+                //해당 대화의 모든 메시지를 DB로부터 가져와 메모리에 다시 올림.
+                _CurDialogue = MessageDBManager.Get().RefreshLastMessage(_CurDialogue.Thread_id);
 
                 //UI 업데이트
-                if (_Instance != null)
-                    _Instance.RefreshRecyclerView();
-
-                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
-                {
-                    CustomPagerAdapter._Pages[i].refreshRecyclerView();
-                }
+                MainFragActivity.RefreshUI();
             }
             else
             {
@@ -261,6 +262,12 @@ namespace LettreForAndroid.UI
                 Toast.MakeText(this, "문자 전송에 실패하였습니다.", ToastLength.Long).Show();
                 //throw new Exception("문자 전송 실패시 코드 짜라");
             }
+        }
+
+        //문자 수신 이후 현재 대화를 업데이트 해야하는 경우 호출됨.
+        public void ReloadCurrentDialogue()
+        {
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
         }
 
         //Resume됬을때는 리시버 다시 등록

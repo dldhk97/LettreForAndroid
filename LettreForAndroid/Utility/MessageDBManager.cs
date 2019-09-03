@@ -18,6 +18,7 @@ using LettreForAndroid.Class;
 using LettreForAndroid.Receivers;
 using Uri = Android.Net.Uri;
 using Android.Graphics;
+using LettreForAndroid.UI;
 
 namespace LettreForAndroid.Utility
 {
@@ -39,7 +40,7 @@ namespace LettreForAndroid.Utility
         {
             _smsManager = SmsManager.Default;
 
-            ReLoad();
+            RefreshLastMessageAll();
         }
 
         public static MessageDBManager Get()
@@ -85,6 +86,7 @@ namespace LettreForAndroid.Utility
             _UnknownDialogue = new DialogueSet();
         }
 
+        //메시지 DB를 탐색하여, 각 대화중 가장 최신 SMS를 찾아 메모리에 올림.
         public void UpdateLastSMS()
         {
             ContentResolver cr = Application.Context.ContentResolver;
@@ -108,13 +110,14 @@ namespace LettreForAndroid.Utility
                     int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
 
                     TextMessage objSMS = new TextMessage(id, address, body, readState, time, type, thread_id);
-                    UpdateDialogue(objSMS);
+                    UpdateLastMessage(objSMS);
                 }
                 cursor.Close();
             }
             
         }
 
+        //메시지 DB를 탐색하여, 각 대화중 가장 최신 MMS를 찾아 메모리에 올림.
         public void UpdateLastMMS()
         {
             ContentResolver cr = Application.Context.ContentResolver;
@@ -144,7 +147,7 @@ namespace LettreForAndroid.Utility
                         objMMS.Thread_id = thread_id;
                         objMMS.Type = type == 132 ? (int)TextMessage.MESSAGE_TYPE.RECEIVED : (int)TextMessage.MESSAGE_TYPE.SENT;
 
-                        UpdateDialogue(objMMS);
+                        UpdateLastMessage(objMMS);
                     }
                     else
                     {
@@ -157,18 +160,21 @@ namespace LettreForAndroid.Utility
         }
 
         //해당 대화중 가장 마지막 문자로 갱신함. 대화가 없다면 새로 생성함.
-        private void UpdateDialogue(TextMessage objSMS)
+        private void UpdateLastMessage(TextMessage objSMS)
         {
             //이 thread_id에 해당하는 대화가 없으면 새로 생성 후 전체탭에 추가
-            if (_TotalDialogue.DialogueList.ContainsKey(objSMS.Thread_id) == false)
+            if (FindDialogue(objSMS.Thread_id) == null)
                 _TotalDialogue.DialogueList.Add(objSMS.Thread_id, CreateNewDialogue(objSMS));
 
             Dialogue objDialogue = _TotalDialogue[objSMS.Thread_id];
-            bool isMMS = objSMS.GetType() == typeof(MultiMediaMessage) ? true : false;
-            objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, isMMS);
+            //bool isMMS = objSMS.GetType() == typeof(MultiMediaMessage) ? true : false;
+            //objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, isMMS);
+
+            objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, true) + CountUnread(objDialogue.Thread_id, false);
 
             if (objDialogue.Count > 0)
             {
+                //대상 문자가 최신이 아니라면 기존 문자 유지, 대상 문자가 더 최신이면 대상 문자로 갱신.
                 if (objDialogue[0].Time > objSMS.Time)
                     return;
                 else
@@ -177,19 +183,19 @@ namespace LettreForAndroid.Utility
             objDialogue.Add(objSMS);
         }
 
-        //대화가 존재하지 않는 경우 호출되는 메소드
+        //대화가 존재하지 않는 경우 호출되어 대화를 새로 생성함.
         private Dialogue CreateNewDialogue(TextMessage objSMS)
         {
             Dialogue objDialogue = new Dialogue();
             objDialogue.Address = objSMS.Address;
-            objDialogue.Contact = ContactDBManager.Get().getContactDataByAddress(objSMS.Address);
+            objDialogue.Contact = ContactDBManager.Get().GetContactDataByAddress(objSMS.Address, false);
             if (objDialogue.Contact != null)
             {
                 objDialogue.DisplayName = objDialogue.Contact.Name;
             }
             else
             {
-                objDialogue.DisplayName = getDisplayNameIfUsual(objDialogue.Address);
+                objDialogue.DisplayName = GetDisplayNameIfUsual(objDialogue.Address);
             }
             objDialogue.Thread_id = objSMS.Thread_id;
             return objDialogue;
@@ -214,39 +220,80 @@ namespace LettreForAndroid.Utility
             return cnt;
         }
 
-        public void ReLoad()
+        //문자 DB를 모두 탐색하여, 가장 최신문자만 가져와 메모리에 올린다.
+        public void RefreshLastMessageAll()
         {
             //Dialogue Set 초기화
             ResetDialogueSet();
 
-            //Total Dialogue에 추가
+            //SMS와 MMS를 모두 탐색하여 최신문자를 메모리에 올림.
             UpdateLastSMS();
             UpdateLastMMS();
 
             //레이블 DB를 바탕으로 각 다이얼로그에 넣음. 레이블DB가 없으면 Unknown에 넣음.
-            Categorize();
+            CategorizeAll();
 
             //각 다이얼로그 대화를 날짜순으로 정렬
             SortDialogueSets();
         }
 
-        public void Categorize()
+        //해당 대화가 메모리에 있으면 최신 문자 갱신, 없으면 대화 생성 후 메모리에 올림. 카테고라이즈와 정렬도 함.
+        public Dialogue RefreshLastMessage(long thread_id)
+        {
+            Dialogue objDialogue = LoadDialogue(thread_id, true);
+
+            if (objDialogue.Count <= 0 || objDialogue == null)
+                throw new Exception("메시지 발송 이후, 대화를 찾을 수 업음.");
+
+            //대화 갱신 혹은 신규 생성
+            UpdateLastMessage(objDialogue[objDialogue.Count - 1]);
+
+            //갱신된 대화 로드
+            objDialogue = LoadDialogue(thread_id, true);
+
+            //연락처 혹은 레이블 DB를 바탕으로 알맞게 탭에 삽입.
+            Categorize(objDialogue);
+            
+            //대화내 문자들을 시간순으로 정렬
+            SortDialogueSets();
+
+            return objDialogue;
+        }
+
+        public void CategorizeAll()
         {
             foreach(Dialogue objDialogue in _TotalDialogue.DialogueList.Values)
             {
-                if(objDialogue.Contact != null)
-                {
-                    objDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
-                }
-                else
-                {
-                    objDialogue.MajorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
-                }
-                if(objDialogue.MajorLable == (int)Dialogue.LableType.UNKNOWN)
-                    _UnknownDialogue.DialogueList.Add(objDialogue.Thread_id, objDialogue);
-                else
-                    _DialogueSets[objDialogue.MajorLable].DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                Categorize(objDialogue);
             }
+        }
+
+        public void Categorize(Dialogue objDialogue)
+        {
+            //연락처에 있으면 대화로, 없으면 로컬 레이블로 설정
+            if (objDialogue.Contact != null)
+            {
+                objDialogue.MajorLable = (int)Dialogue.LableType.COMMON;
+            }
+            else
+            {
+                objDialogue.MajorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
+            }
+
+            //대상 대화목록에 추가
+            DialogueSet targetDialogueSet;
+            if (objDialogue.MajorLable == (int)Dialogue.LableType.UNKNOWN)
+            {
+                targetDialogueSet = _UnknownDialogue;
+            }
+            else
+            {
+                targetDialogueSet = _DialogueSets[objDialogue.MajorLable];
+            }
+
+            //해당 대화셋에 현 대화가 포함되어 있지 않으면 삽입.
+            if (targetDialogueSet.IsContain(objDialogue.Thread_id) == false)
+                targetDialogueSet.DialogueList.Add(objDialogue.Thread_id, objDialogue);
         }
 
         //---------------------------------------------------------------------------------
@@ -737,7 +784,7 @@ namespace LettreForAndroid.Utility
             Application.Context.ContentResolver.Insert(Telephony.Sms.Sent.ContentUri, values);
         }
 
-        public string getDisplayNameIfUsual(string address)
+        public string GetDisplayNameIfUsual(string address)
         {
             switch (address)
             {
@@ -784,9 +831,5 @@ namespace LettreForAndroid.Utility
             }
         }
     }
-
-
-    
-
 
 }

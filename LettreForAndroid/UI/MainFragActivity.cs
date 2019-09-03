@@ -66,20 +66,20 @@ namespace LettreForAndroid.UI
             _LayoutManager = new LinearLayoutManager(Context);
             _RecyclerView.SetLayoutManager(_LayoutManager);
 
-            refreshRecyclerView();
+            RefreshRecyclerView();
 
             return view;
         }
 
-        public void refreshFrag()
+        public void RefreshFrag()
         {
             FragmentTransaction a = FragmentManager.BeginTransaction();
             a.Detach(this);
             a.Attach(this);
-            a.Commit();
+            a.CommitAllowingStateLoss();
         }
 
-        public void refreshRecyclerView()
+        public void RefreshRecyclerView()
         {
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
             if (_Category == (int)Dialogue.LableType.ALL)
@@ -161,7 +161,18 @@ namespace LettreForAndroid.UI
                 readStateRL.Visibility = ViewStates.Invisible;
             }
         }
-        
+
+        //UI 새로고침. 열려있는 대화창과, 탭, 메인프래그를 새로고침.
+        public static void RefreshUI()
+        {
+            //대화창 존재하면 새로고침
+            if (DialogueActivity._Instance != null)
+                DialogueActivity._Instance.RefreshRecyclerView();
+
+            //탭, 메인 새로고침
+            TabFragManager._Instance.RefreshTabLayout();
+        }
+
 
 
         public class DialogueFragAllHolder : RecyclerView.ViewHolder
@@ -189,7 +200,7 @@ namespace LettreForAndroid.UI
                 };
             }
 
-            public void bind(Dialogue dialogue)
+            public void Bind(Dialogue dialogue)
             {
                 mCategoryText.Text = Dialogue._LableTypeStr[dialogue.MajorLable];   //카테고리 설정
                 BindHolder(dialogue, mAddress, mMsg, mTime, mReadStateRL, mReadStateCnt);
@@ -231,7 +242,7 @@ namespace LettreForAndroid.UI
                 };
             }
 
-            public void bind(Dialogue dialogue)
+            public void Bind(Dialogue dialogue)
             {
                 //전체 탭이 아닌 경우
                 //연락처에 있는 사람이면
@@ -272,7 +283,7 @@ namespace LettreForAndroid.UI
                 _Category = iCategory;
             }
 
-            public void updateDialogueSet(DialogueSet iDialogueSet)
+            public void UpdateDialogueSet(DialogueSet iDialogueSet)
             {
                 _DialogueSet = iDialogueSet;
             }
@@ -325,11 +336,11 @@ namespace LettreForAndroid.UI
                 {
                     case VIEW_TYPE_ALL:
                         DialogueFragAllHolder a = iHolder as DialogueFragAllHolder;
-                        a.bind(_DialogueSet[iPosition]);
+                        a.Bind(_DialogueSet[iPosition]);
                         break;
                     case VIEW_TYPE_CATEGORY:
                         DialogueFragCategoryHolder b = iHolder as DialogueFragCategoryHolder;
-                        b.bind(_DialogueSet[iPosition]);
+                        b.Bind(_DialogueSet[iPosition]);
                         break;
                 }
             }

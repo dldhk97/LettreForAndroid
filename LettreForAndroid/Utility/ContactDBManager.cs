@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Text.RegularExpressions;
 using Android.App;
 using Android.Content;
 using Android.Database;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
+using Android.Telephony;
 using Android.Views;
 using Android.Widget;
 
@@ -48,11 +49,18 @@ namespace LettreForAndroid.Utility
             get { return _ContactList.Count; }
         }
 
-        public ContactData getContactDataByAddress(string address)
+        public ContactData GetContactDataByAddress(string address, bool needRefresh)
         {
-            foreach(Contact objContact in _ContactList.Values)
+            if (needRefresh)
+                Refresh();
+
+            string formattedAddress = PhoneNumberUtils.FormatNumber(address);
+            foreach (Contact objContact in _ContactList.Values)
             {
-                if (objContact.PrimaryContactData.Address.Replace("-", "") == address.Replace("-", ""))
+                string objAddress = objContact.PrimaryContactData.Address;
+                objAddress = Regex.Replace(objAddress, "[^\\d]", "");
+                string formattedObjAddress = PhoneNumberUtils.FormatNumber(objAddress);
+                if (formattedAddress.CompareTo(formattedObjAddress) == 0)
                 {
                     return objContact.PrimaryContactData;
                 }

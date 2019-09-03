@@ -30,44 +30,44 @@ namespace LettreForAndroid.Receivers
         {
             var msgs = Telephony.Sms.Intents.GetMessagesFromIntent(intent);
 
+            string displayName = string.Empty;
+            int unreadCnt = 0;
+            TextMessage objMsg = null;
+
             foreach (var msg in msgs)
             {
-                TextMessage objMsg = ConvertToTextMessage(msg);  //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
+                //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
+                 objMsg = ConvertToCustomMessageType(msg);
 
-                UpdateMessage(context, objMsg);                 //DB에 저장
+                //메시지를 DB에 삽입
+                UpdateMessage(context, objMsg);
 
-                string displayName = objMsg.Address;
+                //연락처에 있는지 조회
+                ContactData objContact = ContactDBManager.Get().GetContactDataByAddress(objMsg.Address, true);
 
-                //연락처에 없으면 일상 대화가 아니므로, 서버에 보낸다.
-                if (ContactDBManager.Get().getContactDataByAddress(objMsg.Address) == null)
-                    LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 데이터 받은 후 레이블 DB에 저장
+                //연락처에 없으면 서버에 전송.
+                if (objContact == null)
+                {
+                    LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 레이블 데이터 받은 후 레이블 DB에 저장
+                    displayName = objMsg.Address;                                                   //연락처에 없으면 전화번호로 이름 표시
+                }
                 else
-                    displayName = MessageDBManager.Get().DialogueSets[(int)Dialogue.LableType.COMMON][objMsg.Thread_id].DisplayName;       //연락처에 있으면 표시될 이름 변경
+                {
+                    displayName = objContact.Name;                                                  //연락처에 있으면 표시될 이름 변경
+                }
 
-                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101);       //알림 표시
+                //해당 메시지가 속하는 대화를 찾아 최신문자를 새로고침함.
+                MessageDBManager.Get().RefreshLastMessage(MessageDBManager.Get().GetThreadId(objMsg.Address));
+
+                //읽지않은 개수 카운트
+                unreadCnt++;
             }
 
-            //메세지 DB 새로고침. 느리다. 최적화나 쓰레딩 필요.
-            MessageDBManager.Get().ReLoad();
+            //알림 표시
+            NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101, unreadCnt);
 
-            RefreshUI();
-        }
-
-
-        private TextMessage ConvertToTextMessage(SmsMessage msg)
-        {
-            TextMessage objMessage = new TextMessage();
-            objMessage.Address = msg.OriginatingAddress;
-            objMessage.Msg = msg.MessageBody;
-
-            DateTimeUtillity dtu = new DateTimeUtillity();
-            objMessage.Time = dtu.getCurrentMilTime();
-
-            objMessage.ReadState = (int)TextMessage.MESSAGE_READSTATE.UNREAD;
-            objMessage.Type = (int)TextMessage.MESSAGE_TYPE.RECEIVED;
-            objMessage.Thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
-
-            return objMessage;
+            //UI 새로고침
+            MainFragActivity.RefreshUI();
         }
 
         //문자를 DB에 저장
@@ -83,17 +83,22 @@ namespace LettreForAndroid.Receivers
             context.ContentResolver.Insert(Telephony.Sms.Inbox.ContentUri, values);
         }
 
-        //UI 새로고침
-        private void RefreshUI()
-        {
-            //대화창 존재하면 새로고침
-            if (DialogueActivity._Instance != null)
-                DialogueActivity._Instance.RefreshRecyclerView();
 
-            //탭, 메인 새로고침
-            TabFragManager._Instance.RefreshTabLayout();
+        private TextMessage ConvertToCustomMessageType(SmsMessage msg)
+        {
+            TextMessage objMessage = new TextMessage();
+            objMessage.Address = msg.OriginatingAddress;
+            objMessage.Msg = msg.MessageBody;
+
+            DateTimeUtillity dtu = new DateTimeUtillity();
+            objMessage.Time = dtu.getCurrentMilTime();
+
+            objMessage.ReadState = (int)TextMessage.MESSAGE_READSTATE.UNREAD;
+            objMessage.Type = (int)TextMessage.MESSAGE_TYPE.RECEIVED;
+            objMessage.Thread_id = MessageDBManager.Get().GetThreadId(msg.OriginatingAddress);
+
+            return objMessage;
         }
 
-        
     }
 }

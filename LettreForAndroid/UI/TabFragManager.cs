@@ -126,9 +126,9 @@ namespace LettreForAndroid.UI
             //대화목록 새로고침
             for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
             {
-                CustomPagerAdapter._Pages[i].refreshRecyclerView();
+                CustomPagerAdapter._Pages[i].RefreshRecyclerView();
                 if (DialogueActivity._Instance == null)
-                    CustomPagerAdapter._Pages[i].refreshFrag();
+                    CustomPagerAdapter._Pages[i].RefreshFrag();
             }
         }
     }
