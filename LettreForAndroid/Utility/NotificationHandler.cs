@@ -35,7 +35,7 @@ namespace LettreForAndroid.Utility
                 .SetSmallIcon(Resource.Drawable.ic_notification)
                 .SetAutoCancel(true)                                           //알림 클릭시 알림 아이콘이 상단바에서 사라짐.
                 .SetNumber(unreadCnt)
-                .SetLights(Color.Blue, 1, 1);                                  //LED 표시
+                .SetLights(Application.Context.Resources.GetColor(Resource.Color.colorPrimary), 1, 1);    //LED 표시
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.From(context);
             notificationManager.Notify(notifId, builder.Build());

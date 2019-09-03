@@ -23,7 +23,7 @@ namespace LettreForAndroid.Utility
             return sf.GetString(key, defaultReturn);
         }
 
-        public static bool loadBoolData(Context context, string key, bool defaultReturn)
+        public static bool LoadBoolData(Context context, string key, bool defaultReturn)
         {
             ISharedPreferences sf = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
             return sf.GetBoolean(key, defaultReturn);

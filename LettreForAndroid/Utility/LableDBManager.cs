@@ -79,12 +79,14 @@ namespace LettreForAndroid.Utility
             if (dialogueSet.DialogueList.Count <= 0)
                 return;
 
+            CreateDBCompleteEvent("서버에 전송 및 수신하는 중...[2/4]");
             List<string[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogueSet);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.
             if (receivedData == null || receivedData.Count == 0)
                 return;
 
+            CreateDBCompleteEvent("수신 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
             //받은 결과값들을 하나하나 DB에 넣는다.
             foreach (string[] objStr in receivedData)
             {
@@ -99,6 +101,7 @@ namespace LettreForAndroid.Utility
                 InsertOrUpdate(newDialogue);
             }
 
+            CreateDBCompleteEvent("레이블을 메모리에 올리는 중...[4/4]");
             //DB를 메모리에 올림
             Load();
         }
@@ -163,6 +166,9 @@ namespace LettreForAndroid.Utility
             //DB를 메모리에 올림
             Load();
         }
+
+        public delegate void CreateDBEventHandler(string toastMsg);
+        public event CreateDBEventHandler CreateDBCompleteEvent;
 
     }
 }

@@ -67,6 +67,8 @@ namespace LettreForAndroid.UI
         bool _HasPermission = false;
         bool _IsDefaultPackage = false;
 
+        Task _MessageDBLoadTsk;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -82,7 +84,7 @@ namespace LettreForAndroid.UI
             _NextBtn.Click += _NextBtn_Click;
 
             //처음이 아닌 경우
-            _IsFirst = DataStorageManager.loadBoolData(this, "isFirst", true);
+            _IsFirst = DataStorageManager.LoadBoolData(this, "isFirst", true);
             if (_IsFirst == false)
             {
                 //권한이 있는가?
@@ -151,6 +153,11 @@ namespace LettreForAndroid.UI
             //권한이 이미 승인되어있다면
             if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
             {
+                //미리 메시지 DB 로드
+                //Thasdasdsdread thread asd= new Thread(LoadMessageDBAsync);
+                //threaasdasdasdd.Start();
+                _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
+
                 //처음왔거나, 기본앱설정도 해야된다면 계속 진행.
                 if (_IsFirst || _IsDefaultPackage == false)
                     MoveToNextScreen();
@@ -192,9 +199,18 @@ namespace LettreForAndroid.UI
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
                             //처음왔거나, 기본앱설정도 해야된다면 계속 진행. 권한만 설정해야되는 경우였다면 Finish.
                             if (_IsFirst || _IsDefaultPackage == false)
+                            {
+                                //미리 메시지 DB 로드
+                                //_MessageDBLoadTsk = LoadMessageDBAsync();
+                                _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
+
+                                //다음 화면으로 이동
                                 MoveToNextScreen();
+                            }
                             else
+                            {
                                 Finish();
+                            }
                         }
                         else
                         {
@@ -204,6 +220,11 @@ namespace LettreForAndroid.UI
                     }
                     break;
             }
+        }
+
+        private void LoadMessageDBAsync()
+        {
+            MessageDBManager.Get();
         }
 
         //---------------------------------------------------------------------
@@ -225,15 +246,11 @@ namespace LettreForAndroid.UI
             }
             else
             {
-                await SetAsDefaultAsync();
+                //기본앱으로 설정
+                Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
+                intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, this.PackageName);
+                StartActivityForResult(intent, REQUEST_DEFAULTPACK);
             }
-        }
-
-        async Task SetAsDefaultAsync()
-        {
-            Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
-            intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, this.PackageName);
-            StartActivityForResult(intent, REQUEST_DEFAULTPACK);
         }
 
         protected override async void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
@@ -283,7 +300,7 @@ namespace LettreForAndroid.UI
         {
             CategorizeEventArgs resultArgs = e as CategorizeEventArgs;
             bool isSucceed = false;
-            string toastMessage = string.Empty;
+            string toastMsg = string.Empty;
 
             //프로그레스바 숨기기
             _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Invisible;
@@ -292,24 +309,24 @@ namespace LettreForAndroid.UI
             switch (resultArgs.Result)
             {
                 case (int)CategorizeEventArgs.RESULT.EXIST:
-                    toastMessage = "메시지 분류가 이미 되어있습니다.";
+                    toastMsg = "메시지 분류가 이미 되어있습니다.";
                     isSucceed = true;
                     break;
                 case (int)CategorizeEventArgs.RESULT.SUCCESS:
-                    toastMessage = "메시지 분류가 완료되었습니다.";
+                    toastMsg = "메시지 분류가 완료되었습니다.";
                     isSucceed = true;
                     break;
                 case (int)CategorizeEventArgs.RESULT.FAIL:
-                    toastMessage = "메시지 분류에 실패했습니다.";
+                    toastMsg = "메시지 분류에 실패했습니다.";
                     ShowRetryDialog();
                     break;
                 case (int)CategorizeEventArgs.RESULT.EMPTY:
-                    toastMessage = "분류할 메시지가 없습니다.";
+                    toastMsg = "분류할 메시지가 없습니다.";
                     isSucceed = true;
                     break;
             }
 
-            RunOnUiThread(() => { Toast.MakeText(this, toastMessage, ToastLength.Short).Show(); });
+            RunOnUiThread(() => { Toast.MakeText(this, toastMsg, ToastLength.Short).Show(); });
 
             if (isSucceed)
             {
@@ -354,8 +371,12 @@ namespace LettreForAndroid.UI
             });
         }
 
-        private void CreateLableDB()
+        private async void CreateLableDB()
         {
+            //메시지 DB가 로드될때까지 대기
+            RunOnUiThread(() => { Toast.MakeText(this, "메시지 DB를 불러오는중...[1/4]", ToastLength.Short).Show(); });
+            await _MessageDBLoadTsk;
+
             //미분류 메시지가 하나도 없는 경우
             if (MessageDBManager.Get().UnknownDialogue.Count <= 0)
             {
@@ -364,13 +385,22 @@ namespace LettreForAndroid.UI
             }
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
-            LableDBManager.Get().CreateLableDB(
-            MessageDBManager.Get().UnknownDialogue);
-
+            LableDBManager.Get().CreateDBCompleteEvent += WelcomeActivity_CreateDBCompleteEvent;
+            LableDBManager.Get().CreateLableDB(MessageDBManager.Get().UnknownDialogue);
+            
+            //레이블 DB가 생성되었나?
             if (LableDBManager.Get().IsDBExist())
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.SUCCESS));
             else
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.FAIL));
+        }
+
+        private void WelcomeActivity_CreateDBCompleteEvent(string toastMsg)
+        {
+            RunOnUiThread(() =>
+            {
+                Toast.MakeText(BaseContext, toastMsg, ToastLength.Short).Show();
+            });
         }
 
         //---------------------------------------------------------------------
@@ -385,12 +415,14 @@ namespace LettreForAndroid.UI
             builder2.SetPositiveButton("예", (senderAlert2, args2) =>
             {
                 Finish();
-                DataStorageManager.saveBoolData(this, "isFirst", false);        //isFirst 해제
+                DataStorageManager.saveBoolData(this, "isFirst", false);                      //isFirst 해제
+                DataStorageManager.saveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
             });
             builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
                 Finish();
-                DataStorageManager.saveBoolData(this, "isFirst", false);        //isFirst 해제
+                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
+                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
             });
             Dialog dialog2 = builder2.Create();
             dialog2.Show();
