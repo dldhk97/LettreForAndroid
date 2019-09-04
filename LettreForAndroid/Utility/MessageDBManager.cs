@@ -39,8 +39,6 @@ namespace LettreForAndroid.Utility
         MessageDBManager()
         {
             _smsManager = SmsManager.Default;
-
-            RefreshLastMessageAll();
         }
 
         public static MessageDBManager Get()
@@ -114,7 +112,6 @@ namespace LettreForAndroid.Utility
                 }
                 cursor.Close();
             }
-            
         }
 
         //메시지 DB를 탐색하여, 각 대화중 가장 최신 MMS를 찾아 메모리에 올림.
@@ -159,7 +156,7 @@ namespace LettreForAndroid.Utility
             }
         }
 
-        //해당 대화중 가장 마지막 문자로 갱신함. 대화가 없다면 새로 생성함.
+        //해당 대화중 가장 마지막 문자로 갱신함. 대화가 없다면 생성하여 전체탭에 추가.
         private void UpdateLastMessage(TextMessage objSMS)
         {
             //이 thread_id에 해당하는 대화가 없으면 새로 생성 후 전체탭에 추가
@@ -167,8 +164,6 @@ namespace LettreForAndroid.Utility
                 _TotalDialogueSet.DialogueList.Add(objSMS.Thread_id, CreateNewDialogue(objSMS));
 
             Dialogue objDialogue = _TotalDialogueSet[objSMS.Thread_id];
-            //bool isMMS = objSMS.GetType() == typeof(MultiMediaMessage) ? true : false;
-            //objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, isMMS);
 
             objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, true) + CountUnread(objDialogue.Thread_id, false);
 
@@ -230,8 +225,8 @@ namespace LettreForAndroid.Utility
             UpdateLastSMS();
             UpdateLastMMS();
 
-            //레이블 DB를 바탕으로 각 다이얼로그에 넣음. 레이블DB가 없으면 Unknown에 넣음.
-            CategorizeAll();
+            //로컬 레이블 DB를 바탕으로 각 다이얼로그에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
+            CategorizeSet(_TotalDialogueSet);
 
             //각 다이얼로그 대화를 날짜순으로 정렬
             SortDialogueSets();
@@ -240,7 +235,7 @@ namespace LettreForAndroid.Utility
         //해당 대화가 메모리에 있으면 최신 문자 갱신, 없으면 대화 생성 후 메모리에 올림. 카테고라이즈와 정렬도 함.
         public Dialogue RefreshLastMessage(long thread_id)
         {
-            Dialogue objDialogue = LoadDialogue(thread_id, true);
+            Dialogue objDialogue = LoadDialogue(thread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
 
             if (objDialogue.Count <= 0 || objDialogue == null)
                 throw new Exception("메시지 발송 이후, 대화를 찾을 수 업음.");
@@ -249,7 +244,7 @@ namespace LettreForAndroid.Utility
             UpdateLastMessage(objDialogue[objDialogue.Count - 1]);
 
             //갱신된 대화 로드
-            objDialogue = LoadDialogue(thread_id, true);
+            objDialogue = LoadDialogue(thread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
 
             //연락처 혹은 레이블 DB를 바탕으로 알맞게 탭에 삽입.
             Categorize(objDialogue);
@@ -262,10 +257,10 @@ namespace LettreForAndroid.Utility
 
         //---------------------------------------------------------------------------------
 
-        //로컬 Lable DB를 바탕으로 모두 분류
-        public void CategorizeAll()
+        //로컬 Lable DB를 바탕으로 대화셋 내 대화를 분류
+        public void CategorizeSet(DialogueSet objDialogueSet)
         {
-            foreach(Dialogue objDialogue in _TotalDialogueSet.DialogueList.Values)
+            foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
             {
                 Categorize(objDialogue);
             }
@@ -344,17 +339,10 @@ namespace LettreForAndroid.Utility
         }
 
         //---------------------------------------------------------------------------------
-
-        public void LoadDialogueSet(DialogueSet objDialogueSet)
-        {
-            foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
-            {
-                ReLoadDialogue(objDialogue);
-            }
-        }
+        //로드 메소드들, DB에서 메시지들을 직접 긁어옴
 
         //해당 thread_id에 해당되는 모든 SMS와 MMS를 합친 대화 반환. needRefresh는 treu면 반드시 리로드 한다. 일반적으로 대화 클릭시 호출됨
-        public Dialogue LoadDialogue(long thread_id, bool needRefresh)
+        public Dialogue LoadDialogue(long thread_id, bool needRefresh, int inboxType)
         {
             //대화가 이전에 불려졌던 것이라면
             Dialogue objDialogue = FindDialogue(thread_id);
@@ -362,8 +350,8 @@ namespace LettreForAndroid.Utility
                 return objDialogue;
 
             //없으면 새로 로드 해본다.
-            List<TextMessage> smss = LoadSMS(thread_id);
-            List<TextMessage> mmss = LoadMMS(thread_id);
+            List<TextMessage> smss = LoadSMS(thread_id, inboxType);
+            List<TextMessage> mmss = LoadMMS(thread_id, inboxType);
             List<TextMessage> totalMessages = new List<TextMessage>();
 
             if (smss != null)
@@ -381,10 +369,10 @@ namespace LettreForAndroid.Utility
             return objDialogue;
         }
 
-        public void ReLoadDialogue(Dialogue objDialogue)
+        public void ReLoadDialogue(Dialogue objDialogue, int inboxType)
         {
-            List<TextMessage> smss = LoadSMS(objDialogue.Thread_id);
-            List<TextMessage> mmss = LoadMMS(objDialogue.Thread_id);
+            List<TextMessage> smss = LoadSMS(objDialogue.Thread_id, inboxType);
+            List<TextMessage> mmss = LoadMMS(objDialogue.Thread_id, inboxType);
             List<TextMessage> totalMessages = new List<TextMessage>();
 
             if (smss != null)
@@ -401,15 +389,21 @@ namespace LettreForAndroid.Utility
             }
         }
 
-        //해당 thread_id에 해당되는 모든 SMS를 불러옴
-        private List<TextMessage> LoadSMS(long thread_id)
+        //해당 thread_id에 해당되는 모든 SMS를 불러옴, inboxType에 따라 송신/수신한 메시지만 불러올 수도 있다.
+        private List<TextMessage> LoadSMS(long thread_id, int inboxType)
         {
             List<TextMessage> messages = null;
             ContentResolver cr = Application.Context.ContentResolver;
 
             Uri uri = Uri.Parse("content://sms/");
             string[] projection = new string[] { "_id", "address", "body", "read", "date", "thread_id", "type" };
+
             string selection = "thread_id = " + thread_id;
+            if(inboxType != (int)TextMessage.MESSAGE_TYPE.ALL)
+            {
+                selection = "thread_id = " + thread_id + " AND type = " + inboxType;
+            }
+
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
@@ -433,14 +427,20 @@ namespace LettreForAndroid.Utility
             return messages;
         }
 
-        //해당 thread_id에 해당되는 모든 MMS를 불러옴
-        private List<TextMessage> LoadMMS(long thread_id)
+        //해당 thread_id에 해당되는 모든 MMS를 불러옴, inboxType에 따라 송신/수신한 메시지만 불러올 수도 있다.
+        private List<TextMessage> LoadMMS(long thread_id, int inboxType)
         {
             List<TextMessage> messages = null;
             ContentResolver cr = Application.Context.ContentResolver;
             Uri uri = Uri.Parse("content://mms/");
             string[] projection = new string[] { "_id", "ct_t", "read", "date", "thread_id", "m_type" };
+
             string selection = "thread_id = " + thread_id;
+            if (inboxType != (int)TextMessage.MESSAGE_TYPE.ALL)
+            {
+                selection = "thread_id = " + thread_id + " AND type = " + inboxType;
+            }
+
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
@@ -622,6 +622,104 @@ namespace LettreForAndroid.Utility
                 cursor.Close();
             }
             return address;
+        }
+
+        //-------------------------------------------------------------
+        //처음사용자용
+
+        //SMS DB 조회하여 address, thread_id만 수집한 목록을 반환함.
+        private DialogueSet LoadSMSMetaDatas()
+        {
+            DialogueSet dialogueSet = new DialogueSet();
+
+            ContentResolver cr = Application.Context.ContentResolver;
+
+            Uri uri = Uri.Parse("content://sms/");
+            string[] projection = { "DISTINCT address", "thread_id" };
+            string selection = "address IS NOT NULL) GROUP BY (address";
+            ICursor cursor = cr.Query(uri, projection, selection, null, null);
+
+            if (cursor != null && cursor.Count > 0)
+            {
+                while (cursor.MoveToNext())
+                {
+                    string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+
+                    Dialogue objDialogue = new Dialogue();
+                    objDialogue.Address = address;
+                    objDialogue.Thread_id = thread_id;
+
+                    dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                }
+                cursor.Close();
+            }
+            return dialogueSet;
+        }
+
+        //MMS DB 조회하여 address, thread_id만 수집한 목록을 반환함.
+        private DialogueSet LoadMMSMetaDatas()
+        {
+            DialogueSet dialogueSet = new DialogueSet();
+
+            ContentResolver cr = Application.Context.ContentResolver;
+            Uri uri = Uri.Parse("content://mms/");
+            string[] projection = new string[] { "DISTINCT thread_id", "_id", "ct_t"};
+            string selection = "thread_id IS NOT NULL) GROUP BY (thread_id";
+            ICursor cursor = cr.Query(uri, projection, selection, null, null);
+
+            if (cursor != null && cursor.Count > 0)
+            {
+                while (cursor.MoveToNext())
+                {
+                    string id = cursor.GetString(cursor.GetColumnIndex("_id"));
+                    string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
+                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                    if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                    {
+                        //this is MMS
+                        Dialogue objDialogue = new Dialogue();
+                        objDialogue.Thread_id = thread_id;
+                        objDialogue.Address = GetAddress(id);
+
+                        dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                    }
+                    else
+                    {
+                        //this is SMS
+                        throw new Exception("알 수 없는 MMS 유형");
+                    }
+                }
+                cursor.Close();
+            }
+            return dialogueSet;
+        }
+
+
+        //연락처에 없는 대화 중 수신 메시지만 메모리에 올린다. inboxType으로 송신/수신 메시지만 불러오는것도 가능.
+        public void LoadUnknownMetaDatas()
+        {
+            //SMS, MMS 메타데이터(주소와 thread_id)만 수집
+            DialogueSet smsMetaDatas = LoadSMSMetaDatas();
+            DialogueSet mmsMetaDatas = LoadMMSMetaDatas();
+
+            //smsMetaData에 병합
+            foreach(Dialogue objDialogue in mmsMetaDatas.DialogueList.Values)
+            {
+                if(!smsMetaDatas.IsContain(objDialogue.Thread_id))
+                {
+                    smsMetaDatas.DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                }
+            }
+
+            //연락처에 없는 놈들만 찾는다.
+            foreach(Dialogue objDialogue in smsMetaDatas.DialogueList.Values)
+            {
+                if(ContactDBManager.Get().GetContactDataByAddress(objDialogue.Address, false) == null)
+                {
+                    _UnknownDialogueSet.DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                }
+            }
         }
 
         //--------------------------------------------------------------

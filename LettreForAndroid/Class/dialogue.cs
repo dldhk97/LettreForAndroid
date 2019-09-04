@@ -193,7 +193,7 @@ namespace LettreForAndroid.Class
     //일반적인 SMS를 저장하는 객체
     public class TextMessage
     {
-        public enum MESSAGE_TYPE { RECEIVED = 1, SENT = 2 };
+        public enum MESSAGE_TYPE { ALL = -1, RECEIVED = 1, SENT = 2 };
         public enum MESSAGE_READSTATE { UNREAD = 0, READ = 1};
 
         private string id;          //ID

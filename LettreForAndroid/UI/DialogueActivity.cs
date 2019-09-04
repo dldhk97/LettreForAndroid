@@ -51,7 +51,7 @@ namespace LettreForAndroid.UI
             _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
 
-            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false);   //thread_id로 기존에 대화가 존재하는지 찾는다.
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, false, (int)TextMessage.MESSAGE_TYPE.ALL);   //thread_id로 기존에 대화가 존재하는지 찾는다.
             if (_CurDialogue == null)                                                   //대화가 없으면 새로 만든다.
             {
                 CreateNewDialogue(_CurAddress);
@@ -145,7 +145,7 @@ namespace LettreForAndroid.UI
         public void RefreshRecyclerView()
         {
             //기존에 대화가 있었다면 업데이트, 없으면 새로만들어진 경우이므로 유지
-            Dialogue updatedDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
+            Dialogue updatedDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
             if (updatedDialogue != null)
                 _CurDialogue = updatedDialogue;
 
@@ -267,7 +267,7 @@ namespace LettreForAndroid.UI
         //문자 수신 이후 현재 대화를 업데이트 해야하는 경우 호출됨.
         public void ReloadCurrentDialogue()
         {
-            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true);
+            _CurDialogue = MessageDBManager.Get().LoadDialogue(_CurThread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
         }
 
         //Resume됬을때는 리시버 다시 등록

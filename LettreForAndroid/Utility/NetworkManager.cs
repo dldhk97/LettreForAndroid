@@ -137,8 +137,8 @@ namespace LettreForAndroid.Utility
             {
                 receivedData = new List<string[]>();
 
-                //타입 전송, 타입은 0이면 데이터 제공 X, 1이면 데이터 제공
-                int type = 0;
+                //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X
+                int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
                 byte[] typeByte = IntToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
                 _CurrentSocket.Send(typeByte, SocketFlags.None);
 
@@ -158,7 +158,7 @@ namespace LettreForAndroid.Utility
                     byte[] addr_lengthByte = IntToByteArray(addrByte.Length, 2);                //연락처를 바이트로 바꾼 값의 길이
 
                     byte[] msgByte = StringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
-                    byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);    //문자내용을 바이트로 바꾼 값의 길이
+                    byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);                  //문자내용을 바이트로 바꾼 값의 길이
 
                     //디버깅용 출력부분<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

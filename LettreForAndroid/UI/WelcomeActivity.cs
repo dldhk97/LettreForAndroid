@@ -222,7 +222,16 @@ namespace LettreForAndroid.UI
         private void LoadMessageDBAsync()
         {
             RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 시작", ToastLength.Short).Show(); });
-            MessageDBManager.Get().LoadDialogueSet(MessageDBManager.Get().UnknownDialogueSet);
+
+            //전체탭에 들어간 대화 중 연락처가 없는 대화는 모두 로드하여 Unknown 카테고리에 넣음.
+            MessageDBManager.Get().LoadUnknownMetaDatas();
+
+            //Unknown 카테고리에 들어간 대화의 내용을 모두 로드
+            foreach(Dialogue objDialogue in MessageDBManager.Get().UnknownDialogueSet.DialogueList.Values)
+            {
+                MessageDBManager.Get().ReLoadDialogue(objDialogue, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
+            }
+
             RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 완료", ToastLength.Short).Show(); });
         }
 
@@ -285,12 +294,13 @@ namespace LettreForAndroid.UI
             builder.SetMessage("아니오를 누르시면 문자를 서버로 전송하지 않습니다.\n대신 문자 분류 정확성이 떨어지게 됩니다.");
             builder.SetPositiveButton("예", (senderAlert2, args2) =>
             {
-                DataStorageManager.saveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
+                DataStorageManager.SaveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
                 Categorize();                                                           //온라인 모드이므로, 온라인 카테고리 분류 실행
             });
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
-                DataStorageManager.saveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
+                DataStorageManager.SaveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
+                RunOnUiThread(() => { Toast.MakeText(this, "오프라인 모드를 사용합니다.", ToastLength.Short).Show(); });
 
                 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 //오프라인 분석 메소드 호출
@@ -298,8 +308,8 @@ namespace LettreForAndroid.UI
 
 
                 //오프라인 분석이 끝나면 화면 종료.
-                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
-                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
+                DataStorageManager.SaveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
                 Finish();                                                                       //오프라인 모드를 사용하므로, 기계학습페이지를 표시하지 않고 바로 WelcomeActivity 종료
             });
             Dialog dialog2 = builder.Create();
@@ -445,14 +455,14 @@ namespace LettreForAndroid.UI
             builder2.SetMessage("기계학습 지원을 하시겠습니까?");
             builder2.SetPositiveButton("예", (senderAlert2, args2) =>
             {
-                DataStorageManager.saveBoolData(this, "isFirst", false);                      //isFirst 해제
-                DataStorageManager.saveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
+                DataStorageManager.SaveBoolData(this, "isFirst", false);                      //isFirst 해제
+                DataStorageManager.SaveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
                 Finish();                                                                     //Welecome Activity 종료
             });
             builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
-                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
-                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
+                DataStorageManager.SaveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
                 Finish();
             });
             Dialog dialog2 = builder2.Create();

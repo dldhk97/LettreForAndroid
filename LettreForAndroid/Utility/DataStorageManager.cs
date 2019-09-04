@@ -15,7 +15,7 @@ namespace LettreForAndroid.Utility
     public class DataStorageManager
     {
         const string DEFAULT_NAME = "Lettre";
-        public static string loadStringData(Context context, string key, string defaultReturn)
+        public static string LoadStringData(Context context, string key, string defaultReturn)
         {
             //저장된 값을 불러오기 위해 같은 네임파일을 찾음.
             ISharedPreferences sf = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
@@ -28,13 +28,13 @@ namespace LettreForAndroid.Utility
             ISharedPreferences sf = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
             return sf.GetBoolean(key, defaultReturn);
         }
-        public static int loadIntData(Context context, string key, int defaultReturn)
+        public static int LoadIntData(Context context, string key, int defaultReturn)
         {
             ISharedPreferences sf = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
             return sf.GetInt(key, defaultReturn);
         }
 
-        public static void saveStringData(Context context, string key, string value)
+        public static void SaveStringData(Context context, string key, string value)
         {
             //Activity가 종료되기전에 저장
             ISharedPreferences sharedPreferences = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
@@ -44,7 +44,7 @@ namespace LettreForAndroid.Utility
             editor.PutString(key, value);     //key, keyValue를 저장
             editor.Commit();        //커밋
         }
-        public static void saveBoolData(Context context, string key, bool value)
+        public static void SaveBoolData(Context context, string key, bool value)
         {
             ISharedPreferences sharedPreferences = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
 
@@ -52,7 +52,7 @@ namespace LettreForAndroid.Utility
             editor.PutBoolean(key, value);
             editor.Commit();
         }
-        public static void saveIntData(Context context, string key, int value)
+        public static void SaveIntData(Context context, string key, int value)
         {
             ISharedPreferences sharedPreferences = context.GetSharedPreferences(DEFAULT_NAME, FileCreationMode.Private);
 
