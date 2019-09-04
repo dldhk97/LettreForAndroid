@@ -127,6 +127,7 @@ namespace LettreForAndroid.UI
                     RequestSetAsDefaultAsync();
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
+                    AskOfflineMode();
                     Categorize();
                     break;
                 case (int)WELCOME_SCREEN.MACHINE:
@@ -277,6 +278,31 @@ namespace LettreForAndroid.UI
         }
 
         //---------------------------------------------------------------------
+        // 오프라인 모드 여부 (서버 통신 X)
+        private void AskOfflineMode()
+        {
+            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder.SetCancelable(false);
+            builder.SetTitle("오프라인 모드로 사용하시겠습니까?");
+            builder.SetMessage("오프라인 모드를 사용하게 되면 정확도가 떨어집니다. ");
+            builder.SetPositiveButton("예", (senderAlert2, args2) =>
+            {
+                Finish();
+                DataStorageManager.saveBoolData(this, "isFirst", false);                      //isFirst 해제
+                DataStorageManager.saveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
+            });
+            builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
+            {
+                Finish();
+                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
+                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+            });
+            Dialog dialog2 = builder.Create();
+            dialog2.Show();
+        }
+
+
+        //---------------------------------------------------------------------
         // 레이블 DB 생성 (서버 통신)
 
         public event EventHandler<CategorizeEventArgs> _OnCategorizeComplete;
@@ -385,7 +411,7 @@ namespace LettreForAndroid.UI
             }
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
-            LableDBManager.Get().CreateDBCompleteEvent += WelcomeActivity_CreateDBCompleteEvent;
+            LableDBManager.Get().CreateDBProgressEvent += WelcomeActivity_CreateDBProgressEvent;
             LableDBManager.Get().CreateLableDB(MessageDBManager.Get().UnknownDialogue);
             
             //레이블 DB가 생성되었나?
@@ -395,7 +421,7 @@ namespace LettreForAndroid.UI
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.FAIL));
         }
 
-        private void WelcomeActivity_CreateDBCompleteEvent(string toastMsg)
+        private void WelcomeActivity_CreateDBProgressEvent(string toastMsg)
         {
             RunOnUiThread(() =>
             {
