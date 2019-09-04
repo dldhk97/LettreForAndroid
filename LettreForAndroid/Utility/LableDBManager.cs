@@ -72,7 +72,7 @@ namespace LettreForAndroid.Utility
             return _OnMemoryLables.DialogueList.Count > 0;
         }
 
-
+        //WelcomeActivity에서 호출되는, 처음하는 레이블 분류.
         public void CreateLableDB(DialogueSet dialogueSet)
         {
             //대화가 하나도 없으면 아무것도 하지 않음.

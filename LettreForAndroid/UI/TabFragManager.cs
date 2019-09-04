@@ -85,9 +85,9 @@ namespace LettreForAndroid.UI
                 DialogueSet objDialogueSet;
 
                 if (objTab.Category == (int)Dialogue.LableType.ALL)
-                    objDialogueSet = MessageDBManager.Get().TotalDialogue;
+                    objDialogueSet = MessageDBManager.Get().TotalDialogueSet;
                 else if (objTab.Category == (int)Dialogue.LableType.UNKNOWN)
-                    objDialogueSet = MessageDBManager.Get().UnknownDialogue;
+                    objDialogueSet = MessageDBManager.Get().UnknownDialogueSet;
                 else
                     objDialogueSet = MessageDBManager.Get().DialogueSets[objTab.Category];
 

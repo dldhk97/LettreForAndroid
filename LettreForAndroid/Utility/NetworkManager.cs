@@ -160,8 +160,18 @@ namespace LettreForAndroid.Utility
                     byte[] msgByte = StringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
                     byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);    //문자내용을 바이트로 바꾼 값의 길이
 
-                    //System.Diagnostics.Debug.Print("연락처 : \n" + addr+"\n\n연락처 길이 : \n" + addr.Length + "\n\n문자 내용 : \n" + msg + "\n\n문자 길이 : \n" + msg.Length + "\n\n문자내용 바이트 수 : \n" + msgByte.Length + "\n\n-----------------------\n\n"  );
+                    //디버깅용 출력부분<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+                    //System.Diagnostics.Debug.Print("연락처 : \n" + addr+"\n\n연락처 길이 : \n" + addr.Length + "\n\n문자 내용 : \n" + msg + "\n\n문자 길이 : \n" + msg.Length + "\n\n문자내용 바이트 수 : \n" + msgByte.Length + "\n\n바이트 : \n"  );
+
+                    //string debugByte = "";
+                    //foreach(byte elem in msgByte)
+                    //{
+                    //    debugByte += elem.ToString() + " ";
+                    //}
+                    //System.Diagnostics.Debug.Print(debugByte.ToString() + "\n\n----------------------------");
+
+                    //디버깅용 출력부분<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                     //연락처 길이 전송
                     _CurrentSocket.Send(addr_lengthByte, SocketFlags.None);

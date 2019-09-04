@@ -32,8 +32,8 @@ namespace LettreForAndroid.Utility
 
         private static MessageDBManager _Instance = null;
         private static List<DialogueSet> _DialogueSets = new List<DialogueSet>();
-        private static DialogueSet _TotalDialogue = new DialogueSet();
-        private static DialogueSet _UnknownDialogue = new DialogueSet();
+        private static DialogueSet _TotalDialogueSet = new DialogueSet();
+        private static DialogueSet _UnknownDialogueSet = new DialogueSet();
 
         //객체 생성시 DB에서 문자 다 불러옴
         MessageDBManager()
@@ -50,14 +50,14 @@ namespace LettreForAndroid.Utility
             return _Instance;
         }
 
-        public DialogueSet TotalDialogue
+        public DialogueSet TotalDialogueSet
         {
-            get { return _TotalDialogue; }
+            get { return _TotalDialogueSet; }
         }
 
-        public DialogueSet UnknownDialogue
+        public DialogueSet UnknownDialogueSet
         {
-            get { return _UnknownDialogue; }
+            get { return _UnknownDialogueSet; }
         }
 
         public List<DialogueSet> DialogueSets
@@ -74,16 +74,16 @@ namespace LettreForAndroid.Utility
                     objSet.Clear();
                 }
                 _DialogueSets.Clear();
-                _TotalDialogue.Clear();
-                _UnknownDialogue.Clear();
+                _TotalDialogueSet.Clear();
+                _UnknownDialogueSet.Clear();
             }
 
             for (int i = 0; i < Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets.Add(new DialogueSet(i));
             }
-            _TotalDialogue = new DialogueSet();
-            _UnknownDialogue = new DialogueSet();
+            _TotalDialogueSet = new DialogueSet();
+            _UnknownDialogueSet = new DialogueSet();
         }
 
         //메시지 DB를 탐색하여, 각 대화중 가장 최신 SMS를 찾아 메모리에 올림.
@@ -164,9 +164,9 @@ namespace LettreForAndroid.Utility
         {
             //이 thread_id에 해당하는 대화가 없으면 새로 생성 후 전체탭에 추가
             if (FindDialogue(objSMS.Thread_id) == null)
-                _TotalDialogue.DialogueList.Add(objSMS.Thread_id, CreateNewDialogue(objSMS));
+                _TotalDialogueSet.DialogueList.Add(objSMS.Thread_id, CreateNewDialogue(objSMS));
 
-            Dialogue objDialogue = _TotalDialogue[objSMS.Thread_id];
+            Dialogue objDialogue = _TotalDialogueSet[objSMS.Thread_id];
             //bool isMMS = objSMS.GetType() == typeof(MultiMediaMessage) ? true : false;
             //objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, isMMS);
 
@@ -260,10 +260,12 @@ namespace LettreForAndroid.Utility
             return objDialogue;
         }
 
+        //---------------------------------------------------------------------------------
+
         //로컬 Lable DB를 바탕으로 모두 분류
         public void CategorizeAll()
         {
-            foreach(Dialogue objDialogue in _TotalDialogue.DialogueList.Values)
+            foreach(Dialogue objDialogue in _TotalDialogueSet.DialogueList.Values)
             {
                 Categorize(objDialogue);
             }
@@ -286,7 +288,7 @@ namespace LettreForAndroid.Utility
             DialogueSet targetDialogueSet;
             if (objDialogue.MajorLable == (int)Dialogue.LableType.UNKNOWN)
             {
-                targetDialogueSet = _UnknownDialogue;
+                targetDialogueSet = _UnknownDialogueSet;
             }
             else
             {
@@ -301,7 +303,7 @@ namespace LettreForAndroid.Utility
         //카테고라이즈 해야되는 대화는 서버에 보내 분류함. DEBUG!! 아직 호출되지 않음.
         public void ReCategorizeAll()
         {
-            foreach (Dialogue objDialogue in _TotalDialogue.DialogueList.Values)
+            foreach (Dialogue objDialogue in _TotalDialogueSet.DialogueList.Values)
             {
                 int[] objLables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
 
@@ -337,14 +339,21 @@ namespace LettreForAndroid.Utility
             lables.CopyTo(dialogue.Lables, 0);                                   //레이블 DB에서 레이블 배열을 메모리에 복사
             _DialogueSets[majorLable].InsertOrUpdate(dialogue);                  //레이블에 맞는 셋에 대화 추가
 
-            _UnknownDialogue.DialogueList.Remove(dialogue.Thread_id);           //미분류 탭에 남아있는 대화를 삭제함.
+            _UnknownDialogueSet.DialogueList.Remove(dialogue.Thread_id);           //미분류 탭에 남아있는 대화를 삭제함.
             return true;
         }
 
         //---------------------------------------------------------------------------------
-        // 대화 클릭시 호출됨
 
-        //해당 thread_id에 해당되는 모든 SMS와 MMS를 합친 대화 반환. needRefresh는 treu면 반드시 리로드 한다. 메시지 수신시 필요할거 같아서 미리 만듬.
+        public void LoadDialogueSet(DialogueSet objDialogueSet)
+        {
+            foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
+            {
+                ReLoadDialogue(objDialogue);
+            }
+        }
+
+        //해당 thread_id에 해당되는 모든 SMS와 MMS를 합친 대화 반환. needRefresh는 treu면 반드시 리로드 한다. 일반적으로 대화 클릭시 호출됨
         public Dialogue LoadDialogue(long thread_id, bool needRefresh)
         {
             //대화가 이전에 불려졌던 것이라면
@@ -370,6 +379,26 @@ namespace LettreForAndroid.Utility
                 objDialogue.TextMessageList = totalMessages;
             }
             return objDialogue;
+        }
+
+        public void ReLoadDialogue(Dialogue objDialogue)
+        {
+            List<TextMessage> smss = LoadSMS(objDialogue.Thread_id);
+            List<TextMessage> mmss = LoadMMS(objDialogue.Thread_id);
+            List<TextMessage> totalMessages = new List<TextMessage>();
+
+            if (smss != null)
+                totalMessages.AddRange(smss);
+            if (mmss != null)
+                totalMessages.AddRange(mmss);
+
+            if (totalMessages.Count > 0)
+            {
+                totalMessages = totalMessages.OrderByDescending(i => i.Time).ToList();
+                if (objDialogue == null)
+                    objDialogue = new Dialogue(totalMessages);
+                objDialogue.TextMessageList = totalMessages;
+            }
         }
 
         //해당 thread_id에 해당되는 모든 SMS를 불러옴
@@ -451,7 +480,7 @@ namespace LettreForAndroid.Utility
 
 
         // ---------------------------------------------------------------------------------
-        // For MMS
+        // MMS를 읽기 위한 메소드
 
         private MultiMediaMessage ReadMMS(string id)
         {
@@ -595,14 +624,17 @@ namespace LettreForAndroid.Utility
             return address;
         }
 
+        //--------------------------------------------------------------
+        //유틸리티들
+
         public void SortDialogueSets()
         {
             foreach (DialogueSet dialgoueSet in _DialogueSets)
             {
                 dialgoueSet.SortByLastMessageTime();
             }
-            _TotalDialogue.SortByLastMessageTime();
-            _UnknownDialogue.SortByLastMessageTime();
+            _TotalDialogueSet.SortByLastMessageTime();
+            _UnknownDialogueSet.SortByLastMessageTime();
         }
 
         public long GetThreadId(string address)
@@ -612,8 +644,8 @@ namespace LettreForAndroid.Utility
 
         public Dialogue FindDialogue(long thread_id)
         {
-            if (_TotalDialogue.IsContain(thread_id))
-                return _TotalDialogue[thread_id];
+            if (_TotalDialogueSet.IsContain(thread_id))
+                return _TotalDialogueSet[thread_id];
 
             return null;
         }

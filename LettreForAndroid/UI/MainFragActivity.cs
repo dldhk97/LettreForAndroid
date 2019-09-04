@@ -83,9 +83,9 @@ namespace LettreForAndroid.UI
         {
             //데이터 준비 : 현재 탭에 해당되는 대화목록을 가져온다.
             if (_Category == (int)Dialogue.LableType.ALL)
-                _DialogueSet = MessageDBManager.Get().TotalDialogue;
+                _DialogueSet = MessageDBManager.Get().TotalDialogueSet;
             else if (_Category == (int)Dialogue.LableType.UNKNOWN)
-                _DialogueSet = MessageDBManager.Get().UnknownDialogue;
+                _DialogueSet = MessageDBManager.Get().UnknownDialogueSet;
             else
                 _DialogueSet = MessageDBManager.Get().DialogueSets[_Category];
 

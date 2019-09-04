@@ -154,8 +154,6 @@ namespace LettreForAndroid.UI
             if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
             {
                 //미리 메시지 DB 로드
-                //Thasdasdsdread thread asd= new Thread(LoadMessageDBAsync);
-                //threaasdasdasdd.Start();
                 _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
 
                 //처음왔거나, 기본앱설정도 해야된다면 계속 진행.
@@ -201,7 +199,6 @@ namespace LettreForAndroid.UI
                             if (_IsFirst || _IsDefaultPackage == false)
                             {
                                 //미리 메시지 DB 로드
-                                //_MessageDBLoadTsk = LoadMessageDBAsync();
                                 _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
 
                                 //다음 화면으로 이동
@@ -224,8 +221,9 @@ namespace LettreForAndroid.UI
 
         private void LoadMessageDBAsync()
         {
-            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드", ToastLength.Short).Show(); });
-            MessageDBManager.Get();
+            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 시작", ToastLength.Short).Show(); });
+            MessageDBManager.Get().LoadDialogueSet(MessageDBManager.Get().UnknownDialogueSet);
+            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 완료", ToastLength.Short).Show(); });
         }
 
         //---------------------------------------------------------------------
@@ -283,19 +281,26 @@ namespace LettreForAndroid.UI
         {
             Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
             builder.SetCancelable(false);
-            builder.SetTitle("오프라인 모드로 사용하시겠습니까?");
-            builder.SetMessage("오프라인 모드를 사용하게 되면 정확도가 떨어집니다. ");
+            builder.SetTitle("온라인 모드를 사용하시겠습니까?");
+            builder.SetMessage("아니오를 누르시면 문자를 서버로 전송하지 않습니다.\n대신 문자 분류 정확성이 떨어지게 됩니다.");
             builder.SetPositiveButton("예", (senderAlert2, args2) =>
-            {
-                DataStorageManager.saveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
-                //
-                //오프라인 메소드 호출
-                //
-            });
-            builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
                 DataStorageManager.saveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
                 Categorize();
+            });
+            builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
+            {
+                DataStorageManager.saveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
+
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                //오프라인 분석 메소드 호출
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+                //오프라인 분석이 끝나면 화면 종료.
+                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
+                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                Finish();
             });
             Dialog dialog2 = builder.Create();
             dialog2.Show();
@@ -404,7 +409,7 @@ namespace LettreForAndroid.UI
             await _MessageDBLoadTsk;
 
             //미분류 메시지가 하나도 없는 경우
-            if (MessageDBManager.Get().UnknownDialogue.Count <= 0)
+            if (MessageDBManager.Get().UnknownDialogueSet.Count <= 0)
             {
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.EMPTY));
                 return;
@@ -412,7 +417,7 @@ namespace LettreForAndroid.UI
 
             //서버와 통신해서 Lable DB 생성 후 메모리에 올림.
             LableDBManager.Get().CreateDBProgressEvent += WelcomeActivity_CreateDBProgressEvent;
-            LableDBManager.Get().CreateLableDB(MessageDBManager.Get().UnknownDialogue);
+            LableDBManager.Get().CreateLableDB(MessageDBManager.Get().UnknownDialogueSet);
             
             //레이블 DB가 생성되었나?
             if (LableDBManager.Get().IsDBExist())
@@ -440,15 +445,15 @@ namespace LettreForAndroid.UI
             builder2.SetMessage("기계학습 지원을 하시겠습니까?");
             builder2.SetPositiveButton("예", (senderAlert2, args2) =>
             {
-                Finish();
                 DataStorageManager.saveBoolData(this, "isFirst", false);                      //isFirst 해제
                 DataStorageManager.saveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
+                Finish();                                                                     //Welecome Activity 종료
             });
             builder2.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
-                Finish();
                 DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
                 DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                Finish();
             });
             Dialog dialog2 = builder2.Create();
             dialog2.Show();
