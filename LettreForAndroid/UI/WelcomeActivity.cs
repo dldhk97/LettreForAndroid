@@ -128,7 +128,6 @@ namespace LettreForAndroid.UI
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
                     AskOfflineMode();
-                    Categorize();
                     break;
                 case (int)WELCOME_SCREEN.MACHINE:
                     AskMachineSupport();
@@ -225,6 +224,7 @@ namespace LettreForAndroid.UI
 
         private void LoadMessageDBAsync()
         {
+            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드", ToastLength.Short).Show(); });
             MessageDBManager.Get();
         }
 
@@ -287,15 +287,15 @@ namespace LettreForAndroid.UI
             builder.SetMessage("오프라인 모드를 사용하게 되면 정확도가 떨어집니다. ");
             builder.SetPositiveButton("예", (senderAlert2, args2) =>
             {
-                Finish();
-                DataStorageManager.saveBoolData(this, "isFirst", false);                      //isFirst 해제
-                DataStorageManager.saveBoolData(this, "supportMachineLearning", true);        //기계학습 지원 승인
+                DataStorageManager.saveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
+                //
+                //오프라인 메소드 호출
+                //
             });
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
-                Finish();
-                DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
-                DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                DataStorageManager.saveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
+                Categorize();
             });
             Dialog dialog2 = builder.Create();
             dialog2.Show();

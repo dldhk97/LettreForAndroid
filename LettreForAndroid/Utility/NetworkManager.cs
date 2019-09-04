@@ -117,7 +117,8 @@ namespace LettreForAndroid.Utility
             //메시지 목록을 만들기 위해 Foreach로 메시지 각각 탐색
             foreach (TextMessage objMessage in messageList)
             {
-                string ProcessedMsg = Regex.Replace(objMessage.Msg, "[0-9]", " ");       //메시지 내용의 숫자를 제외함.
+                string ProcessedMsg = Regex.Replace(objMessage.Msg, @"[^가-힣]", " ");       //메시지 내용 중 한글을 제외한 것은 다 공백으로 치환함.
+                ProcessedMsg = ProcessedMsg.Trim();
                 toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
             }
 
@@ -158,6 +159,9 @@ namespace LettreForAndroid.Utility
 
                     byte[] msgByte = StringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
                     byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);    //문자내용을 바이트로 바꾼 값의 길이
+
+                    //System.Diagnostics.Debug.Print("연락처 : \n" + addr+"\n\n연락처 길이 : \n" + addr.Length + "\n\n문자 내용 : \n" + msg + "\n\n문자 길이 : \n" + msg.Length + "\n\n문자내용 바이트 수 : \n" + msgByte.Length + "\n\n-----------------------\n\n"  );
+
 
                     //연락처 길이 전송
                     _CurrentSocket.Send(addr_lengthByte, SocketFlags.None);
