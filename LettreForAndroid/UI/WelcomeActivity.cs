@@ -286,7 +286,7 @@ namespace LettreForAndroid.UI
             builder.SetPositiveButton("예", (senderAlert2, args2) =>
             {
                 DataStorageManager.saveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
-                Categorize();
+                Categorize();                                                           //온라인 모드이므로, 온라인 카테고리 분류 실행
             });
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
@@ -300,7 +300,7 @@ namespace LettreForAndroid.UI
                 //오프라인 분석이 끝나면 화면 종료.
                 DataStorageManager.saveBoolData(this, "isFirst", false);                        //isFirst 해제
                 DataStorageManager.saveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
-                Finish();
+                Finish();                                                                       //오프라인 모드를 사용하므로, 기계학습페이지를 표시하지 않고 바로 WelcomeActivity 종료
             });
             Dialog dialog2 = builder.Create();
             dialog2.Show();
