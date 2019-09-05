@@ -46,6 +46,9 @@ namespace LettreForAndroid.Utility
 
         public int[] GetLables(long thread_id)
         {
+            if (_OnMemoryLables == null)
+                Load();
+
             if (_OnMemoryLables.DialogueList.ContainsKey(thread_id))
             {
                 Dialogue objdialogue = _OnMemoryLables[thread_id];
@@ -163,7 +166,7 @@ namespace LettreForAndroid.Utility
 
             InsertOrUpdate(newDialogue);
             
-            //DB를 메모리에 올림
+            //레이블 DB를 메모리에 올림
             Load();
         }
 

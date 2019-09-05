@@ -79,9 +79,12 @@ namespace LettreForAndroid.Utility
             for (int i = 0; i < Dialogue.Lable_COUNT; i++)
             {
                 _DialogueSets.Add(new DialogueSet(i));
+                _DialogueSets[i].Lable = i;
             }
             _TotalDialogueSet = new DialogueSet();
+            _TotalDialogueSet.Lable = (int)Dialogue.LableType.ALL;
             _UnknownDialogueSet = new DialogueSet();
+            _UnknownDialogueSet.Lable = (int)Dialogue.LableType.UNKNOWN;
         }
 
         //메시지 DB를 탐색하여, 각 대화중 가장 최신 SMS를 찾아 메모리에 올림.

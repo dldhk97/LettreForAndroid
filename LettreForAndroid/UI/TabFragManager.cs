@@ -42,11 +42,14 @@ namespace LettreForAndroid.UI
         TabLayout _TabLayout;
         CustomPagerAdapter _Adapter;
 
+        public int[] _ScrollPosition;                                       //메인 프래그의 스크롤 위치를 기억함
+
         public TabFragManager(Activity iActivity, FragmentManager iFm)
         {
             activity = iActivity;
             fm = iFm;
             _Instance = this;
+            _ScrollPosition = new int[tabFrags.Count + 2];
         }
 
         // 탭 레이아웃 설정
@@ -79,7 +82,7 @@ namespace LettreForAndroid.UI
 
         private void UpdateNotiCount()
         {
-            foreach(TabFrag objTab in tabFrags)
+            foreach (TabFrag objTab in tabFrags)
             {
                 int totalUnreadCnt = 0;
                 DialogueSet objDialogueSet;
@@ -91,7 +94,7 @@ namespace LettreForAndroid.UI
                 else
                     objDialogueSet = MessageDBManager.Get().DialogueSets[objTab.Category];
 
-                foreach(Dialogue objDialogue in objDialogueSet.DialogueList.Values)
+                foreach (Dialogue objDialogue in objDialogueSet.DialogueList.Values)
                 {
                     totalUnreadCnt += objDialogue.UnreadCnt;
                 }
@@ -130,6 +133,12 @@ namespace LettreForAndroid.UI
                 if (DialogueActivity._Instance == null)
                     CustomPagerAdapter._Pages[i].RefreshFrag();
             }
+        }
+
+        public int[] ScrollPosition
+        {
+            get { return _ScrollPosition; }
+            set { _ScrollPosition = value; }
         }
     }
 }

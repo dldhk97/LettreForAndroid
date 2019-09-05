@@ -41,7 +41,6 @@ namespace LettreForAndroid.UI
             fragment.Arguments = args;
 
             return fragment;
-
         }
 
         //새로운 페이지가 만들어질때 호출됨
@@ -92,7 +91,7 @@ namespace LettreForAndroid.UI
             //대화가 있으면 리사이클러 뷰 내용안에 표시하도록 함
             if (_DialogueSet.Count > 0)
             {
-                DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet, _Category);
+                DialogueSetAdpater adapter = new DialogueSetAdpater(_DialogueSet, _Category, _LayoutManager);
                 _RecyclerView.SetAdapter(adapter);
             }
             else
@@ -101,6 +100,27 @@ namespace LettreForAndroid.UI
                 _GuideText.Visibility = ViewStates.Visible;
                 _RecyclerView.Visibility = ViewStates.Gone;
             }
+        }
+
+        public override void OnResume()
+        {
+            base.OnResume();
+
+            //대화액티비티가 끝나면 스크롤 위치 복원
+            int position = TabFragManager._Instance.ScrollPosition[_Category];
+            if (position > 0)
+            {
+                _RecyclerView.ScrollToPosition(position);
+            }
+        }
+
+        public override void OnPause()
+        {
+            base.OnPause();
+
+            //현재 스크롤 위치 기억
+            LinearLayoutManager layoutManager = (LinearLayoutManager)_LayoutManager;
+            TabFragManager._Instance.ScrollPosition[_DialogueSet.Lable] = layoutManager.FindFirstVisibleItemPosition();
         }
 
         //----------------------------------------------------------------------
@@ -281,13 +301,15 @@ namespace LettreForAndroid.UI
 
             // 현 페이지 대화 목록
             public DialogueSet _DialogueSet;
+            private RecyclerView.LayoutManager _LayoutManager;
             int _Category;
 
             // Load the adapter with the data set (photo album) at construction time:
-            public DialogueSetAdpater(DialogueSet iDialogueSet, int iCategory)
+            public DialogueSetAdpater(DialogueSet iDialogueSet, int iCategory, RecyclerView.LayoutManager layoutManager)
             {
                 _DialogueSet = iDialogueSet;
                 _Category = iCategory;
+                _LayoutManager = layoutManager;
             }
 
             public void UpdateDialogueSet(DialogueSet iDialogueSet)
@@ -370,6 +392,10 @@ namespace LettreForAndroid.UI
                     intent.PutExtra("address", _DialogueSet[iPosition].Address);
 
                     Android.App.Application.Context.StartActivity(intent);
+
+                    //현재 스크롤 위치 기억
+                    LinearLayoutManager layoutManager = (LinearLayoutManager)_LayoutManager;
+                    TabFragManager._Instance.ScrollPosition[_DialogueSet.Lable] = layoutManager.FindFirstVisibleItemPosition();
                 }
                 else if(type == (int)CLICK_TYPE.LONG_CLICK)
                 {

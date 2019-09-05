@@ -110,6 +110,7 @@ namespace LettreForAndroid.Utility
             return SendAndReceiveData(toSendData);
         }
 
+        //데이터를 서버에 보내기 전 전처리과정.
         private List<string[]> ConvertToSendData(List<TextMessage> messageList)
         {
             List<string[]> toSendData = new List<string[]>();
@@ -118,8 +119,10 @@ namespace LettreForAndroid.Utility
             foreach (TextMessage objMessage in messageList)
             {
                 string ProcessedMsg = Regex.Replace(objMessage.Msg, @"[^가-힣]", " ");       //메시지 내용 중 한글을 제외한 것은 다 공백으로 치환함.
-                ProcessedMsg = ProcessedMsg.Trim();
-                toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
+                ProcessedMsg = ProcessedMsg.Trim();                                          //좌우 공백 제거
+                //문자가 비어있지 않으면 리스트에 추가
+                if (ProcessedMsg.Length > 0)
+                    toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
             }
 
             return toSendData;
@@ -128,6 +131,9 @@ namespace LettreForAndroid.Utility
         //데이터를 여러개 보낼 때(어플 -> 서버)
         private List<string[]> SendAndReceiveData(List<string[]> dataList)
         {
+            if (dataList.Count <= 0)
+                return null;
+
             if (!_IsConnected)
                 MakeConnection();
 
@@ -137,8 +143,9 @@ namespace LettreForAndroid.Utility
             {
                 receivedData = new List<string[]>();
 
-                //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X
-                int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
+                //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X, 현재 서버측에서 타입1일때 처리를 못하므로 0으로 보냄
+                //int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
+                int type = 0;
                 byte[] typeByte = IntToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
                 _CurrentSocket.Send(typeByte, SocketFlags.None);
 
