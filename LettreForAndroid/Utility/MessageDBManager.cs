@@ -407,20 +407,23 @@ namespace LettreForAndroid.Utility
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                messages = new List<TextMessage>();
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
-                    string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    string body = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
-                    int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
-                    long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
-                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
+                    messages = new List<TextMessage>();
+                    while (cursor.MoveToNext())
+                    {
+                        string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
+                        string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                        string body = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
+                        int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
+                        long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
+                        int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
 
-                    TextMessage objSMS = new TextMessage(id, address, body, readState, time, type, thread_id);
-                    messages.Add(objSMS);
+                        TextMessage objSMS = new TextMessage(id, address, body, readState, time, type, thread_id);
+                        messages.Add(objSMS);
+                    }
                 }
                 cursor.Close();
             }
@@ -436,41 +439,50 @@ namespace LettreForAndroid.Utility
             string[] projection = new string[] { "_id", "ct_t", "read", "date", "thread_id", "m_type" };
 
             string selection = "thread_id = " + thread_id;
-            if (inboxType != (int)TextMessage.MESSAGE_TYPE.ALL)
+
+            switch(inboxType)
             {
-                selection = "thread_id = " + thread_id + " AND type = " + inboxType;
+                case (int)TextMessage.MESSAGE_TYPE.RECEIVED:
+                    selection = "thread_id = " + thread_id + " AND m_type = " + 132;
+                    break;
+                case (int)TextMessage.MESSAGE_TYPE.SENT:
+                    selection = "thread_id = " + thread_id + " AND m_type = " + 128;
+                    break;
             }
 
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                messages = new List<TextMessage>();
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string id = cursor.GetString(cursor.GetColumnIndex("_id"));
-                    string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
-                    int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
-                    long time = cursor.GetLong(cursor.GetColumnIndex("date"));
-                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("m_type"));
-                    if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                    messages = new List<TextMessage>();
+                    while (cursor.MoveToNext())
                     {
-                        //this is MMS
-                        MultiMediaMessage objMMS = ReadMMS(id);
-                        objMMS.Id = id;
-                        objMMS.ReadState = readState;
-                        objMMS.Time = time * 1000;
-                        objMMS.Thread_id = thread_id;
-                        objMMS.Type = type == 132 ? (int)TextMessage.MESSAGE_TYPE.RECEIVED : (int)TextMessage.MESSAGE_TYPE.SENT;
+                        string id = cursor.GetString(cursor.GetColumnIndex("_id"));
+                        string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
+                        int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
+                        long time = cursor.GetLong(cursor.GetColumnIndex("date"));
+                        int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("m_type"));
+                        if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                        {
+                            //this is MMS
+                            MultiMediaMessage objMMS = ReadMMS(id);
+                            objMMS.Id = id;
+                            objMMS.ReadState = readState;
+                            objMMS.Time = time * 1000;
+                            objMMS.Thread_id = thread_id;
+                            objMMS.Type = type == 132 ? (int)TextMessage.MESSAGE_TYPE.RECEIVED : (int)TextMessage.MESSAGE_TYPE.SENT;
 
-                        //Add to List
-                        messages.Add(objMMS);
-                    }
-                    else
-                    {
-                        //this is SMS
-                        throw new Exception("알 수 없는 MMS 유형");
+                            //Add to List
+                            messages.Add(objMMS);
+                        }
+                        else
+                        {
+                            //this is SMS
+                            throw new Exception("알 수 없는 MMS 유형");
+                        }
                     }
                 }
                 cursor.Close();
@@ -492,49 +504,52 @@ namespace LettreForAndroid.Utility
 
             MultiMediaMessage objMMS = new MultiMediaMessage(); ;
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string partId = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
-                    string mediaType = cursor.GetString(cursor.GetColumnIndexOrThrow("ct"));
-                    if ("application/smil".Equals(mediaType))
+                    while (cursor.MoveToNext())
                     {
-                        //smil은 무시한다?
-                        continue;
-                    }
-
-                    objMMS.Address = GetAddress(id);
-
-                    if ("text/plain".Equals(mediaType))
-                    {
-                        string data = cursor.GetString(cursor.GetColumnIndexOrThrow("_data"));
-                        string body;
-                        if (data != null)
+                        string partId = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
+                        string mediaType = cursor.GetString(cursor.GetColumnIndexOrThrow("ct"));
+                        if ("application/smil".Equals(mediaType))
                         {
-                            body = GetMMSText(partId);
+                            //smil은 무시한다?
+                            continue;
+                        }
+
+                        objMMS.Address = GetAddress(id);
+
+                        if ("text/plain".Equals(mediaType))
+                        {
+                            string data = cursor.GetString(cursor.GetColumnIndexOrThrow("_data"));
+                            string body;
+                            if (data != null)
+                            {
+                                body = GetMMSText(partId);
+                            }
+                            else
+                            {
+                                body = cursor.GetString(cursor.GetColumnIndexOrThrow("text"));
+                            }
+                            objMMS.Msg = body;
+                            objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.TEXT;
+                        }
+                        else if ("image/jpeg".Equals(mediaType) || "image/bmp".Equals(mediaType) || "image/gif".Equals(mediaType) ||
+                            "image/jpg".Equals(mediaType) || "image/png".Equals(mediaType))
+                        {
+                            objMMS.Bitmap = GetMMSImage(partId);
+                            objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.IMAGE;
+                        }
+                        else if ("text/x-vCard".Equals(mediaType))
+                        {
+                            //.vcf는 처리 어케하지
+                            objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.VCF;
                         }
                         else
                         {
-                            body = cursor.GetString(cursor.GetColumnIndexOrThrow("text"));
+                            //throw new Exception("알 수 없는 MMS 타입");
                         }
-                        objMMS.Msg = body;
-                        objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.TEXT;
-                    }
-                    else if ("image/jpeg".Equals(mediaType) || "image/bmp".Equals(mediaType) || "image/gif".Equals(mediaType) || 
-                        "image/jpg".Equals(mediaType) || "image/png".Equals(mediaType))
-                    {
-                        objMMS.Bitmap = GetMMSImage(partId); 
-                        objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.IMAGE;
-                    }
-                    else if("text/x-vCard".Equals(mediaType))
-                    {
-                        //.vcf는 처리 어케하지
-                        objMMS.MediaType = (int)MultiMediaMessage.MEDIA_TYPE.VCF;
-                    }
-                    else
-                    {
-                        //throw new Exception("알 수 없는 MMS 타입");
                     }
                 }
                 cursor.Close();
