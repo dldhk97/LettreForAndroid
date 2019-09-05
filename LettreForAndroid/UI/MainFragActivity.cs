@@ -105,9 +105,46 @@ namespace LettreForAndroid.UI
 
         //----------------------------------------------------------------------
         // DialogueFragAll VIEW HOLDER
-        // 전체 탭의 프래그먼트
+        // 전체 탭의 프래그먼트 뷰홀더
 
-        
+        public class DialogueFragAllHolder : RecyclerView.ViewHolder
+        {
+            public TextView mCategoryText { get; private set; }
+            public TextView mAddress { get; private set; }
+            public TextView mMsg { get; private set; }
+            public TextView mTime { get; private set; }
+            public RelativeLayout mReadStateRL { get; private set; }
+            public TextView mReadStateCnt { get; private set; }
+
+            // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
+            public DialogueFragAllHolder(View iItemView, System.Action<int, int> iListener) : base(iItemView)
+            {
+                mCategoryText = iItemView.FindViewById<TextView>(Resource.Id.dfa_categoryTV);
+                mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfa_addressTV);
+                mMsg = iItemView.FindViewById<TextView>(Resource.Id.dfa_msgTV);
+                mTime = iItemView.FindViewById<TextView>(Resource.Id.dfa_timeTV);
+                mReadStateRL = iItemView.FindViewById<RelativeLayout>(Resource.Id.dfa_readstateRL);
+                mReadStateCnt = iItemView.FindViewById<TextView>(Resource.Id.dfa_readstateCntTV);
+
+                iItemView.Click += (sender, e) =>
+                {
+                    iListener(base.LayoutPosition, (int)DialogueSetAdpater.CLICK_TYPE.CLICK);
+                };
+
+                iItemView.LongClick += (sender, e) =>
+                {
+                    iListener(base.LayoutPosition, (int)DialogueSetAdpater.CLICK_TYPE.LONG_CLICK);
+                };
+            }
+
+            public void Bind(Dialogue dialogue)
+            {
+                mCategoryText.Text = Dialogue._LableTypeStr[dialogue.MajorLable];   //카테고리 설정
+                BindHolder(dialogue, mAddress, mMsg, mTime, mReadStateRL, mReadStateCnt);
+            }
+        }
+
+
         public static void BindHolder(Dialogue dialogue, TextView address, TextView msgText, TextView timeText, RelativeLayout readStateRL, TextView readStateCnt)
         {
             TextMessage lastMessage = dialogue[0];                           //대화 중 가장 마지막 문자
@@ -173,40 +210,6 @@ namespace LettreForAndroid.UI
             TabFragManager._Instance.RefreshTabLayout();
         }
 
-
-
-        public class DialogueFragAllHolder : RecyclerView.ViewHolder
-        {
-            public TextView mCategoryText { get; private set; }
-            public TextView mAddress { get; private set; }
-            public TextView mMsg { get; private set; }
-            public TextView mTime { get; private set; }
-            public RelativeLayout mReadStateRL { get; private set; }
-            public TextView mReadStateCnt { get; private set; }
-
-            // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
-            public DialogueFragAllHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
-            {
-                mCategoryText = iItemView.FindViewById<TextView>(Resource.Id.dfa_categoryTV);
-                mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfa_addressTV);
-                mMsg = iItemView.FindViewById<TextView>(Resource.Id.dfa_msgTV);
-                mTime = iItemView.FindViewById<TextView>(Resource.Id.dfa_timeTV);
-                mReadStateRL = iItemView.FindViewById<RelativeLayout>(Resource.Id.dfa_readstateRL);
-                mReadStateCnt = iItemView.FindViewById<TextView>(Resource.Id.dfa_readstateCntTV);
-
-                iItemView.Click += (sender, e) =>
-                {
-                    iListener(base.LayoutPosition);
-                };
-            }
-
-            public void Bind(Dialogue dialogue)
-            {
-                mCategoryText.Text = Dialogue._LableTypeStr[dialogue.MajorLable];   //카테고리 설정
-                BindHolder(dialogue, mAddress, mMsg, mTime, mReadStateRL, mReadStateCnt);
-            }
-        }
-
         //----------------------------------------------------------------------
         // DialogueFragCategory VIEW HOLDER
         // 전체 탭을 제외한 나머지 탭의 프래그먼트
@@ -227,7 +230,7 @@ namespace LettreForAndroid.UI
             }
 
             // 카드뷰 레이아웃(dialogue_frag) 내 객체들 참조.
-            public DialogueFragCategoryHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
+            public DialogueFragCategoryHolder(View iItemView, System.Action<int, int> iListener) : base(iItemView)
             {
                 mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.dfc_profileIB);
                 mAddress = iItemView.FindViewById<TextView>(Resource.Id.dfc_addressTV);
@@ -238,7 +241,12 @@ namespace LettreForAndroid.UI
 
                 iItemView.Click += (sender, e) =>
                 {
-                    iListener(base.LayoutPosition);
+                    iListener(base.LayoutPosition, (int)DialogueSetAdpater.CLICK_TYPE.CLICK);
+                };
+
+                iItemView.LongClick += (sender, e) =>
+                {
+                    iListener(base.LayoutPosition, (int)DialogueSetAdpater.CLICK_TYPE.LONG_CLICK);
                 };
             }
 
@@ -266,11 +274,10 @@ namespace LettreForAndroid.UI
 
         public class DialogueSetAdpater : RecyclerView.Adapter
         {
+            public enum CLICK_TYPE { CLICK = 1, LONG_CLICK };
+
             private const int VIEW_TYPE_ALL = 1;
             private const int VIEW_TYPE_CATEGORY = 2;
-            
-            // Event handler for item clicks:
-            public event System.EventHandler<int> mItemClick;
 
             // 현 페이지 대화 목록
             public DialogueSet _DialogueSet;
@@ -352,17 +359,30 @@ namespace LettreForAndroid.UI
             }
 
             // 대화를 클릭했을 때 발생하는 메소드
-            void OnClick(int iPosition)
+            void OnClick(int iPosition, int type)
             {
-                if (mItemClick != null)
-                    mItemClick(this, iPosition);
+                if(type == (int)CLICK_TYPE.CLICK)
+                {
+                    //일반 터치 시 대화 액티비티로 이동
+                    Context context = Android.App.Application.Context;
 
-                Context context = Android.App.Application.Context;
+                    Intent intent = new Intent(context, typeof(DialogueActivity));
+                    intent.PutExtra("address", _DialogueSet[iPosition].Address);
 
-                Intent intent = new Intent(context, typeof(DialogueActivity));
-                intent.PutExtra("address", _DialogueSet[iPosition].Address);
+                    Android.App.Application.Context.StartActivity(intent);
+                }
+                else if(type == (int)CLICK_TYPE.LONG_CLICK)
+                {
+                    string majorLableStr = "Major Lable = " + _DialogueSet[iPosition].MajorLable + "\n";
+                    string lableStr = "Lable = ";
+                    foreach(int lableElem in _DialogueSet[iPosition].Lables)
+                    {
+                        lableStr += lableElem + " ";
+                    }
+                    Toast.MakeText(Android.App.Application.Context, majorLableStr + lableStr, ToastLength.Short).Show();
+                    //롱 터치 시 옵션 제공 (현재는 디버깅용으로 레이블 표시)
 
-                Android.App.Application.Context.StartActivity(intent);
+                }
             }
         }
     }
