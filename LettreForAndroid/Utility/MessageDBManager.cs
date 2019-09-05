@@ -279,6 +279,13 @@ namespace LettreForAndroid.Utility
                 objDialogue.MajorLable = LableDBManager.Get().GetMajorLable(objDialogue.Thread_id);
             }
 
+            //대화에 해당되는 레이블을 로컬 DB로부터 가져와 복사함.
+            int[] localLables = LableDBManager.Get().GetLables(objDialogue.Thread_id);
+            if(localLables != null)
+            {
+                localLables.CopyTo(objDialogue.Lables, 0);
+            }
+
             //대상 대화목록에 추가
             DialogueSet targetDialogueSet;
             if (objDialogue.MajorLable == (int)Dialogue.LableType.UNKNOWN)

@@ -54,7 +54,7 @@ namespace LettreForAndroid
         public void Setup()
         {
             ContactDBManager.Get();                                 //연락처를 모두 메모리에 올림
-            LableDBManager.Get();                                   //레이블 DB를 모두 메모리에 올림
+            LableDBManager.Get().Load();                            //레이블 DB를 모두 메모리에 올림
             MessageDBManager.Get().RefreshLastMessageAll();         //메시지를 모두 메모리에 올림
 
             //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용

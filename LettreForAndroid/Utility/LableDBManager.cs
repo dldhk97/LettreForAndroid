@@ -22,7 +22,6 @@ namespace LettreForAndroid.Utility
         public LableDBManager()
         {
             _Helper = new MySQLiteOpenHelper(Application.Context);
-            Load();
         }
 
         public static LableDBManager Get()

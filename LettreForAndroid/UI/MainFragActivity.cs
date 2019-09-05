@@ -373,13 +373,14 @@ namespace LettreForAndroid.UI
                 }
                 else if(type == (int)CLICK_TYPE.LONG_CLICK)
                 {
-                    string majorLableStr = "Major Lable = " + _DialogueSet[iPosition].MajorLable + "\n";
-                    string lableStr = "Lable = ";
+                    string majorLableStr = "대표 레이블 = " + _DialogueSet[iPosition].MajorLable + "\n";
+                    string lableStr = "레이블 = ";
                     foreach(int lableElem in _DialogueSet[iPosition].Lables)
                     {
                         lableStr += lableElem + " ";
                     }
-                    Toast.MakeText(Android.App.Application.Context, majorLableStr + lableStr, ToastLength.Short).Show();
+                    string msgCnt = "\n문자 수 = " + _DialogueSet[iPosition].Count.ToString();
+                    Toast.MakeText(Android.App.Application.Context, majorLableStr + lableStr + msgCnt, ToastLength.Short).Show();
                     //롱 터치 시 옵션 제공 (현재는 디버깅용으로 레이블 표시)
 
                 }
