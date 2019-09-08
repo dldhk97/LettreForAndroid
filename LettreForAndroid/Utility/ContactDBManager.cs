@@ -25,6 +25,7 @@ namespace LettreForAndroid.Utility
 
         private static ContactDBManager _Instance = null;
         private Dictionary<long, Contact> _ContactList = new Dictionary<long, Contact>();
+        private Dictionary<string, ContactData> _ContactDataList = new Dictionary<string, ContactData>();
 
         //객체 생성시 DB에서 연락처 다 불러옴
         ContactDBManager()
@@ -49,7 +50,7 @@ namespace LettreForAndroid.Utility
             get { return _ContactList.Count; }
         }
 
-        public ContactData GetContactDataByAddress(string address, bool needRefresh)
+        public ContactData GetContactDataByAddress2(string address, bool needRefresh)
         {
             if (needRefresh)
                 Refresh();
@@ -68,10 +69,42 @@ namespace LettreForAndroid.Utility
             return null;
         }
 
+        public ContactData GetContactDataByAddress(string address, bool needRefresh)
+        {
+            if (needRefresh)
+                Refresh();
+
+            //System.Diagnostics.Debug.WriteLine("GetContactDataByAddress : " + address);
+            string refinedAddress = PhoneNumberUtils.FormatNumber(address, "KR");
+
+            if (_ContactDataList.ContainsKey(refinedAddress))
+                return _ContactDataList[refinedAddress];
+            return null;
+        }
+
         public void Refresh()
         {
+            _ContactList.Clear();
+            _ContactDataList.Clear();
+
             LoadRawContact();
             LoadContactData();
+            LoadContactData2();
+        }
+
+        //TODO : 더 최적화할 건덕지가 있다.
+        //LoadContactData()와 RawContact와 LoadContactData2랑 합칠수 있을듯...
+        private void LoadContactData2()
+        {
+            foreach (Contact objContact in _ContactList.Values)
+            {
+                string refinedAddress = PhoneNumberUtils.FormatNumber(objContact.PrimaryContactData.Address, "KR");
+
+                if (_ContactDataList.ContainsKey(refinedAddress) == false)
+                    _ContactDataList.Add(refinedAddress, objContact.PrimaryContactData);
+
+                //System.Diagnostics.Debug.WriteLine("LoadContactData2 : " + refinedAddress);
+            }
         }
 
         private void LoadContactData()
@@ -93,32 +126,35 @@ namespace LettreForAndroid.Utility
 
             ICursor cursor = cr.Query(uri, projection, null, null, null);   //쿼리
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while(cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    long id = cursor.GetLong(cursor.GetColumnIndex(projection[0]));
-                    long rawContact_id = cursor.GetLong(cursor.GetColumnIndex(projection[1]));
-                    long contact_id = cursor.GetLong(cursor.GetColumnIndex(projection[2]));
-                    string address = cursor.GetString(cursor.GetColumnIndex(projection[3]));
-                    string name = cursor.GetString(cursor.GetColumnIndex(projection[4]));
-                    int isPrimary = cursor.GetInt(cursor.GetColumnIndex(projection[5]));
-                    string photoThumbnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[6]));
-
-                    ContactData objContact = new ContactData(id, rawContact_id, contact_id, address, name, isPrimary, photoThumbnail_uri);
-
-                    //Android.Util.Log.Debug("Contact : ", id.ToString() + "," + rawContact_id.ToString() + "," + contact_id.ToString() + "," + address + "," + name);
-
-                    if (isPrimary == 1)
+                    while (cursor.MoveToNext())
                     {
-                        _ContactList[contact_id].RawContacts[rawContact_id].PrimaryContact = objContact;
-                    }
+                        long id = cursor.GetLong(cursor.GetColumnIndex(projection[0]));
+                        long rawContact_id = cursor.GetLong(cursor.GetColumnIndex(projection[1]));
+                        long contact_id = cursor.GetLong(cursor.GetColumnIndex(projection[2]));
+                        string address = cursor.GetString(cursor.GetColumnIndex(projection[3]));
+                        string name = cursor.GetString(cursor.GetColumnIndex(projection[4]));
+                        int isPrimary = cursor.GetInt(cursor.GetColumnIndex(projection[5]));
+                        string photoThumbnail_uri = cursor.GetString(cursor.GetColumnIndex(projection[6]));
 
-                    //_RawContactList[rawContact_id].Contacts.Add(objContact);
-                    _ContactList[contact_id].RawContacts[rawContact_id].ContactDatas.Add(objContact);
+                        ContactData objContact = new ContactData(id, rawContact_id, contact_id, address, name, isPrimary, photoThumbnail_uri);
+
+                        //Android.Util.Log.Debug("Contact : ", id.ToString() + "," + rawContact_id.ToString() + "," + contact_id.ToString() + "," + address + "," + name);
+
+                        if (isPrimary == 1)
+                        {
+                            _ContactList[contact_id].RawContacts[rawContact_id].PrimaryContact = objContact;
+                        }
+
+                        //_RawContactList[rawContact_id].Contacts.Add(objContact);
+                        _ContactList[contact_id].RawContacts[rawContact_id].ContactDatas.Add(objContact);
+                    }
                 }
+                cursor.Close();
             }
-            cursor.Close();
 
             //PrimaryContact가 없는 연락처는 제거한다.
             List<Contact> deleteTarget = new List<Contact>();

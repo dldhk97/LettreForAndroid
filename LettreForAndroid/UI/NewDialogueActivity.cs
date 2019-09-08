@@ -17,6 +17,7 @@ using LettreForAndroid.Receivers;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Provider;
+using Android.Telephony;
 
 namespace LettreForAndroid.UI
 {
@@ -93,6 +94,8 @@ namespace LettreForAndroid.UI
             _AddressBox = FindViewById<EditText>(Resource.Id.cv_searchEditText);
 
             _SendButton.Click += _SendButton_Click;
+            //TODO : 제대로 적용되고, 전송되는지 확인해봐라
+            _AddressBox.AddTextChangedListener(new PhoneNumberFormattingTextWatcher());             //연락처 입력 박스 수정시 바로 하이픈 붙음
         }
 
         private void _SendButton_Click(object sender, EventArgs e)

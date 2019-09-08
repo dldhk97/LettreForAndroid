@@ -103,23 +103,26 @@ namespace LettreForAndroid.Utility
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while(cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
-                    string body = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
-                    string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
-                    long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
-                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
-                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
+                    while (cursor.MoveToNext())
+                    {
+                        string id = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
+                        string body = cursor.GetString(cursor.GetColumnIndexOrThrow("body"));
+                        string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                        int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
+                        long time = cursor.GetLong(cursor.GetColumnIndexOrThrow("date"));
+                        long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                        int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));
 
-                    TextMessage objSMS = new TextMessage(id, address, body, readState, time, type, thread_id);
-                    UpdateLastMessage(objSMS);
+                        TextMessage objSMS = new TextMessage(id, address, body, readState, time, type, thread_id);
+                        UpdateLastMessage(objSMS);
+                    }
                 }
-                cursor.Close();
             }
+            cursor.Close();
         }
 
         //메시지 DB를 탐색하여, 각 대화중 가장 최신 MMS를 찾아 메모리에 올림.
@@ -173,7 +176,8 @@ namespace LettreForAndroid.Utility
 
             Dialogue objDialogue = _TotalDialogueSet[objSMS.Thread_id];
 
-            objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, true) + CountUnread(objDialogue.Thread_id, false);
+            //TODO : 느린 메시지 로딩 속도의 원흉
+            //objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, true) + CountUnread(objDialogue.Thread_id, false);
 
             if (objDialogue.Count > 0)
             {
@@ -191,7 +195,8 @@ namespace LettreForAndroid.Utility
         {
             Dialogue objDialogue = new Dialogue();
             objDialogue.Address = objSMS.Address;
-            objDialogue.Contact = ContactDBManager.Get().GetContactDataByAddress(objSMS.Address, false);
+            objDialogue.Contact = ContactDBManager.Get().GetContactDataByAddress(objSMS.Address, false);        //메시지 DB 로드가 느린 원인
+
             if (objDialogue.Contact != null)
             {
                 objDialogue.DisplayName = objDialogue.Contact.Name;
@@ -205,12 +210,13 @@ namespace LettreForAndroid.Utility
         }
 
         //해당 대화 중 읽지않은 문자의 수를 셈
-        public int CountUnread(long thread_id, bool isMMS)
+        //TODO : 느린 메시지 로딩속도의 원흉. 사용되지 않음.
+        public int CountUnread2(long thread_id, bool isMMS)
         {
             string typeStr = isMMS ? "mms" : "sms";
             ContentResolver cr = Application.Context.ContentResolver;
 
-            Uri uri = Uri.Parse("content://" + typeStr + "/");
+            Uri uri = Uri.Parse("content://" + typeStr + "/inbox");
             string[] projection = new string[] { "read", "thread_id" };
             string selection = "thread_id = " + thread_id + " AND read = 0";
             ICursor cursor = cr.Query(uri, projection, selection, null, null);
@@ -228,18 +234,47 @@ namespace LettreForAndroid.Utility
         {
             _IsLoaded = true;
 
-            //Dialogue Set 초기화
-            ResetDialogueSet();
+            ResetDialogueSet();     //Dialogue Set 초기화
 
-            //SMS와 MMS를 모두 탐색하여 최신문자를 TotalDialogueSet(메모리)에 올림.
-            UpdateLastSMS();
-            UpdateLastMMS();
+            UpdateLastSMS();        //SMS와 MMS를 모두 탐색하여 최신문자를 TotalDialogueSet(메모리)에 올림.
 
-            //로컬 레이블 DB를 바탕으로 각 다이얼로그셋에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
-            CategorizeSet(_TotalDialogueSet);
+            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw.Start();
+            UpdateLastMMS();        //TODO : 4초정도로 꽤 느린 속도
+            //sw.Stop();
+            //System.Diagnostics.Debug.WriteLine("UpdateLastMMS : " + sw.ElapsedMilliseconds.ToString() + " ms");
 
-            //각 다이얼로그 대화를 날짜순으로 정렬
-            SortDialogueSets();
+            CountUnread(false);     //읽지않은 SMS 개수 세어 메모리에 대화(메모리)에 저장
+            CountUnread(true);      //읽지않은 MMS 개수 세어 메모리에 대화(메모리)에 저장
+
+            CategorizeSet(_TotalDialogueSet);           //로컬 레이블 DB를 바탕으로 각 다이얼로그셋에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
+
+            SortDialogueSets();                         //각 다이얼로그 대화를 날짜순으로 정렬
+        }
+
+        private void CountUnread(bool isMMS)
+        {
+            string typeStr = isMMS ? "mms" : "sms";
+
+            ContentResolver cr = Application.Context.ContentResolver;
+
+            Uri uri = Uri.Parse("content://" + typeStr + "/inbox");
+            string[] projection = new string[] { "read", "thread_id" };
+            string selection = "read = 0";
+            ICursor cursor = cr.Query(uri, projection, selection, null, null);
+
+            if (cursor != null)
+            {
+                if(cursor.Count > 0)
+                {
+                    while(cursor.MoveToNext())
+                    {
+                        long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                        _TotalDialogueSet[thread_id].UnreadCnt++;
+                    }
+                }
+                cursor.Close();
+            }
         }
 
         //해당 대화가 메모리에 있으면 최신 문자 갱신, 없으면 대화 생성 후 메모리에 올림. 카테고라이즈와 정렬도 함.
