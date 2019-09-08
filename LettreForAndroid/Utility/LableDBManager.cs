@@ -144,6 +144,9 @@ namespace LettreForAndroid.Utility
             if (textMessage == null)
                 return;
 
+            if(_OnMemoryLables == null)
+                Load();
+
             Dictionary<string, int[]> receivedDatas = NetworkManager.Get().GetLableFromServer(textMessage);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.

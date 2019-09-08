@@ -24,6 +24,8 @@ namespace LettreForAndroid
     [Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/BasicTheme")]
     public class MainActivity : AppCompatActivity
     {
+        public static MainActivity _Instance { get; private set; }
+
         TabFragManager _TabFragManager;
         ContactViewManager _ContactManager;
 
@@ -34,6 +36,8 @@ namespace LettreForAndroid
             base.OnCreate(bundle);
 
             SetContentView(Resource.Layout.MainActivity);
+
+            _Instance = this;
 
             StartActivityForResult(typeof(WelcomeActivity), REQUEST_NEWWELCOMECOMPLETE);
 

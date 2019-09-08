@@ -36,14 +36,11 @@ namespace LettreForAndroid.Receivers
 
             foreach (var msg in msgs)
             {
-                //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
-                 objMsg = ConvertToCustomMessageType(msg);
+                objMsg = ConvertToCustomMessageType(msg);           //시스템 메시지 형식을 레뜨레 메시지 형식으로 변환
 
-                //메시지를 DB에 삽입
-                UpdateMessage(context, objMsg);
+                UpdateMessage(context, objMsg);                     //메시지를 안드로이드 메시지 DB에 삽입
 
-                //연락처에 있는지 조회
-                ContactData objContact = ContactDBManager.Get().GetContactDataByAddress(objMsg.Address, true);
+                ContactData objContact = ContactDBManager.Get().GetContactDataByAddress(objMsg.Address, true);      //연락처에 있는지 조회
 
                 //연락처에 없으면 서버에 전송.
                 if (objContact == null)
@@ -56,18 +53,17 @@ namespace LettreForAndroid.Receivers
                     displayName = objContact.Name;                                                  //연락처에 있으면 표시될 이름 변경
                 }
 
-                //해당 메시지가 속하는 대화를 찾아 최신문자를 새로고침함.
-                MessageDBManager.Get().RefreshLastMessage(MessageDBManager.Get().GetThreadId(objMsg.Address));
+                unreadCnt++;                    //읽지않은 개수 카운트
 
-                //읽지않은 개수 카운트
-                unreadCnt++;
+                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101, unreadCnt);       //알림 표시
+
+                //IsLoaded가 true이면 어플이 포그라운드, 메시지 목록이 메모리에 올라와있는 상태임.
+                //false이면 최근 메시지목록을 불러오지 않는다. (메모리에 올라간 메시지가 없기 때문에 Refresh하려면 크래시남)
+                if (MessageDBManager.Get().IsLoaded == true)
+                    MessageDBManager.Get().RefreshLastMessage(MessageDBManager.Get().GetThreadId(objMsg.Address));  //해당 메시지가 속하는 대화를 찾아 최신문자를 새로고침함.
             }
 
-            //알림 표시
-            NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101, unreadCnt);
-
-            //UI 새로고침
-            MainFragActivity.RefreshUI();
+            MainFragActivity.RefreshUI();               //UI 새로고침
         }
 
         //문자를 DB에 저장

@@ -28,17 +28,16 @@ namespace LettreForAndroid.Utility
 
     public class MessageDBManager
     {
-        private SmsManager _smsManager;
-
         private static MessageDBManager _Instance = null;
         private static List<DialogueSet> _DialogueSets = new List<DialogueSet>();
         private static DialogueSet _TotalDialogueSet = new DialogueSet();
         private static DialogueSet _UnknownDialogueSet = new DialogueSet();
 
-        //객체 생성시 DB에서 문자 다 불러옴
+        private bool _IsLoaded = false;
+
         MessageDBManager()
         {
-            _smsManager = SmsManager.Default;
+            
         }
 
         public static MessageDBManager Get()
@@ -62,6 +61,12 @@ namespace LettreForAndroid.Utility
         {
             get { return _DialogueSets; }
         }
+
+        public bool IsLoaded
+        {
+            get { return _IsLoaded; }
+        }
+
 
         private void ResetDialogueSet()
         {
@@ -221,14 +226,16 @@ namespace LettreForAndroid.Utility
         //문자 DB를 모두 탐색하여, 가장 최신문자만 가져와 메모리에 올린다.
         public void RefreshLastMessageAll()
         {
+            _IsLoaded = true;
+
             //Dialogue Set 초기화
             ResetDialogueSet();
 
-            //SMS와 MMS를 모두 탐색하여 최신문자를 메모리에 올림.
+            //SMS와 MMS를 모두 탐색하여 최신문자를 TotalDialogueSet(메모리)에 올림.
             UpdateLastSMS();
             UpdateLastMMS();
 
-            //로컬 레이블 DB를 바탕으로 각 다이얼로그에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
+            //로컬 레이블 DB를 바탕으로 각 다이얼로그셋에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
             CategorizeSet(_TotalDialogueSet);
 
             //각 다이얼로그 대화를 날짜순으로 정렬

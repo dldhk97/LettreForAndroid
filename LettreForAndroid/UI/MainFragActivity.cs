@@ -227,7 +227,8 @@ namespace LettreForAndroid.UI
                 DialogueActivity._Instance.RefreshRecyclerView();
 
             //탭, 메인 새로고침
-            TabFragManager._Instance.RefreshTabLayout();
+            if(TabFragManager._Instance != null)
+                TabFragManager._Instance.RefreshTabLayout();
         }
 
         //----------------------------------------------------------------------

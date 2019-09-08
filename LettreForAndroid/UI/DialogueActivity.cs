@@ -22,7 +22,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace LettreForAndroid.UI
 {
-    [Activity(Label = "DialogueActivity", Theme = "@style/BasicTheme")]
+    [Activity(Label = "레뜨레", Theme = "@style/BasicTheme")]
     [IntentFilter(new[] { "android.intent.action.SEND", "android.intent.action.SENDTO" }, Categories = new[] { "android.intent.category.DEFAULT", "android.intent.category.BROWSABLE" }, DataSchemes = new[] { "sms", "smsto", "mms", "mmsto" })]
     public class DialogueActivity : AppCompatActivity
     {
@@ -47,6 +47,14 @@ namespace LettreForAndroid.UI
             SetContentView(Resource.Layout.DialogueActivity);
 
             _Instance = this;
+
+            if (MessageDBManager.Get().IsLoaded == false)
+            {
+                ContactDBManager.Get();                                 //연락처를 모두 메모리에 올림
+                LableDBManager.Get().Load();                            //레이블 DB를 모두 메모리에 올림
+                MessageDBManager.Get().RefreshLastMessageAll();
+            }
+
 
             _CurAddress = Intent.GetStringExtra("address");                             //액티비티 인자로 전화번호를 받는다.
             _CurThread_id = MessageDBManager.Get().GetThreadId(_CurAddress);           //해당 전화번호로 등록된 thread_id를 찾는다.
@@ -114,6 +122,15 @@ namespace LettreForAndroid.UI
                 Finish();
                 OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);     //창 닫을때 페이드효과
                 //OverridePendingTransition(0, 0);     //창 닫을때 효과 없음
+
+                //알림창 클릭해서 대화창을 열었을땐 뒤로가려고 하면 메인액티비티가 존재하지 않으므로, 메인액티비티를 실행한다.
+                if (MainActivity._Instance == null)
+                {
+                    Intent mainActivityIntent = new Intent(Application.Context, typeof(MainActivity));
+                    mainActivityIntent.AddFlags(ActivityFlags.NewTask);
+                    StartActivity(mainActivityIntent);
+                }
+
             }
             return base.OnOptionsItemSelected(item);
         }
@@ -139,7 +156,8 @@ namespace LettreForAndroid.UI
             RefreshRecyclerView();
 
             //탭 새로고침
-            TabFragManager._Instance.RefreshTabLayout();
+            if(TabFragManager._Instance != null)
+                TabFragManager._Instance.RefreshTabLayout();
         }
 
         public void RefreshRecyclerView()
