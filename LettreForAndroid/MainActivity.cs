@@ -18,6 +18,7 @@ using LettreForAndroid.Receivers;
 
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Support.Design.Widget;
+using Android.Content.Res;
 
 namespace LettreForAndroid
 {
@@ -41,6 +42,8 @@ namespace LettreForAndroid
 
             StartActivityForResult(typeof(WelcomeActivity), REQUEST_NEWWELCOMECOMPLETE);
 
+			AssetManager assets = this.Assets;
+			
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
