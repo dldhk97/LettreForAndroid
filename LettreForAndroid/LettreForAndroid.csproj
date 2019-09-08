@@ -64,6 +64,9 @@
     <Reference Include="Mono.Android" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="TfIdf">
+      <HintPath>..\..\TfIdf\TfIdf\bin\Debug\netstandard2.0\TfIdf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\Contact.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\WelcomeActivity.cs" />
+    <Compile Include="Utility\PredictionEngine.cs" />
     <Compile Include="Utility\ContactDBManager.cs" />
     <Compile Include="Utility\LableDBManager.cs" />
     <Compile Include="Utility\MySQLiteOpenHelper.cs" />
@@ -96,6 +100,9 @@
     <Compile Include="Utility\SpamFilter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\msg_non_trio_3ngram_trainset.csv" />
+    <AndroidAsset Include="Assets\msg_non_ratio_4ngram_trainset.csv" />
+    <AndroidAsset Include="Assets\msg_non_trio_5ngram_trainset.csv" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />

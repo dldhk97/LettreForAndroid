@@ -302,10 +302,10 @@ namespace LettreForAndroid.UI
                 DataStorageManager.SaveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
                 RunOnUiThread(() => { Toast.MakeText(this, "오프라인 모드를 사용합니다.", ToastLength.Short).Show(); });
 
+				Categorize_Offline();
                 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 //오프라인 분석 메소드 호출
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`
 
                 //오프라인 분석이 끝나면 화면 종료.
                 DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
@@ -337,7 +337,22 @@ namespace LettreForAndroid.UI
             thread.Start();
         }
 
-        private void WelcomeActivity_OnCategorizeComplete(object sender, EventArgs e)
+		private void Categorize_Offline()
+		{
+			//이벤트 등록 - 스레드 작업이 끝이 났는지 확인하기 위한 메서드
+			_OnCategorizeComplete -= WelcomeActivity_OnCategorizeComplete;
+			_OnCategorizeComplete += WelcomeActivity_OnCategorizeComplete;
+
+			// 검토사항 - 이부분은 gui를 새로 해줘야 하는가?
+			//프로그레스바 표기
+			_Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
+			_ViewPager.Adapter.NotifyDataSetChanged();
+
+			//
+			LableDBManager.Get().CreateLableDB_Offline(MessageDBManager.Get().UnknownDialogueSet);
+		}
+
+		private void WelcomeActivity_OnCategorizeComplete(object sender, EventArgs e)
         {
             CategorizeEventArgs resultArgs = e as CategorizeEventArgs;
             bool isSucceed = false;
@@ -435,8 +450,32 @@ namespace LettreForAndroid.UI
             else
                 _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.FAIL));
         }
+		private async void CreateLableDB_Offline()
+		{
+			//메시지 DB가 로드될때까지 대기
+			RunOnUiThread(() => { Toast.MakeText(this, "메시지 DB를 불러오는중...[1/4]", ToastLength.Short).Show(); });
+			await _MessageDBLoadTsk;
 
-        private void WelcomeActivity_CreateDBProgressEvent(string toastMsg)
+			//미분류 메시지가 하나도 없는 경우
+			if (MessageDBManager.Get().UnknownDialogueSet.Count <= 0)
+			{
+				_OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.EMPTY));
+				return;
+			}
+
+			//예측엔진을 통해  Lable DB 생성 후 메모리에 올림.
+			LableDBManager.Get().CreateDBProgressEvent += WelcomeActivity_CreateDBProgressEvent;
+			LableDBManager.Get().CreateLableDB_Offline(MessageDBManager.Get().UnknownDialogueSet);
+
+			//레이블 DB가 생성되었나?
+			if (LableDBManager.Get().IsDBExist())
+				_OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.SUCCESS));
+			else
+				_OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.FAIL));
+		}
+
+
+		private void WelcomeActivity_CreateDBProgressEvent(string toastMsg)
         {
             RunOnUiThread(() =>
             {
