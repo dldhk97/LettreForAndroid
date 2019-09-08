@@ -109,7 +109,10 @@ namespace LettreForAndroid.UI
 
             SetSupportActionBar(toolbar);
 
-            SupportActionBar.Title = _CurDialogue.DisplayName;
+            //연락처가 없으면 전화번호로 표시, 있으면 이름 (전화번호)로 표시
+            string title = _CurDialogue.Contact == null ? _CurDialogue.DisplayName : _CurDialogue.DisplayName + " (" + _CurDialogue.Address + ")";
+
+            SupportActionBar.Title = title;
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.SetHomeButtonEnabled(true);
         }

@@ -95,7 +95,7 @@ namespace LettreForAndroid.UI
 
             _SendButton.Click += _SendButton_Click;
             //TODO : 제대로 적용되고, 전송되는지 확인해봐라
-            _AddressBox.AddTextChangedListener(new PhoneNumberFormattingTextWatcher());             //연락처 입력 박스 수정시 바로 하이픈 붙음
+            _AddressBox.AddTextChangedListener(new PhoneNumberFormattingTextWatcher("KR"));             //연락처 입력 박스 수정시 바로 하이픈 붙음
         }
 
         private void _SendButton_Click(object sender, EventArgs e)
