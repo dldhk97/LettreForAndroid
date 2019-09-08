@@ -1,7 +1,9 @@
 ﻿using Android.Content.Res;
 using Android.OS;
 using LettreForAndroid.Class;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using TFIDF;
 
@@ -16,8 +18,18 @@ namespace LettreForAndroid.Utility
 			// 문서 유사도 분석을 위한 TfIdf
 			tfidf = new TfIdf();
 
+			// Assets 폴더내 파일 읽기
+			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
+			Stopwatch sw = new Stopwatch();
+
+			sw.Start();
+
 			// 미리 n그램으로 분리된 문서를 불러와서 예측하는데 걸리는 연산시간을 단축
-			tfidf.Load_documents(this.Assets.Open("msg_non_ratio_4ngram_trainset.csv"));
+			tfidf.Load_documents(filename);
+
+			sw.Stop();
+			Console.WriteLine("TFIDF 훈련 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms");
+
 		}
 
 		public Dictionary<string, int[]> Predict(DialogueSet dialogueSet)
@@ -26,7 +38,6 @@ namespace LettreForAndroid.Utility
 			Dictionary<string, int[]> receivedDatas = new Dictionary<string, int[]>();
 
 			// dialogueSet에 있는 전화번호와 문자메시지를 
-
 
 			foreach (var elem in dialogueSet.DialogueList.Values)
 			{
@@ -47,6 +58,7 @@ namespace LettreForAndroid.Utility
 						}
 					}
 					receive_labels[max.label - 1]++;
+
 				}
 				receivedDatas.Add(elem.Address, receive_labels);
 			}

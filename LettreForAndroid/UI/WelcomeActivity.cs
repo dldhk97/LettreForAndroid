@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -298,10 +299,13 @@ namespace LettreForAndroid.UI
                 DataStorageManager.SaveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
                 RunOnUiThread(() => { Toast.MakeText(this, "오프라인 모드를 사용합니다.", ToastLength.Short).Show(); });
 
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+
 				Categorize_Offline();
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                //오프라인 분석 메소드 호출
-                //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<`
+
+				sw.Stop();
+				System.Console.WriteLine("총 처리 시간: " + sw.ElapsedMilliseconds.ToString() + "ms");
 
                 //오프라인 분석이 끝나면 화면 종료.
                 DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
@@ -335,7 +339,7 @@ namespace LettreForAndroid.UI
 
 		private void Categorize_Offline()
 		{
-			//이벤트 등록 - 스레드 작업이 끝이 났는지 확인하기 위한 메서드
+			//이벤트 등록 - 스레드 작업이 끝이 났는지 확인하기 위한 메서드z
 			_OnCategorizeComplete -= WelcomeActivity_OnCategorizeComplete;
 			_OnCategorizeComplete += WelcomeActivity_OnCategorizeComplete;
 

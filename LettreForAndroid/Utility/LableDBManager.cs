@@ -135,7 +135,7 @@ namespace LettreForAndroid.Utility
 				InsertOrUpdate(newDialogue);
 			}
 
-			CreateDBProgressEvent("레이블을 메모리에 올리는 중...[4/4]");
+			//CreateDBProgressEvent("레이블을 메모리에 올리는 중...[4/4]");
 			//DB를 메모리에 올림
 			Load();
 		}
