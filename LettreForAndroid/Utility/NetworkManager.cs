@@ -83,34 +83,108 @@ namespace LettreForAndroid.Utility
             }
         }
 
-        public List<string[]> GetLablesFromServer(DialogueSet dialogues)
+        //서버와 통신 후 연락처-레이블 쌍의 목록을 반환함. 일반적으로 첫 카테고리 분류시 호출됨
+        public Dictionary<string, int[]> GetLablesFromServer(DialogueSet dialogues)
         {
-            List<string[]> toSendData = new List<string[]>();
+            List<string[]> toSendDatas = new List<string[]>();
+            Dictionary<string, int> emptyCntList = new Dictionary<string, int>();
 
             foreach (Dialogue objDialogue in dialogues.DialogueList.Values)
             {
-                toSendData.AddRange(ConvertToSendData(objDialogue.TextMessageList));
+                List<string[]> processedMsg = ConvertToSendData(objDialogue.TextMessageList);     //이 대화 내 모든 문자를 전처리한다.
+                int emptyCnt = 0;
+
+                //각 문자를 탐색한다.
+                foreach (string[] data in processedMsg)
+                {
+                    string msg = data[1];
+
+                    //문자 중 문자 내용이 있으면 전송목록에 추가, 없으면 빈 문자 개수 카운트
+                    if (msg == string.Empty)
+                    {
+                        emptyCnt++;
+                    }
+                    else
+                    {
+                        //문자내용이 있는 경우 전송할 목록에 추가한다.
+                        toSendDatas.Add(data);
+                    }
+                }
+
+                emptyCntList.Add(objDialogue.Address, emptyCnt);                           //현 대화에서 빈 문자의 수를 리스트에 저장
             }
 
-            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
-            return SendAndReceiveData(toSendData);
+            Dictionary<string, int[]> receivedDatas = SendAndReceiveData(toSendDatas);     //내용이 있는 문자는 전송하고 결과값을 받는다. 내용이 없는 문자는 아래에서 레이블만 병합.
+
+            //서버에서 받은 연락처-레이블 쌍과, 빈 문자 연락처-레이블 쌍을 병합함.
+            foreach(KeyValuePair<string, int> data in emptyCntList)
+            {
+                if(receivedDatas.ContainsKey(data.Key))
+                {
+                    receivedDatas[data.Key][0] += data.Value;
+                }
+                else
+                {
+                    receivedDatas.Add(data.Key, new int[] { data.Value, 0, 0, 0, 0, 0, 0 });
+                }
+            }
+            return receivedDatas;
         }
 
-        public List<string[]> GetLablesFromServer(Dialogue dialogue)
+        //서버와 통신 후 연락처-레이블 쌍의 목록을 반환함. 일반적으로 재 분류시 호출됨
+        public Dictionary<string, int[]> GetLablesFromServer(Dialogue dialogue)
         {
-            List<string[]> toSendData = ConvertToSendData(dialogue.TextMessageList);
+            List<string[]> toSendDatas = new List<string[]>();
+            List<string[]> processedMsg = ConvertToSendData(dialogue.TextMessageList);     //이 대화 내 모든 문자를 전처리한다.
+            int emptyCnt = 0;
+
+            //각 문자를 탐색한다.
+            foreach (string[] data in processedMsg)
+            {
+                string msg = data[1];
+
+                //문자 중 문자 내용이 있으면 전송목록에 추가, 없으면 빈 문자 개수 카운트
+                if (msg == string.Empty)
+                {
+                    emptyCnt++;
+                }
+                else
+                {
+                    //문자내용이 있는 경우 전송할 목록에 추가한다.
+                    toSendDatas.Add(data);
+                }
+            }
+
+            Dictionary<string, int[]> receivedDatas = SendAndReceiveData(toSendDatas);     //내용이 있는 문자는 전송하고 결과값을 받는다. 내용이 없는 문자는 아래에서 레이블만 병합.
+            receivedDatas[dialogue.Address][0] += emptyCnt;
+
             //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
-            return SendAndReceiveData(toSendData);
+            return receivedDatas;
         }
 
-        public List<string[]> GetLableFromServer(TextMessage message)
+        //서버와 통신 후 연락처-레이블 쌍의 목록을 반환함. 일반적으로 메시지 수신 시 호출됨
+        public Dictionary<string, int[]> GetLableFromServer(TextMessage message)
         {
-            List<string[]> toSendData = ConvertToSendData(new List<TextMessage>() { message });
-            //모든 메시지가 toSendData 배열에 들어갔음. 이것을 서버로 전송하고, 결과값을 받는다.
-            return SendAndReceiveData(toSendData);
+            List<string[]> processedData = ConvertToSendData(new List<TextMessage>() { message });
+            Dictionary<string, int[]> result;
+
+            string address = processedData[0][0];
+            string msg = processedData[0][1];
+
+            //메시지 내용이 전처리 후 비어있다면 대화로 분류한다.
+            if (msg == string.Empty)
+            {
+                result = new Dictionary<string, int[]>();
+                result.Add(address, new int[] { 1, 0, 0, 0, 0, 0, 0 });
+            }
+            else
+            {
+                result = SendAndReceiveData(processedData);        //내용이 있으면 서버로 보내고 결과 레이블을 받는다.
+            }
+            return result;
         }
 
-        //데이터를 서버에 보내기 전 전처리과정.
+        //데이터를 서버에 보내기 전 전처리과정. 연락처-문자 쌍이 반환된다.
         private List<string[]> ConvertToSendData(List<TextMessage> messageList)
         {
             List<string[]> toSendData = new List<string[]>();
@@ -120,16 +194,14 @@ namespace LettreForAndroid.Utility
             {
                 string ProcessedMsg = Regex.Replace(objMessage.Msg, @"[^가-힣]", " ");       //메시지 내용 중 한글을 제외한 것은 다 공백으로 치환함.
                 ProcessedMsg = ProcessedMsg.Trim();                                          //좌우 공백 제거
-                //문자가 비어있지 않으면 리스트에 추가
-                if (ProcessedMsg.Length > 0)
-                    toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });
+                toSendData.Add(new string[] { objMessage.Address, ProcessedMsg });           //리스트에 추가
             }
 
             return toSendData;
         }
 
         //데이터를 여러개 보낼 때(어플 -> 서버)
-        private List<string[]> SendAndReceiveData(List<string[]> dataList)
+        private Dictionary<string, int[]> SendAndReceiveData(List<string[]> dataList)
         {
             if (dataList.Count <= 0)
                 return null;
@@ -137,11 +209,11 @@ namespace LettreForAndroid.Utility
             if (!_IsConnected)
                 MakeConnection();
 
-            List<string[]> receivedData = null;
+            Dictionary<string, int[]> receivedData = null;
 
             if (_IsConnected)
             {
-                receivedData = new List<string[]>();
+                receivedData = new Dictionary<string, int[]>();
 
                 //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X, 현재 서버측에서 타입1일때 처리를 못하므로 0으로 보냄
                 //int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
@@ -235,16 +307,7 @@ namespace LettreForAndroid.Utility
 
                     //-------------------------------------------------------
 
-                    receivedData.Add(new string[] {
-                        receive_addr_str,
-                        receive_lables[0].ToString(),
-                        receive_lables[1].ToString(),
-                        receive_lables[2].ToString(),
-                        receive_lables[3].ToString(),
-                        receive_lables[4].ToString(),
-                        receive_lables[5].ToString(),
-                        receive_lables[6].ToString(),
-                    });
+                    receivedData.Add(receive_addr_str, receive_lables);             //결과 리스트에 삽입.
                 }
             }
             // (4) 소켓 닫기

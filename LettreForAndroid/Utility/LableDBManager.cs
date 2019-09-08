@@ -57,7 +57,7 @@ namespace LettreForAndroid.Utility
             return null;
         }
 
-        //내장 DB에 단일 데이터 삽입 혹은 교체(업데이트)
+        //내장 DB에 단일 데이터 삽입 혹은 교체(덮어씌움)
         public void InsertOrUpdate(Dialogue dialogue)
         {
             _Helper.InsertOrUpdate(Application.Context, dialogue);
@@ -82,7 +82,7 @@ namespace LettreForAndroid.Utility
                 return;
 
             CreateDBProgressEvent("서버에 전송 및 수신하는 중...[2/4]");
-            List<string[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogueSet);                  //서버에서 데이터를 받는다.
+            Dictionary<string, int[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogueSet);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.
             if (receivedData == null || receivedData.Count == 0)
@@ -90,13 +90,13 @@ namespace LettreForAndroid.Utility
 
             CreateDBProgressEvent("수신 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
             //받은 결과값들을 하나하나 DB에 넣는다.
-            foreach (string[] objStr in receivedData)
+            foreach (KeyValuePair<string, int[]> data in receivedData)
             {
                 Dialogue newDialogue = new Dialogue();
-                newDialogue.Address = objStr[0];
+                newDialogue.Address = data.Key;
 
                 for (int i = 0; i < Dialogue.Lable_COUNT; i++)
-                    newDialogue.Lables[i] = Convert.ToInt32(objStr[i + 1]);
+                    newDialogue.Lables[i] = data.Value[i];
 
                 newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
@@ -108,26 +108,26 @@ namespace LettreForAndroid.Utility
             Load();
         }
 
-        //서버와 통신하여 레이블을 갱신함.
+        //서버와 통신하여 레이블을 갱신함(덮어씌움).
         public void UpdateLableDB(Dialogue dialogue)
         {
             if (dialogue.Count <= 0)
                 return;
 
-            List<string[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogue);                  //서버에서 데이터를 받는다.
+            Dictionary<string, int[]> receivedData = NetworkManager.Get().GetLablesFromServer(dialogue);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.
-            if (receivedData == null)
+            if (receivedData == null || receivedData.Count == 0)
                 return;
 
             //받은 결과값들을 하나하나 DB에 넣는다.
-            foreach (string[] objStr in receivedData)
+            foreach (KeyValuePair<string, int[]> data in receivedData)
             {
                 Dialogue newDialogue = new Dialogue();
-                newDialogue.Address = objStr[0];
+                newDialogue.Address = data.Key;
 
                 for (int i = 0; i < Dialogue.Lable_COUNT; i++)
-                    newDialogue.Lables[i] = Convert.ToInt32(objStr[i + 1]);
+                    newDialogue.Lables[i] = data.Value[i];
 
                 newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
@@ -144,17 +144,17 @@ namespace LettreForAndroid.Utility
             if (textMessage == null)
                 return;
 
-            List<string[]> receivedDatas = NetworkManager.Get().GetLableFromServer(textMessage);                  //서버에서 데이터를 받는다.
+            Dictionary<string, int[]> receivedDatas = NetworkManager.Get().GetLableFromServer(textMessage);                  //서버에서 데이터를 받는다.
 
             //서버 통신 실패시 아무것도 하지 않음.
-            if (receivedDatas == null)
+            if (receivedDatas == null || receivedDatas.Count == 0)
                 return;
 
-            string[] receivedData = receivedDatas[0];
+            int[] receivedLable = receivedDatas[textMessage.Address];
 
             Dialogue newDialogue = new Dialogue();
 
-            newDialogue.Address = receivedData[0];
+            newDialogue.Address = textMessage.Address;
             newDialogue.Thread_id = MessageDBManager.Get().GetThreadId(newDialogue.Address);
 
             int[] dbLables = GetLables(newDialogue.Thread_id);                              //레이블 DB의 레이블을 가져옴.
@@ -162,7 +162,7 @@ namespace LettreForAndroid.Utility
                 dbLables.CopyTo(newDialogue.Lables, 0);
 
             for (int i = 0; i < Dialogue.Lable_COUNT; i++)
-                newDialogue.Lables[i] += Convert.ToInt32(receivedData[i + 1]);                 //서버에서 받은 레이블을 누적.
+                newDialogue.Lables[i] += receivedLable[i];                 //서버에서 받은 레이블을 누적.
 
             InsertOrUpdate(newDialogue);
             
