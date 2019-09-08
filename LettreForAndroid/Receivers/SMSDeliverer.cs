@@ -45,7 +45,16 @@ namespace LettreForAndroid.Receivers
                 //연락처에 없으면 서버에 전송.
                 if (objContact == null)
                 {
-                    LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 레이블 데이터 받은 후 레이블 DB에 저장
+                    if(DataStorageManager.LoadBoolData(context, "useOfflineMode", false) == true)
+                    {
+                        //오프라인 모드 사용 시
+                    }
+                    else
+                    {
+                        //온라인 모드 사용 시
+                        LableDBManager.Get().AccumulateLableDB(objMsg);                                 //서버에서 레이블 데이터 받은 후 레이블 DB에 저장
+                    }
+                    
                     displayName = objMsg.Address;                                                   //연락처에 없으면 전화번호로 이름 표시
                 }
                 else

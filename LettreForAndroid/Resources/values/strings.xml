@@ -13,7 +13,7 @@
   <string name="welcome_screen4_primaryText">기본앱으로 지정해주세요!</string>
   <string name="welcome_screen4_secondaryText">메시지 수신을 위해 레뜨레를 기본앱으로 지정해 주셔야 합니다.</string>
   <string name="welcome_screen5_primaryText">카테고리 분류</string>
-  <string name="welcome_screen5_secondaryText">서버와 통신하여 문자 메시지들을 분류합니다.\n데이터를 사용하므로 와이파이에 연결된 환경에서 해주시기 바랍니다.</string>
+  <string name="welcome_screen5_secondaryText">서버와 통신하여 문자 메시지들을 분류합니다.\n데이터를 사용하므로 와이파이에 연결된 환경에서 시도해주시기 바랍니다.</string>
   <string name="welcome_screen6_primaryText">기계학습에 기여해주세요!</string>
-  <string name="welcome_screen6_secondaryText">레뜨레는 기계학습을 기반으로 작동합니다.\n여려분의 기여로 더 똑똑한 레뜨레가 만들어집니다.\n메세지 수집은 개인정보 보호를 위해 대화를 제외한 문자만 수집됩니다.\n또한, 인증번호와 같은 숫자는 제외되어 전송됩니다.</string>
+  <string name="welcome_screen6_secondaryText">여려분의 기여로 더 똑똑한 레뜨레가 만들어집니다.\n메세지 수집은 개인정보 보호를 위해 대화를 제외한 문자만 수집됩니다.\n또한, 숫자, 영어를 제외한 한글만 수집됩니다.\n메시지는 첫분류 이후 수신받은 메시지만 수집됩니다.</string>
 </resources>
