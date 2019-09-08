@@ -35,7 +35,8 @@ namespace LettreForAndroid.Utility
                 .SetLargeIcon(BitmapFactory.DecodeResource(context.Resources, Resource.Drawable.ic_notification))
                 .SetSmallIcon(Resource.Drawable.ic_notification)
                 .SetCategory(Notification.CategoryMessage)
-                .SetAutoCancel(true)                                           //알림 클릭시 알림 아이콘이 상단바에서 사라짐.
+                .SetColor(Application.Context.Resources.GetColor(Resource.Color.colorPrimary))
+                .SetAutoCancel(true)                                                                //알림 클릭시 알림 아이콘이 상단바에서 사라짐.
                 .SetNumber(unreadCnt)
                 //.AddAction(Resource.Drawable.dd9_send_36dp_2x_2, "답장", dialogueActivityIntent)
                 //.AddAction(Resource.Drawable.dd9_send_36dp_2x_2, "읽음", dialogueActivityIntent)
