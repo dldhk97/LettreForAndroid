@@ -64,12 +64,16 @@ namespace LettreForAndroid.Receivers
 
                 unreadCnt++;                    //읽지않은 개수 카운트
 
-                NotificationHandler.Notification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101, unreadCnt);       //알림 표시
+                NotificationHandler.ShowNotification(context, "Lettre Channel 1", displayName, objMsg.Msg, objMsg.Address, "Ticker", 101, unreadCnt);       //알림 표시
 
                 //IsLoaded가 true이면 어플이 포그라운드, 메시지 목록이 메모리에 올라와있는 상태임.
                 //false이면 최근 메시지목록을 불러오지 않는다. (메모리에 올라간 메시지가 없기 때문에 Refresh하려면 크래시남)
                 if (MessageDBManager.Get().IsLoaded == true)
-                    MessageDBManager.Get().RefreshLastMessage(MessageDBManager.Get().GetThreadId(objMsg.Address));  //해당 메시지가 속하는 대화를 찾아 최신문자를 새로고침함.
+                {
+                    long thread_id = MessageDBManager.Get().GetThreadId(objMsg.Address);
+                    MessageDBManager.Get().RefreshLastMessage(thread_id);                       //해당 메시지가 속하는 대화를 찾아 최신문자를 새로고침함.
+                }
+                    
             }
 
             MainFragActivity.RefreshUI();               //UI 새로고침

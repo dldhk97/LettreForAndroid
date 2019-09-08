@@ -221,8 +221,6 @@ namespace LettreForAndroid.UI
 
         private void LoadMessageDBAsync()
         {
-            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 시작", ToastLength.Short).Show(); });
-
             //전체탭에 들어간 대화 중 연락처가 없는 대화는 모두 로드하여 Unknown 카테고리에 넣음.
             MessageDBManager.Get().LoadUnknownMetaDatas();
 
@@ -231,8 +229,6 @@ namespace LettreForAndroid.UI
             {
                 MessageDBManager.Get().ReLoadDialogue(objDialogue, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
             }
-
-            RunOnUiThread(() => { Toast.MakeText(this, "DEBUG : 백그라운드 메세지 DB 로드 완료", ToastLength.Short).Show(); });
         }
 
         //---------------------------------------------------------------------

@@ -176,9 +176,6 @@ namespace LettreForAndroid.Utility
 
             Dialogue objDialogue = _TotalDialogueSet[objSMS.Thread_id];
 
-            //TODO : 느린 메시지 로딩 속도의 원흉
-            //objDialogue.UnreadCnt = CountUnread(objDialogue.Thread_id, true) + CountUnread(objDialogue.Thread_id, false);
-
             if (objDialogue.Count > 0)
             {
                 //대상 문자가 최신이 아니라면 기존 문자 유지, 대상 문자가 더 최신이면 대상 문자로 갱신.
@@ -209,26 +206,6 @@ namespace LettreForAndroid.Utility
             return objDialogue;
         }
 
-        //해당 대화 중 읽지않은 문자의 수를 셈
-        //TODO : 느린 메시지 로딩속도의 원흉. 사용되지 않음.
-        public int CountUnread2(long thread_id, bool isMMS)
-        {
-            string typeStr = isMMS ? "mms" : "sms";
-            ContentResolver cr = Application.Context.ContentResolver;
-
-            Uri uri = Uri.Parse("content://" + typeStr + "/inbox");
-            string[] projection = new string[] { "read", "thread_id" };
-            string selection = "thread_id = " + thread_id + " AND read = 0";
-            ICursor cursor = cr.Query(uri, projection, selection, null, null);
-
-            int cnt = cursor.Count;
-
-            if(cursor != null)
-                cursor.Close();
-
-            return cnt;
-        }
-
         //문자 DB를 모두 탐색하여, 가장 최신문자만 가져와 메모리에 올린다.
         public void RefreshLastMessageAll()
         {
@@ -244,15 +221,15 @@ namespace LettreForAndroid.Utility
             //sw.Stop();
             //System.Diagnostics.Debug.WriteLine("UpdateLastMMS : " + sw.ElapsedMilliseconds.ToString() + " ms");
 
-            CountUnread(false);     //읽지않은 SMS 개수 세어 메모리에 대화(메모리)에 저장
-            CountUnread(true);      //읽지않은 MMS 개수 세어 메모리에 대화(메모리)에 저장
+            CountUnreadAll(false);     //읽지않은 SMS 개수 세어 메모리에 대화(메모리)에 저장
+            CountUnreadAll(true);      //읽지않은 MMS 개수 세어 메모리에 대화(메모리)에 저장
 
             CategorizeSet(_TotalDialogueSet);           //로컬 레이블 DB를 바탕으로 각 다이얼로그셋에 넣음. 레이블DB가 없으면 Unknown에 넣음. (네트워킹 X)
 
             SortDialogueSets();                         //각 다이얼로그 대화를 날짜순으로 정렬
         }
 
-        private void CountUnread(bool isMMS)
+        public void CountUnreadAll(bool isMMS)
         {
             string typeStr = isMMS ? "mms" : "sms";
 
@@ -277,6 +254,26 @@ namespace LettreForAndroid.Utility
             }
         }
 
+        //해당 대화 중 읽지않은 문자의 수를 셈
+        //느리기 때문에 한 대화내에서 읽지않은 문자의 수를 셀 때 사용
+        private int CountUnread(long thread_id, bool isMMS)
+        {
+            string typeStr = isMMS ? "mms" : "sms";
+            ContentResolver cr = Application.Context.ContentResolver;
+
+            Uri uri = Uri.Parse("content://" + typeStr + "/inbox");
+            string[] projection = new string[] { "read", "thread_id" };
+            string selection = "thread_id = " + thread_id + " AND read = 0";
+            ICursor cursor = cr.Query(uri, projection, selection, null, null);
+
+            int cnt = cursor.Count;
+
+            if (cursor != null)
+                cursor.Close();
+
+            return cnt;
+        }
+
         //해당 대화가 메모리에 있으면 최신 문자 갱신, 없으면 대화 생성 후 메모리에 올림. 카테고라이즈와 정렬도 함.
         public Dialogue RefreshLastMessage(long thread_id)
         {
@@ -285,17 +282,15 @@ namespace LettreForAndroid.Utility
             if (objDialogue.Count <= 0 || objDialogue == null)
                 throw new Exception("메시지 발송 이후, 대화를 찾을 수 업음.");
 
-            //대화 갱신 혹은 신규 생성
-            UpdateLastMessage(objDialogue[objDialogue.Count - 1]);
+            UpdateLastMessage(objDialogue[objDialogue.Count - 1]);                                      //대화 갱신 혹은 신규 생성
 
-            //갱신된 대화 로드
-            objDialogue = LoadDialogue(thread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
+            objDialogue = LoadDialogue(thread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);             //갱신된 대화 로드
 
-            //연락처 혹은 레이블 DB를 바탕으로 알맞게 탭에 삽입.
-            Categorize(objDialogue);
-            
-            //대화내 문자들을 시간순으로 정렬
-            SortDialogueSets();
+            objDialogue.UnreadCnt = CountUnread(thread_id, false) + CountUnread(thread_id, true);
+
+            Categorize(objDialogue);                                                                    //연락처 혹은 레이블 DB를 바탕으로 알맞게 탭에 삽입.
+
+            SortDialogueSets();                                                                         //대화내 문자들을 시간순으로 정렬
 
             return objDialogue;
         }
