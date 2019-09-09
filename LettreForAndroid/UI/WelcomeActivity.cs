@@ -125,7 +125,7 @@ namespace LettreForAndroid.UI
                     GetEsentialPermissionAsync();
                     break;
                 case (int)WELCOME_SCREEN.PACKAGE:
-                    RequestSetAsDefaultAsync();
+                    RequestSetAsDefault();
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
                     AskOfflineMode();
@@ -175,7 +175,7 @@ namespace LettreForAndroid.UI
         }
 
         //권한 요청 후 결과가 나왔을 때
-        public override async void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
             switch (requestCode)
             {
@@ -237,7 +237,7 @@ namespace LettreForAndroid.UI
 
         const int REQUEST_DEFAULTPACK = 2;
 
-        async Task RequestSetAsDefaultAsync()
+        private void RequestSetAsDefault()
         {
             //기본앱으로 이미 지정이 되어있나?
             if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
@@ -258,7 +258,7 @@ namespace LettreForAndroid.UI
             }
         }
 
-        protected override async void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
         {
             switch (requestCode)
             {
