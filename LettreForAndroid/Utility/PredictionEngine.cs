@@ -9,7 +9,7 @@ using TFIDF;
 
 namespace LettreForAndroid.Utility
 {
-	class PredictionEngine : MainActivity
+	class PredictionEngine
 	{
 		TfIdf tfidf;
 

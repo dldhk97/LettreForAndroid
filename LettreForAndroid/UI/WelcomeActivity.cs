@@ -297,20 +297,14 @@ namespace LettreForAndroid.UI
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
                 DataStorageManager.SaveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
-                RunOnUiThread(() => { Toast.MakeText(this, "오프라인 모드를 사용합니다.", ToastLength.Short).Show(); });
 
 				Stopwatch sw = new Stopwatch();
 				sw.Start();
 
-				Categorize_Offline();
+                Categorize();
 
-				sw.Stop();
+                sw.Stop();
 				System.Console.WriteLine("총 처리 시간: " + sw.ElapsedMilliseconds.ToString() + "ms");
-
-                //오프라인 분석이 끝나면 화면 종료.
-                DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
-                DataStorageManager.SaveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
-                Finish();                                                                       //오프라인 모드를 사용하므로, 기계학습페이지를 표시하지 않고 바로 WelcomeActivity 종료
             });
             Dialog dialog2 = builder.Create();
             dialog2.Show();
@@ -332,25 +326,19 @@ namespace LettreForAndroid.UI
             _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
             _ViewPager.Adapter.NotifyDataSetChanged();
 
-            //서버와 연결 시도
-            Thread thread = new Thread(CreateLableDB);
+            Thread thread = null;
+            bool isOffline = DataStorageManager.LoadBoolData(this, "useOfflineMode", false);
+
+            if (isOffline)
+            {
+               thread = new Thread(CreateLableDB_Offline);  //오프라인으로 분류 : 자체적 레이블 DB 생성
+            }
+            else
+            {
+                thread = new Thread(CreateLableDB);         //온라인으로 분류 : 서버와 연결 시도 후 레이블 DB 생성
+            }
             thread.Start();
         }
-
-		private void Categorize_Offline()
-		{
-			//이벤트 등록 - 스레드 작업이 끝이 났는지 확인하기 위한 메서드z
-			_OnCategorizeComplete -= WelcomeActivity_OnCategorizeComplete;
-			_OnCategorizeComplete += WelcomeActivity_OnCategorizeComplete;
-
-			// 검토사항 - 이부분은 gui를 새로 해줘야 하는가?
-			//프로그레스바 표기
-			_Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
-			_ViewPager.Adapter.NotifyDataSetChanged();
-
-			//
-			LableDBManager.Get().CreateLableDB_Offline(MessageDBManager.Get().UnknownDialogueSet);
-		}
 
 		private void WelcomeActivity_OnCategorizeComplete(object sender, EventArgs e)
         {
@@ -386,7 +374,19 @@ namespace LettreForAndroid.UI
 
             if (isSucceed)
             {
-                MoveToNextScreen();
+                if(DataStorageManager.LoadBoolData(Application.Context, "useOfflineMode", false))
+                {
+                    //오프라인 분석이 끝나면 화면 종료.
+                    DataStorageManager.SaveBoolData(this, "isFirst", false);                        //isFirst 해제
+                    DataStorageManager.SaveBoolData(this, "supportMachineLearning", false);         //기계학습 지원 비승인
+                    Finish();                                                                       //오프라인 모드를 사용하므로, 기계학습페이지를 표시하지 않고 바로 WelcomeActivity 종료
+                }
+                else
+                {
+                    //온라인 분석이 끝나면 다음 화면으로 이동.
+                    MoveToNextScreen();
+                }
+                
             }
             
         }

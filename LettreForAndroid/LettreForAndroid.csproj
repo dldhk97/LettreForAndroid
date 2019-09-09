@@ -67,6 +67,9 @@
     <Reference Include="TfIdf">
       <HintPath>..\..\TfIdf\TfIdf\bin\Debug\netstandard2.0\TfIdf.dll</HintPath>
     </Reference>
+    <Reference Include="TFIDF_for_xamarin">
+      <HintPath>..\TFIDF_for_xamarin.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\Contact.cs" />

@@ -114,13 +114,13 @@ namespace LettreForAndroid.Utility
 			if (dialogueSet.DialogueList.Count <= 0)
 				return;
 
-			//CreateDBProgressEvent("서버에 전송 및 수신하는 중...[2/4]");
+			CreateDBProgressEvent("내장 분석기로 예측하는 중...[2/4]");
 
 			//PredictionEngine을 통해 dialogue의 레이블을 예측
 			PredictionEngine predEngine = new PredictionEngine();
 			Dictionary<string, int[]> receivedData = predEngine.Predict(dialogueSet);
 
-			//CreateDBProgressEvent("예측 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
+			CreateDBProgressEvent("예측 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
 			//받은 결과값들을 하나하나 DB에 넣는다.
 			foreach (KeyValuePair<string, int[]> data in receivedData)
 			{
@@ -135,7 +135,7 @@ namespace LettreForAndroid.Utility
 				InsertOrUpdate(newDialogue);
 			}
 
-			//CreateDBProgressEvent("레이블을 메모리에 올리는 중...[4/4]");
+			CreateDBProgressEvent("레이블을 메모리에 올리는 중...[4/4]");
 			//DB를 메모리에 올림
 			Load();
 		}
