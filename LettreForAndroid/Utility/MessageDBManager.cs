@@ -279,8 +279,8 @@ namespace LettreForAndroid.Utility
         {
             Dialogue objDialogue = LoadDialogue(thread_id, true, (int)TextMessage.MESSAGE_TYPE.ALL);
 
-            if (objDialogue.Count <= 0 || objDialogue == null)
-                throw new Exception("메시지 발송 이후, 대화를 찾을 수 업음.");
+            //if (objDialogue.Count <= 0 || objDialogue == null)
+            //    throw new Exception("메시지 발송 이후, 대화를 찾을 수 업음.");
 
             UpdateLastMessage(objDialogue[objDialogue.Count - 1]);                                      //대화 갱신 혹은 신규 생성
 
@@ -528,7 +528,7 @@ namespace LettreForAndroid.Utility
                         else
                         {
                             //this is SMS
-                            throw new Exception("알 수 없는 MMS 유형");
+                            //throw new Exception("알 수 없는 MMS 유형");
                         }
                     }
                 }
@@ -749,7 +749,7 @@ namespace LettreForAndroid.Utility
                     else
                     {
                         //this is SMS
-                        throw new Exception("알 수 없는 MMS 유형");
+                        //throw new Exception("알 수 없는 MMS 유형");
                     }
                 }
                 cursor.Close();
