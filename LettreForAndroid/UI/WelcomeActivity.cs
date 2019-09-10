@@ -99,9 +99,9 @@ namespace LettreForAndroid.UI
                     _HasPermission = true;
 
                 if (_IsDefaultPackage == false)                                         //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
-                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
-                else if (_HasPermission == false)                                 //권한이 없다면, 권한페이지로 이동.
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
+                else if (_HasPermission == false)                                 //권한이 없다면, 권한페이지로 이동.
+                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
                 else                                                                    //이미 설정 다되있으면 피니쉬
                     Finish();
             }
@@ -188,7 +188,7 @@ namespace LettreForAndroid.UI
             if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
             {
                 //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
-                if (_IsFirst || _HasPermission)
+                if (_IsFirst || _HasPermission == false)
                     MoveToNextScreen();
                 else
                     Finish();
@@ -212,7 +212,7 @@ namespace LettreForAndroid.UI
                     {
                         Toast.MakeText(this, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
                         //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
-                        if (_IsFirst || _HasPermission)
+                        if (_IsFirst || _HasPermission == false)
                             MoveToNextScreen();
                         else
                             Finish();
@@ -235,14 +235,17 @@ namespace LettreForAndroid.UI
             //권한이 이미 승인되어있다면
             if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
             {
-                //미리 메시지 DB 로드
-                _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
-
                 //처음왔으면 다음스크린으로, 아니면 종료
-                if (_IsFirst )
+                if (_IsFirst)
+                {
+                    //미리 메시지 DB 로드
+                    _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
                     MoveToNextScreen();
+                }
                 else
+                {
                     Finish();
+                }
                 return;
             }
 
