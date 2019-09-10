@@ -8,10 +8,10 @@
   <string name="welcome_screen1_secondaryText">레뜨레는 기계학습을 통한 문자 자동 분류 어플리케이션입니다.\n\n계속 버튼을 눌러 진행해주세요.</string>
   <string name="welcome_screen2_primaryText">개인정보취급방침</string>
   <string name="welcome_screen2_secondaryText">계속 버튼을 눌러 개인정보 취급방침에 동의해주시기 바랍니다.</string>
-  <string name="welcome_screen3_primaryText">권한이 필요합니다!</string>
-  <string name="welcome_screen3_secondaryText">메시지 수발신, 연락처 조회 등의 권한이 필요합니다.</string>
-  <string name="welcome_screen4_primaryText">기본앱으로 지정해주세요!</string>
-  <string name="welcome_screen4_secondaryText">메시지 수신을 위해 레뜨레를 기본앱으로 지정해 주셔야 합니다.</string>
+  <string name="welcome_screen3_primaryText">기본앱으로 지정해주세요!</string>
+  <string name="welcome_screen3_secondaryText">메시지 수신을 위해 레뜨레를 기본앱으로 지정해 주셔야 합니다.</string>
+  <string name="welcome_screen4_primaryText">권한이 필요합니다!</string>
+  <string name="welcome_screen4_secondaryText">메시지 수발신, 연락처 조회 등의 권한이 필요합니다.</string>
   <string name="welcome_screen5_primaryText">카테고리 분류</string>
   <string name="welcome_screen5_secondaryText">서버와 통신하여 문자 메시지들을 분류합니다.\n데이터를 사용하므로 와이파이에 연결된 환경에서 시도해주시기 바랍니다.</string>
   <string name="welcome_screen6_primaryText">기계학습에 기여해주세요!</string>
