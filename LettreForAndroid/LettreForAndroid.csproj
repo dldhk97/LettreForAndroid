@@ -40,6 +40,8 @@
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <MandroidI18n />
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64</AndroidSupportedAbis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -65,7 +67,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="TFIDF_for_xamarin">
-      <HintPath>..\TFIDF_for_xamarin.dll</HintPath>
+      <HintPath>E:\github\TFIDF_for_xamarin\TFIDF_for_xamarin\bin\Debug\TFIDF_for_xamarin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -100,9 +102,10 @@
     <Compile Include="Utility\SpamFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\msg_non_trio_3ngram_trainset.csv" />
+    <AndroidAsset Include="Assets\msg_non_ratio_2ngram_trainset.csv" />
+    <AndroidAsset Include="Assets\msg_non_ratio_3ngram_trainset.csv" />
     <AndroidAsset Include="Assets\msg_non_ratio_4ngram_trainset.csv" />
-    <AndroidAsset Include="Assets\msg_non_trio_5ngram_trainset.csv" />
+    <AndroidAsset Include="Assets\msg_non_ratio_5ngram_trainset.csv" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
