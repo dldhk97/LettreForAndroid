@@ -156,9 +156,7 @@ namespace LettreForAndroid.UI
 
             _SendButton.Click += _SendButton_Click;
 
-            RefreshRecyclerView();
-
-            
+            MainFragActivity.RefreshUI();               //UI 새로고침
         }
 
         public void RefreshRecyclerView()

@@ -106,10 +106,6 @@ namespace LettreForAndroid.UI
         {
             base.OnResume();
 
-			//탭 새로고침
-			//if (TabFragManager._Instance != null)
-			//	TabFragManager._Instance.RefreshTabLayout();
-
 			//대화액티비티가 끝나면 스크롤 위치 복원
 			int position = TabFragManager._Instance.ScrollPosition[_Category];
             if (position > 0)
