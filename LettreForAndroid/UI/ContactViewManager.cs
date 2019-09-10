@@ -203,7 +203,7 @@ namespace LettreForAndroid.UI
             Dialogue objDialogue = MessageDBManager.Get().FindDialogue(thread_id);
 
             //연락처와의 대화 페이지를 보여준다.
-            Context context = Application.Context;
+            Context context = MainActivity._Instance;
             Intent intent = new Intent(context, typeof(DialogueActivity));
 
             //기존 대화가 존재하면 기존 대화를 보여준다.
@@ -214,7 +214,7 @@ namespace LettreForAndroid.UI
             intent.PutExtra("category", (int)Dialogue.LableType.COMMON);        //연락처로부터 나온 대화이므로, 레이블은 일반 대화임.
             intent.PutExtra("address", objContact.Address);
 
-            Application.Context.StartActivity(intent);
+            context.StartActivity(intent);
         }
 
     }

@@ -128,12 +128,12 @@ namespace LettreForAndroid.UI
 
                 //MainFragActivity.RefreshUI();
 
-                Context context = Android.App.Application.Context;
+                Context context = MainActivity._Instance;
 
                 Intent intent = new Intent(context, typeof(DialogueActivity));
                 intent.PutExtra("address", _AddressBox.Text);
 
-                Android.App.Application.Context.StartActivity(intent);
+                context.StartActivity(intent);
             }
             else
             {

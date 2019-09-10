@@ -397,7 +397,6 @@ namespace LettreForAndroid.UI
                     Intent intent = new Intent(context, typeof(DialogueActivity));
                     intent.PutExtra("address", _DialogueSet[iPosition].Address);
 
-					//Android.App.Application.Context.StartActivity(intent);
 					context.StartActivity(intent);
 
                     //현재 스크롤 위치 기억

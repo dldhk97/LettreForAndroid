@@ -129,7 +129,7 @@ namespace LettreForAndroid.UI
                 //알림창 클릭해서 대화창을 열었을땐 뒤로가려고 하면 메인액티비티가 존재하지 않으므로, 메인액티비티를 실행한다.
                 if (MainActivity._Instance == null)
                 {
-                    Intent mainActivityIntent = new Intent(Application.Context, typeof(MainActivity));
+                    Intent mainActivityIntent = new Intent(this, typeof(MainActivity));
                     mainActivityIntent.AddFlags(ActivityFlags.NewTask);
                     StartActivity(mainActivityIntent);
                 }
