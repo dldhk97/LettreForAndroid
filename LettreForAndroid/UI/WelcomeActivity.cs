@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace LettreForAndroid.UI
         private NonSwipeableViewPager _ViewPager;
         private Button _NextBtn;
 
-        private enum WELCOME_SCREEN { WELCOME = 0, PRIVACY, PERMISSION, PACKAGE, CATEGORIZE, MACHINE };
+        private enum WELCOME_SCREEN { WELCOME = 0, PRIVACY, PACKAGE, PERMISSION, CATEGORIZE, MACHINE };
 
         List<Screen> _Screens = new List<Screen>()
         {
@@ -44,15 +45,15 @@ namespace LettreForAndroid.UI
                 Application.Context.Resources.GetString(Resource.String.welcome_screen2_secondaryText),
                 Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome2)),
 
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.permission_icon,
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512,
                 Application.Context.Resources.GetString(Resource.String.welcome_screen3_primaryText),
                 Application.Context.Resources.GetString(Resource.String.welcome_screen3_secondaryText),
-                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome3)),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome4)),
 
-            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.main_icon_drawable_512,
+            new Screen(Resource.Layout.welcome_screen, Resource.Drawable.permission_icon,
                 Application.Context.Resources.GetString(Resource.String.welcome_screen4_primaryText),
                 Application.Context.Resources.GetString(Resource.String.welcome_screen4_secondaryText),
-                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome4)),
+                Application.Context.Resources.GetColor(Resource.Color.colorBackground_welcome3)),
 
             new Screen(Resource.Layout.welcome_screen, Resource.Drawable.categorize_icon,
                 Application.Context.Resources.GetString(Resource.String.welcome_screen5_primaryText),
@@ -89,18 +90,18 @@ namespace LettreForAndroid.UI
             _IsFirst = DataStorageManager.LoadBoolData(this, "isFirst", true);
             if (_IsFirst == false)
             {
-                //권한이 있는가?
-                if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions));
-                    _HasPermission = true;
-
                 //기본 패키지로 되어있는가?
                 if (PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
                     _IsDefaultPackage = true;
 
-                if (_HasPermission == false)                                            //권한이 없다면, 권한페이지로 이동.
-                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
-                else if (_IsDefaultPackage == false)                                    //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
+                //권한이 있는가?
+                if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions));
+                    _HasPermission = true;
+
+                if (_IsDefaultPackage == false)                                         //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
+                else if (_HasPermission == false)                                 //권한이 없다면, 권한페이지로 이동.
+                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
                 else                                                                    //이미 설정 다되있으면 피니쉬
                     Finish();
             }
@@ -120,13 +121,13 @@ namespace LettreForAndroid.UI
                     MoveToNextScreen();
                     break;
                 case (int)WELCOME_SCREEN.PRIVACY:
-                    MoveToNextScreen();
-                    break;
-                case (int)WELCOME_SCREEN.PERMISSION:
-                    GetEsentialPermissionAsync();
+                    ShowPrivacyDialog();
                     break;
                 case (int)WELCOME_SCREEN.PACKAGE:
                     RequestSetAsDefault();
+                    break;
+                case (int)WELCOME_SCREEN.PERMISSION:
+                    GetEsentialPermissionAsync();
                     break;
                 case (int)WELCOME_SCREEN.CATEGORIZE:
                     AskOfflineMode();
@@ -135,6 +136,36 @@ namespace LettreForAndroid.UI
                     AskMachineSupport();
                     break;
             }
+        }
+
+        private void ShowPrivacyDialog()
+        {
+            string privacyPolicyStr;
+            AssetManager assets = this.Assets;
+
+            using (StreamReader sr = new StreamReader(assets.Open("PrivacyPolicy.txt")))
+            {
+                privacyPolicyStr = sr.ReadToEnd();
+            }
+
+            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder.SetCancelable(false);
+            builder.SetTitle("개인정보취급방침에 동의하시겠습니까?");
+            builder.SetMessage(privacyPolicyStr);
+            builder.SetPositiveButton("예", (senderAlert, args) =>
+            {
+                MoveToNextScreen();
+            });
+            builder.SetNegativeButton("아니오", (senderAlert, args) =>
+            {
+                RunOnUiThread(() => 
+                {
+                    Toast.MakeText(this, "개인정보취급방침에 동의해주셔야 레뜨레를 사용하실 수 있습니다.", ToastLength.Short).Show();
+                    _NextBtn.Clickable = true;          //버튼 누를 수 있게 풀어줘야 됨.
+                });        
+            });
+            Dialog dialog = builder.Create();
+            dialog.Show();
         }
 
         private void MoveToNextScreen()
@@ -146,6 +177,55 @@ namespace LettreForAndroid.UI
             });
         }
 
+        //---------------------------------------------------------------------
+        // 기본앱 설정
+
+        const int REQUEST_DEFAULTPACK = 2;
+
+        private void RequestSetAsDefault()
+        {
+            //기본앱으로 이미 지정이 되어있나?
+            if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
+            {
+                //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
+                if (_IsFirst || _HasPermission == false)
+                    MoveToNextScreen();
+                else
+                    Finish();
+                return;
+            }
+            else
+            {
+                //기본앱으로 설정
+                Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
+                intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, this.PackageName);
+                StartActivityForResult(intent, REQUEST_DEFAULTPACK);
+            }
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            switch (requestCode)
+            {
+                case REQUEST_DEFAULTPACK:
+                    if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
+                    {
+                        Toast.MakeText(this, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
+                        //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
+                        if (_IsFirst || _HasPermission == false)
+                            MoveToNextScreen();
+                        else
+                            Finish();
+                    }
+                    else
+                    {
+                        Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다.\n다시 시도해주세요.", ToastLength.Short).Show();
+                        RunOnUiThread(() => { _NextBtn.Clickable = true; });        //버튼 누를 수 있게 풀어줘야 됨.
+                    }
+                    break;
+            }
+        }
+
         //---------------------------------------------------------------------------------
         // 권한 부여
 
@@ -155,14 +235,17 @@ namespace LettreForAndroid.UI
             //권한이 이미 승인되어있다면
             if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions))
             {
-                //미리 메시지 DB 로드
-                _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
-
-                //처음왔거나, 기본앱설정도 해야된다면 계속 진행.
-                if (_IsFirst || _IsDefaultPackage == false)
+                //처음왔으면 다음스크린으로, 아니면 종료
+                if (_IsFirst)
+                {
+                    //미리 메시지 DB 로드
+                    _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
                     MoveToNextScreen();
+                }
                 else
+                {
                     Finish();
+                }
                 return;
             }
 
@@ -197,8 +280,8 @@ namespace LettreForAndroid.UI
                         if (isAllGranted)
                         {
                             Toast.MakeText(this, "권한이 승인되었습니다.", ToastLength.Short).Show();
-                            //처음왔거나, 기본앱설정도 해야된다면 계속 진행. 권한만 설정해야되는 경우였다면 Finish.
-                            if (_IsFirst || _IsDefaultPackage == false)
+                            //처음왔으면 다음스크린으로, 아니면 종료
+                            if (_IsFirst)
                             {
                                 //미리 메시지 DB 로드
                                 _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());
@@ -227,58 +310,9 @@ namespace LettreForAndroid.UI
             MessageDBManager.Get().LoadUnknownMetaDatas();
 
             //Unknown 카테고리에 들어간 대화의 내용을 모두 로드
-            foreach(Dialogue objDialogue in MessageDBManager.Get().UnknownDialogueSet.DialogueList.Values)
+            foreach (Dialogue objDialogue in MessageDBManager.Get().UnknownDialogueSet.DialogueList.Values)
             {
                 MessageDBManager.Get().ReLoadDialogue(objDialogue, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
-            }
-        }
-
-        //---------------------------------------------------------------------
-        // 기본앱 설정
-
-        const int REQUEST_DEFAULTPACK = 2;
-
-        private void RequestSetAsDefault()
-        {
-            //기본앱으로 이미 지정이 되어있나?
-            if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
-            {
-                //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
-                if (_IsFirst)
-                    MoveToNextScreen();
-                else
-                    Finish();
-                return;
-            }
-            else
-            {
-                //기본앱으로 설정
-                Intent intent = new Intent(Telephony.Sms.Intents.ActionChangeDefault);
-                intent.PutExtra(Telephony.Sms.Intents.ExtraPackageName, this.PackageName);
-                StartActivityForResult(intent, REQUEST_DEFAULTPACK);
-            }
-        }
-
-        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
-        {
-            switch (requestCode)
-            {
-                case REQUEST_DEFAULTPACK:
-                    if (this.PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
-                    {
-                        Toast.MakeText(this, "기본 앱으로 설정되었습니다.", ToastLength.Short).Show();
-                        //처음온거면 계속 진행, 기본앱이 풀려서 다시 설정한 것이라면 Finish
-                        if (_IsFirst)
-                            MoveToNextScreen();
-                        else
-                            Finish();
-                    }
-                    else
-                    {
-                        Toast.MakeText(this, "기본 앱으로 설정되지 않았습니다.\n다시 시도해주세요.", ToastLength.Short).Show();
-                        RunOnUiThread(() => { _NextBtn.Clickable = true; });        //버튼 누를 수 있게 풀어줘야 됨.
-                    }
-                    break;
             }
         }
 
