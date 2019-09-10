@@ -816,7 +816,10 @@ namespace LettreForAndroid.Utility
             values.Put("read", readState);
 
             ContentResolver cr = Application.Context.ContentResolver; 
-            cr.Update(Uri.Parse("content://sms/"), values, "_id=" + msg.Id, null);
+            if(msg.GetType() != typeof(MultiMediaMessage))
+                cr.Update(Uri.Parse("content://sms/"), values, "_id=" + msg.Id, null);
+            else
+                cr.Update(Uri.Parse("content://mms/"), values, "_id=" + msg.Id, null);
         }
 
         //-------------------------------------------
