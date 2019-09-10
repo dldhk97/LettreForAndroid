@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -120,7 +121,7 @@ namespace LettreForAndroid.UI
                     MoveToNextScreen();
                     break;
                 case (int)WELCOME_SCREEN.PRIVACY:
-                    MoveToNextScreen();
+                    ShowPrivacyDialog();
                     break;
                 case (int)WELCOME_SCREEN.PERMISSION:
                     GetEsentialPermissionAsync();
@@ -135,6 +136,36 @@ namespace LettreForAndroid.UI
                     AskMachineSupport();
                     break;
             }
+        }
+
+        private void ShowPrivacyDialog()
+        {
+            string privacyPolicyStr;
+            AssetManager assets = this.Assets;
+
+            using (StreamReader sr = new StreamReader(assets.Open("PrivacyPolicy.txt")))
+            {
+                privacyPolicyStr = sr.ReadToEnd();
+            }
+
+            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            builder.SetCancelable(false);
+            builder.SetTitle("개인정보취급방침에 동의하시겠습니까?");
+            builder.SetMessage(privacyPolicyStr);
+            builder.SetPositiveButton("예", (senderAlert, args) =>
+            {
+                MoveToNextScreen();
+            });
+            builder.SetNegativeButton("아니오", (senderAlert, args) =>
+            {
+                RunOnUiThread(() => 
+                {
+                    Toast.MakeText(this, "개인정보취급방침에 동의해주셔야 레뜨레를 사용하실 수 있습니다.", ToastLength.Short).Show();
+                    _NextBtn.Clickable = true;          //버튼 누를 수 있게 풀어줘야 됨.
+                });        
+            });
+            Dialog dialog = builder.Create();
+            dialog.Show();
         }
 
         private void MoveToNextScreen()

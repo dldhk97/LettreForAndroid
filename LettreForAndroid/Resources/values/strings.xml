@@ -7,7 +7,7 @@
   <string name="welcome_screen1_primaryText">환영합니다!</string>
   <string name="welcome_screen1_secondaryText">레뜨레는 기계학습을 통한 문자 자동 분류 어플리케이션입니다.\n\n계속 버튼을 눌러 진행해주세요.</string>
   <string name="welcome_screen2_primaryText">개인정보취급방침</string>
-  <string name="welcome_screen2_secondaryText">개인정보 취급방침 내용과, 동의 버튼 다이얼로그 표시</string>
+  <string name="welcome_screen2_secondaryText">계속 버튼을 눌러 개인정보 취급방침에 동의해주시기 바랍니다.</string>
   <string name="welcome_screen3_primaryText">권한이 필요합니다!</string>
   <string name="welcome_screen3_secondaryText">메시지 수발신, 연락처 조회 등의 권한이 필요합니다.</string>
   <string name="welcome_screen4_primaryText">기본앱으로 지정해주세요!</string>
