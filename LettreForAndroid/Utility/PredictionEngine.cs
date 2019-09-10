@@ -38,10 +38,10 @@ namespace LettreForAndroid.Utility
 			//string 연락처  int[] 7개 카테고리의 레이블 수
 			Dictionary<string, int[]> receivedDatas = new Dictionary<string, int[]>();
 			Stopwatch sw = new Stopwatch();
-
+			Stopwatch dialsw = new Stopwatch();
 
 			// dialogueSet에 있는 전화번호와 문자메시지를 
-
+			dialsw.Start();
 			foreach (var elem in dialogueSet.DialogueList.Values)
 			{
 				int[] receive_labels = new int[Dialogue.Lable_COUNT];
@@ -54,7 +54,6 @@ namespace LettreForAndroid.Utility
 																				DataEmbedding.to_ngram(
 																															DataEmbedding.del_digit(textMessage.Msg),
 																															4));
-
 					//sim.Sort(delegate (Similarity A, Similarity B)
 					//{
 					//	if (A.similarity > B.similarity) return 1;
@@ -93,6 +92,8 @@ namespace LettreForAndroid.Utility
 				Console.WriteLine("similarities 계산 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms");
 				receivedDatas.Add(elem.Address, receive_labels);
 			}
+			dialsw.Stop();
+			Console.WriteLine("다이얼로그 계산시간 : " + dialsw.ElapsedMilliseconds.ToString() + "ms");
 			return receivedDatas;
 		}
 	}

@@ -160,7 +160,7 @@ namespace LettreForAndroid.Utility
                     else
                     {
                         //this is SMS
-                        throw new Exception("알 수 없는 MMS 유형");
+                        //throw new Exception("알 수 없는 MMS 유형");
                     }
                 }
                 cursor.Close();
