@@ -106,12 +106,17 @@ namespace LettreForAndroid.UI
         {
             base.OnResume();
 
-            //대화액티비티가 끝나면 스크롤 위치 복원
-            int position = TabFragManager._Instance.ScrollPosition[_Category];
+			//탭 새로고침
+			//if (TabFragManager._Instance != null)
+			//	TabFragManager._Instance.RefreshTabLayout();
+
+			//대화액티비티가 끝나면 스크롤 위치 복원
+			int position = TabFragManager._Instance.ScrollPosition[_Category];
             if (position > 0)
             {
                 _RecyclerView.ScrollToPosition(position);
             }
+
         }
 
         public override void OnPause()
@@ -386,13 +391,14 @@ namespace LettreForAndroid.UI
             {
                 if(type == (int)CLICK_TYPE.CLICK)
                 {
-                    //일반 터치 시 대화 액티비티로 이동
-                    Context context = Android.App.Application.Context;
+					//일반 터치 시 대화 액티비티로 이동
+					Context context = MainActivity._Instance;
 
                     Intent intent = new Intent(context, typeof(DialogueActivity));
                     intent.PutExtra("address", _DialogueSet[iPosition].Address);
 
-                    Android.App.Application.Context.StartActivity(intent);
+					//Android.App.Application.Context.StartActivity(intent);
+					context.StartActivity(intent);
 
                     //현재 스크롤 위치 기억
                     LinearLayoutManager layoutManager = (LinearLayoutManager)_LayoutManager;

@@ -130,7 +130,7 @@ namespace LettreForAndroid.UI
             for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
             {
                 CustomPagerAdapter._Pages[i].RefreshRecyclerView();
-                if (DialogueActivity._Instance == null)
+                if (DialogueActivity._Instance != null)
                     CustomPagerAdapter._Pages[i].RefreshFrag();
             }
         }

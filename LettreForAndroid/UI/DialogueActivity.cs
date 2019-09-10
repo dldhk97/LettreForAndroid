@@ -158,9 +158,7 @@ namespace LettreForAndroid.UI
 
             RefreshRecyclerView();
 
-            //탭 새로고침
-            if(TabFragManager._Instance != null)
-                TabFragManager._Instance.RefreshTabLayout();
+            
         }
 
         public void RefreshRecyclerView()
