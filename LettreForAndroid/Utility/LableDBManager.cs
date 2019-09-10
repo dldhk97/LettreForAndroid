@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -118,7 +119,14 @@ namespace LettreForAndroid.Utility
 
 			//PredictionEngine을 통해 dialogue의 레이블을 예측
 			PredictionEngine predEngine = new PredictionEngine();
+
+			Stopwatch sw = new Stopwatch();
+
+			sw.Start();
 			Dictionary<string, int[]> receivedData = predEngine.Predict(dialogueSet);
+			sw.Stop();
+
+			Console.WriteLine("receivedData 예측 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms");
 
 			CreateDBProgressEvent("예측 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
 			//받은 결과값들을 하나하나 DB에 넣는다.
