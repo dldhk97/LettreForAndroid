@@ -21,7 +21,7 @@ namespace LettreForAndroid.Utility
 			tfidf = new TfIdf();
 
 			// Assets 폴더내 파일 읽기
-			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
+			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_2ngram_trainset.csv");
 			Stopwatch sw = new Stopwatch();
 
 			sw.Start();
@@ -54,7 +54,7 @@ namespace LettreForAndroid.Utility
 				foreach (var textMessage in elem.TextMessageList)
 				{
 					//sw.Start();
-					Similarity[] sim = tfidf.Similarities(dataEmbedding.to_ngram(dataEmbedding.del_digit(textMessage.Msg), 4));
+					Similarity[] sim = tfidf.Similarities(dataEmbedding.to_ngram(dataEmbedding.del_digit(textMessage.Msg), 2));
 
 					//sw.Stop();
 					//System.Diagnostics.Debug.WriteLine("내용 : " + textMessage.Msg);
@@ -72,7 +72,7 @@ namespace LettreForAndroid.Utility
 						maxObj = new Similarity(7, 0);
 
 					receive_labels[maxObj.label - 1]++;
-
+					
 					//maxsw.Stop();
 					//System.Diagnostics.Debug.WriteLine("max 계산 시간  : " + maxsw.ElapsedMilliseconds.ToString() + "ms\n");
 					//maxsw.Reset();
