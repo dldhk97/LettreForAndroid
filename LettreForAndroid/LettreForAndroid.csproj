@@ -58,6 +58,7 @@
     <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -67,7 +68,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="TFIDF_for_xamarin">
-      <HintPath>E:\github\TFIDF_for_xamarin\TFIDF_for_xamarin\bin\Debug\TFIDF_for_xamarin.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\TFIDF_for_xamarin\TFIDF_for_xamarin\bin\Debug\TFIDF_for_xamarin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -105,7 +106,6 @@
     <AndroidAsset Include="Assets\msg_non_ratio_2ngram_trainset.csv" />
     <AndroidAsset Include="Assets\msg_non_ratio_3ngram_trainset.csv" />
     <AndroidAsset Include="Assets\msg_non_ratio_4ngram_trainset.csv" />
-    <AndroidAsset Include="Assets\msg_non_ratio_5ngram_trainset.csv" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />

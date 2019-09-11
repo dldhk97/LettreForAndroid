@@ -33,53 +33,35 @@ namespace LettreForAndroid.Utility
 			System.Diagnostics.Debug.WriteLine("TFIDF 훈련 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms");
 
 		}
-
+			
 		public Dictionary<string, int[]> Predict(DialogueSet dialogueSet)
 		{
 			//string 연락처  int[] 7개 카테고리의 레이블 수
 			Dictionary<string, int[]> receivedDatas = new Dictionary<string, int[]>();
-			Regex regex = new Regex("[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]");
-			Stopwatch sw = new Stopwatch();
-			Stopwatch maxsw = new Stopwatch();
-			Stopwatch dialsw = new Stopwatch();
+			DataEmbedding dataEmbedding = new DataEmbedding();
+
+			//Stopwatch sw = new Stopwatch();
+			//Stopwatch maxsw = new Stopwatch();
+			//Stopwatch dialsw = new Stopwatch();
 
 
 			// dialogueSet에 있는 전화번호와 문자메시지에서 유사도를 측정
 			foreach (var elem in dialogueSet.DialogueList.Values)
 			{
 				int[] receive_labels = new int[Dialogue.Lable_COUNT];
-				dialsw.Start();
+				//dialsw.Start();
 
 				foreach (var textMessage in elem.TextMessageList)
 				{
-					sw.Start();
-					var del_digit_msg = regex.Replace(textMessage.Msg, "");
-					sw.Stop();
-					System.Diagnostics.Debug.WriteLine("숫자제거 시간  : " + sw.ElapsedMilliseconds.ToString() + "ms\n");
+					//sw.Start();
+					Similarity[] sim = tfidf.Similarities(dataEmbedding.to_ngram(dataEmbedding.del_digit(textMessage.Msg), 4));
 
-					sw.Reset();
+					//sw.Stop();
+					//System.Diagnostics.Debug.WriteLine("내용 : " + textMessage.Msg);
+					//System.Diagnostics.Debug.WriteLine("similarities 계산 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms\n");
+					//sw.Reset();
 
-					sw.Start();
-					Similarity[] sim = tfidf.Similarities(
-																				DataEmbedding.to_ngram(
-																															del_digit_msg,   //text
-																															4));                    //ngram size 
-
-					sw.Stop();
-					System.Diagnostics.Debug.WriteLine("내용 : " + textMessage.Msg);
-					System.Diagnostics.Debug.WriteLine("similarities 계산 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms\n");
-					sw.Reset();
-					//sim.Sort(delegate (Similarity A, Similarity B)
-					//{
-					//	if (A.similarity > B.similarity) return 1;
-					//	else if (A.similarity < B.similarity) return -1;
-					//	else return 0;
-					//});
-
-					//int result = sim[sim.Count - 1].label;
-					//receive_labels[result - 1]++;
-
-					maxsw.Start();
+					//maxsw.Start();
 
 					Similarity maxObj;
 					if (sim.Length > 1)
@@ -91,26 +73,14 @@ namespace LettreForAndroid.Utility
 
 					receive_labels[maxObj.label - 1]++;
 
-					maxsw.Stop();
-					System.Diagnostics.Debug.WriteLine("max 계산 시간  : " + maxsw.ElapsedMilliseconds.ToString() + "ms\n");
-					maxsw.Reset();
-					//Similarity max = new Similarity(7, 0);
-
-					//foreach (var s in sim)
-					//{
-					//	if (max.similarity < s.similarity)
-					//	{
-					//		max.label = s.label;
-					//		max.similarity = s.similarity;
-					//	}
-					//}
-					//receive_labels[max.label - 1]++;
-
+					//maxsw.Stop();
+					//System.Diagnostics.Debug.WriteLine("max 계산 시간  : " + maxsw.ElapsedMilliseconds.ToString() + "ms\n");
+					//maxsw.Reset();
 				}
 
-				dialsw.Stop();
-				System.Diagnostics.Debug.WriteLine("다이얼로그 계산시간 : " + dialsw.ElapsedMilliseconds.ToString() + "ms\n");
-				dialsw.Reset();
+				//dialsw.Stop();
+				//System.Diagnostics.Debug.WriteLine("다이얼로그 계산시간 : " + dialsw.ElapsedMilliseconds.ToString() + "ms\n");
+				//dialsw.Reset();
 				receivedDatas.Add(elem.Address, receive_labels);
 
 			}
