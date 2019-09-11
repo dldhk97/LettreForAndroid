@@ -121,8 +121,8 @@ namespace LettreForAndroid.Utility
                         UpdateLastMessage(objSMS);
                     }
                 }
+                cursor.Close();
             }
-            cursor.Close();
         }
 
         //메시지 DB를 탐색하여, 각 대화중 가장 최신 MMS를 찾아 메모리에 올림.
@@ -135,32 +135,35 @@ namespace LettreForAndroid.Utility
             string sortOrder = "date desc";
             ICursor cursor = cr.Query(uri, projection, selection, null, sortOrder);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string id = cursor.GetString(cursor.GetColumnIndex("_id"));
-                    string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
-                    int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
-                    long time = cursor.GetLong(cursor.GetColumnIndex("date"));
-                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
-                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("m_type"));
-                    if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                    while (cursor.MoveToNext())
                     {
-                        //this is MMS
-                        MultiMediaMessage objMMS = ReadMMS(id);
-                        objMMS.Id = id;
-                        objMMS.ReadState = readState;
-                        objMMS.Time = time * 1000;          //1000을 곱하지 않으면 1970년으로 표기됨
-                        objMMS.Thread_id = thread_id;
-                        objMMS.Type = type == 132 ? (int)TextMessage.MESSAGE_TYPE.RECEIVED : (int)TextMessage.MESSAGE_TYPE.SENT;
+                        string id = cursor.GetString(cursor.GetColumnIndex("_id"));
+                        string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
+                        int readState = cursor.GetInt(cursor.GetColumnIndex("read"));
+                        long time = cursor.GetLong(cursor.GetColumnIndex("date"));
+                        long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                        int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("m_type"));
+                        if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                        {
+                            //this is MMS
+                            MultiMediaMessage objMMS = ReadMMS(id);
+                            objMMS.Id = id;
+                            objMMS.ReadState = readState;
+                            objMMS.Time = time * 1000;          //1000을 곱하지 않으면 1970년으로 표기됨
+                            objMMS.Thread_id = thread_id;
+                            objMMS.Type = type == 132 ? (int)TextMessage.MESSAGE_TYPE.RECEIVED : (int)TextMessage.MESSAGE_TYPE.SENT;
 
-                        UpdateLastMessage(objMMS);
-                    }
-                    else
-                    {
-                        //this is SMS
-                        //throw new Exception("알 수 없는 MMS 유형");
+                            UpdateLastMessage(objMMS);
+                        }
+                        else
+                        {
+                            //this is SMS
+                            //throw new Exception("알 수 없는 MMS 유형");
+                        }
                     }
                 }
                 cursor.Close();
@@ -215,11 +218,7 @@ namespace LettreForAndroid.Utility
 
             UpdateLastSMS();        //SMS와 MMS를 모두 탐색하여 최신문자를 TotalDialogueSet(메모리)에 올림.
 
-            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
             UpdateLastMMS();        //TODO : 4초정도로 꽤 느린 속도
-            //sw.Stop();
-            //System.Diagnostics.Debug.WriteLine("UpdateLastMMS : " + sw.ElapsedMilliseconds.ToString() + " ms");
 
             CountUnreadAll(false);     //읽지않은 SMS 개수 세어 메모리에 대화(메모리)에 저장
             CountUnreadAll(true);      //읽지않은 MMS 개수 세어 메모리에 대화(메모리)에 저장
@@ -669,17 +668,20 @@ namespace LettreForAndroid.Utility
 
             string address = string.Empty;
 
-            if(cursor != null && cursor.Count > 0)
+            if(cursor != null)
             {
-                while(cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));     //137은 from, 151은 to... 나중에 ENUM 으로 바꿔라 DEBUG!
-                    if(type == 137)
+                    while (cursor.MoveToNext())
                     {
-                        address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                        break;
+                        int type = cursor.GetInt(cursor.GetColumnIndexOrThrow("type"));     //137은 from, 151은 to... 나중에 ENUM 으로 바꿔라 DEBUG!
+                        if (type == 137)
+                        {
+                            address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                            break;
+                        }
+
                     }
-                        
                 }
                 cursor.Close();
             }
@@ -701,18 +703,21 @@ namespace LettreForAndroid.Utility
             string selection = "address IS NOT NULL) GROUP BY (address";
             ICursor cursor = cr.Query(uri, projection, selection, null, null);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
-                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                    while (cursor.MoveToNext())
+                    {
+                        string address = cursor.GetString(cursor.GetColumnIndexOrThrow("address"));
+                        long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
 
-                    Dialogue objDialogue = new Dialogue();
-                    objDialogue.Address = address;
-                    objDialogue.Thread_id = thread_id;
+                        Dialogue objDialogue = new Dialogue();
+                        objDialogue.Address = address;
+                        objDialogue.Thread_id = thread_id;
 
-                    dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                        dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                    }
                 }
                 cursor.Close();
             }
@@ -730,26 +735,29 @@ namespace LettreForAndroid.Utility
             string selection = "thread_id IS NOT NULL) GROUP BY (thread_id";
             ICursor cursor = cr.Query(uri, projection, selection, null, null);
 
-            if (cursor != null && cursor.Count > 0)
+            if (cursor != null)
             {
-                while (cursor.MoveToNext())
+                if(cursor.Count > 0)
                 {
-                    string id = cursor.GetString(cursor.GetColumnIndex("_id"));
-                    string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
-                    long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
-                    if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                    while (cursor.MoveToNext())
                     {
-                        //this is MMS
-                        Dialogue objDialogue = new Dialogue();
-                        objDialogue.Thread_id = thread_id;
-                        objDialogue.Address = GetAddress(id);
+                        string id = cursor.GetString(cursor.GetColumnIndex("_id"));
+                        string mmsType = cursor.GetString(cursor.GetColumnIndex("ct_t"));
+                        long thread_id = cursor.GetLong(cursor.GetColumnIndexOrThrow("thread_id"));
+                        if ("application/vnd.wap.multipart.related".Equals(mmsType) || "application/vnd.wap.multipart.mixed".Equals(mmsType))
+                        {
+                            //this is MMS
+                            Dialogue objDialogue = new Dialogue();
+                            objDialogue.Thread_id = thread_id;
+                            objDialogue.Address = GetAddress(id);
 
-                        dialogueSet.DialogueList.Add(thread_id, objDialogue);
-                    }
-                    else
-                    {
-                        //this is SMS
-                        //throw new Exception("알 수 없는 MMS 유형");
+                            dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                        }
+                        else
+                        {
+                            //this is SMS
+                            //throw new Exception("알 수 없는 MMS 유형");
+                        }
                     }
                 }
                 cursor.Close();
