@@ -336,14 +336,15 @@ namespace LettreForAndroid.UI
         // 오프라인 모드 여부 (서버 통신 X)
         private void AskOfflineMode()
         {
-            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.SetCancelable(false);
             builder.SetTitle("온라인 모드를 사용하시겠습니까?");
             builder.SetMessage("아니오를 누르시면 문자를 서버로 전송하지 않습니다.\n대신 문자 분류 정확성이 떨어지게 됩니다.");
             builder.SetPositiveButton("예", (senderAlert2, args2) =>
             {
+                //온라인 모드이므로, 온라인 카테고리 분류 실행.
                 DataStorageManager.SaveBoolData(this, "useOfflineMode", false);         //오프라인 모드 사용하지 않음.
-                Categorize();                                                           //온라인 모드이므로, 온라인 카테고리 분류 실행
+                Categorize();
             });
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
@@ -366,6 +367,16 @@ namespace LettreForAndroid.UI
             //이벤트 등록
             _OnCategorizeComplete -= WelcomeActivity_OnCategorizeComplete;
             _OnCategorizeComplete += WelcomeActivity_OnCategorizeComplete;
+
+            //온라인모드이면 인터넷 연결상태 체크함.
+            if (DataStorageManager.LoadBoolData(this, "useOfflineMode", false) == false)
+            {
+                if (Xamarin.Essentials.Connectivity.NetworkAccess != Xamarin.Essentials.NetworkAccess.Internet)
+                {
+                    _OnCategorizeComplete.Invoke(this, new CategorizeEventArgs((int)CategorizeEventArgs.RESULT.NETWORKFAIL));
+                    return;
+                }
+            }
 
             //프로그레스바 표기
             _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
@@ -394,19 +405,27 @@ namespace LettreForAndroid.UI
                     toastMsg = "메시지 분류가 완료되었습니다.";
                     isSucceed = true;
                     break;
-                case (int)CategorizeEventArgs.RESULT.FAIL:
-                    toastMsg = "메시지 분류에 실패했습니다.";
-                    ShowRetryDialog();
-                    break;
                 case (int)CategorizeEventArgs.RESULT.EMPTY:
                     toastMsg = "분류할 메시지가 없습니다.";
                     isSucceed = true;
+                    break;
+                case (int)CategorizeEventArgs.RESULT.FAIL:
+                    toastMsg = "메시지 분류에 실패했습니다.";
+                    isSucceed = false;
+                    break;
+                case (int)CategorizeEventArgs.RESULT.NETWORKFAIL:
+                    toastMsg = "인터넷에 연결하신 후 시도해주시기 바랍니다.";
+                    isSucceed = false;
                     break;
             }
 
             RunOnUiThread(() => { Toast.MakeText(this, toastMsg, ToastLength.Short).Show(); });
 
-            if (isSucceed)
+            if(isSucceed == false)
+            {
+                ShowRetryDialog();
+            }
+            else 
             {
                 if(DataStorageManager.LoadBoolData(Application.Context, "useOfflineMode", false))
                 {
@@ -427,7 +446,7 @@ namespace LettreForAndroid.UI
 
         private void ShowRetryDialog()
         {
-            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.SetCancelable(false);
             builder.SetTitle("메시지 분류에 실패했습니다.");
             builder.SetMessage("다시 시도하시겠습니까?");
@@ -437,7 +456,7 @@ namespace LettreForAndroid.UI
             });
             builder.SetNegativeButton("아니오", (senderAlert, args) =>
             {
-                Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
                 builder2.SetTitle("메시지를 나중에 분류할 수 있습니다.");
                 builder2.SetMessage("메시지 분류를 미루시겠습니까?");
                 builder2.SetPositiveButton("예", (senderAlert2, args2) =>
@@ -508,7 +527,7 @@ namespace LettreForAndroid.UI
 
         private void AskMachineSupport()
         {
-            Android.Support.V7.App.AlertDialog.Builder builder2 = new Android.Support.V7.App.AlertDialog.Builder(this);
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
             builder2.SetCancelable(false);
             builder2.SetTitle("기계학습 지원 요청");
             builder2.SetMessage("기계학습 지원을 하시겠습니까?");
@@ -637,7 +656,7 @@ namespace LettreForAndroid.UI
 
     public class CategorizeEventArgs : EventArgs
     {
-        public enum RESULT { EXIST = 0, SUCCESS, FAIL, EMPTY }
+        public enum RESULT { EXIST = 0, SUCCESS, EMPTY, FAIL, NETWORKFAIL }
         private int result;
 
         public CategorizeEventArgs(int result)

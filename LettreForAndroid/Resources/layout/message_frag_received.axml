@@ -62,6 +62,16 @@
                 android:padding="8dp"
                 android:textColor="#ffffff"
                 android:layout_marginTop="2dp"
+                android:visibility="visible"
+            />
+            <ImageView
+                android:id="@+id/mfr_mmsImageIV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="240dp"
+                android:padding="8dp"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"
             />
 
             <TextView
@@ -80,7 +90,7 @@
             android:text="MMS"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/colorPrimary"
-            android:textSize="8dp"
+            android:textSize="9dp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

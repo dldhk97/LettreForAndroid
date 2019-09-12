@@ -341,6 +341,7 @@ namespace LettreForAndroid.UI
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
         public TextView mMmsTag { get; private set; }
+        public ImageView mMmsImage { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public ReceivedMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -350,6 +351,7 @@ namespace LettreForAndroid.UI
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfr_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfr_timeTV);
             mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfr_mmsTagTV);
+            mMmsImage = iItemView.FindViewById<ImageView>(Resource.Id.mfr_mmsImageIV);
 
             iItemView.LongClick += (sendet, e) =>
              {
@@ -378,7 +380,17 @@ namespace LettreForAndroid.UI
                 //연락처에 사진이 없으면 기본사진으로 설정
                 mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
             }
+
             mMsg.Text = message.Msg;
+
+            if (message.Msg != string.Empty && message.Msg != null)
+            {
+                mMsg.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMsg.Visibility = ViewStates.Gone;
+            }
 
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
@@ -386,10 +398,32 @@ namespace LettreForAndroid.UI
             if(message.GetType() == typeof(MultiMediaMessage))
             {
                 mMmsTag.Visibility = ViewStates.Visible;
+
+                MultiMediaMessage mms = message as MultiMediaMessage;
+                if (mms.MediaType == (int)MultiMediaMessage.MEDIA_TYPE.IMAGE)
+                {
+                    if(mms.Bitmap != null)
+                    {
+                        mMmsImage.SetImageBitmap(mms.Bitmap);
+                        mMmsImage.Visibility = ViewStates.Visible;
+                    }
+                    else
+                    {
+                        mMmsImage.SetImageBitmap(null);
+                        mMmsImage.Visibility = ViewStates.Gone;
+                    }
+                }
+                else
+                {
+                    mMmsImage.SetImageBitmap(null);
+                    mMmsImage.Visibility = ViewStates.Gone;
+                }
             }
             else
             {
+                mMmsImage.SetImageBitmap(null);
                 mMmsTag.Visibility = ViewStates.Gone;
+                mMmsImage.Visibility = ViewStates.Gone;
             }
 
         }
@@ -403,6 +437,7 @@ namespace LettreForAndroid.UI
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
         public TextView mMmsTag { get; private set; }
+        public ImageView mMmsImage { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public SentMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -411,6 +446,7 @@ namespace LettreForAndroid.UI
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfs_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfs_timeTV);
             mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfs_mmsTagTV);
+            mMmsImage = iItemView.FindViewById<ImageView>(Resource.Id.mfs_mmsImageIV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -430,16 +466,47 @@ namespace LettreForAndroid.UI
 
             mMsg.Text = message.Msg;
 
+            if (message.Msg != string.Empty && message.Msg != null)
+            {
+                mMsg.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMsg.Visibility = ViewStates.Gone;
+            }
+
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
 
             if (message.GetType() == typeof(MultiMediaMessage))
             {
                 mMmsTag.Visibility = ViewStates.Visible;
+
+                MultiMediaMessage mms = message as MultiMediaMessage;
+                if (mms.MediaType == (int)MultiMediaMessage.MEDIA_TYPE.IMAGE)
+                {
+                    if (mms.Bitmap != null)
+                    {
+                        mMmsImage.SetImageBitmap(mms.Bitmap);
+                        mMmsImage.Visibility = ViewStates.Visible;
+                    }
+                    else
+                    {
+                        mMmsImage.SetImageBitmap(null);
+                        mMmsImage.Visibility = ViewStates.Gone;
+                    }
+                }
+                else
+                {
+                    mMmsImage.SetImageBitmap(null);
+                    mMmsImage.Visibility = ViewStates.Gone;
+                }
             }
             else
             {
+                mMmsImage.SetImageBitmap(null);
                 mMmsTag.Visibility = ViewStates.Gone;
+                mMmsImage.Visibility = ViewStates.Gone;
             }
         }
     }
