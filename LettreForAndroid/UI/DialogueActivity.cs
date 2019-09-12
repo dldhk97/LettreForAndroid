@@ -402,6 +402,7 @@ namespace LettreForAndroid.UI
     {
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
+        public TextView mMmsTag { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public SentMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -409,6 +410,7 @@ namespace LettreForAndroid.UI
             // Locate and cache view references:
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfs_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfs_timeTV);
+            mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfs_mmsTagTV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -421,7 +423,7 @@ namespace LettreForAndroid.UI
             };
         }
 
-        public void bind(List<RecyclerItem> list, int iPosition)
+        public void Bind(List<RecyclerItem> list, int iPosition)
         {
             MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
@@ -430,6 +432,15 @@ namespace LettreForAndroid.UI
 
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
+
+            if (message.GetType() == typeof(MultiMediaMessage))
+            {
+                mMmsTag.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMmsTag.Visibility = ViewStates.Gone;
+            }
         }
     }
 
@@ -526,7 +537,7 @@ namespace LettreForAndroid.UI
                     break;
                 case VIEW_TYPE_MESSAGE_SENT:
                     SentMessageHolder c = iHolder as SentMessageHolder;
-                    c.bind(mRecyclerItem, iPosition);
+                    c.Bind(mRecyclerItem, iPosition);
                     break;
             }
 

@@ -14,44 +14,61 @@
         android:src="@drawable/message_frag_rec_sent_tail"
         android:layout_alignParentRight="true"
         android:elevation="3dp"/>
-
     <LinearLayout
-        android:id="@+id/mfs_msg_LL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/message_frag_rec_sent"
-        android:elevation="3dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:layout_toLeftOf="@+id/mfs_msg_tailIV"
-        >
+        android:orientation="horizontal"
+        android:layout_toLeftOf="@+id/mfs_msg_tailIV">
 
         <TextView
-            android:id="@+id/mfs_msgTV"
-            android:text="보낸 메시지"
+            android:text="MMS"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/colorPrimary"
+            android:textSize="8dp"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="240dp"
-            android:padding="8dp"
-            android:textColor="@color/textColorDark"
-            android:layout_marginTop="2dp"
-        />
+            android:id="@+id/mfs_mmsTagTV"
+            android:layout_marginBottom="2dp"
+            android:visibility="gone"
+            android:layout_gravity="bottom"/>
 
-        <TextView
-            android:id="@+id/mfs_timeTV"
-            android:text="11:40"
+        <LinearLayout
+            android:id="@+id/mfs_msg_LL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textColorDark"
-            android:textSize="10sp"
-            android:layout_gravity="right"
+            android:orientation="vertical"
+            android:background="@drawable/message_frag_rec_sent"
+            android:elevation="3dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"/>
+            >
+
+            <TextView
+                android:id="@+id/mfs_msgTV"
+                android:text="보낸 메시지"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="240dp"
+                android:padding="8dp"
+                android:textColor="@color/textColorDark"
+                android:layout_marginTop="2dp"
+            />
+
+            <TextView
+                android:id="@+id/mfs_timeTV"
+                android:text="11:40"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorDark"
+                android:textSize="10sp"
+                android:layout_gravity="right"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
     
-
 </RelativeLayout>

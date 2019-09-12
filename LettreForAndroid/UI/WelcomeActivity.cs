@@ -23,6 +23,8 @@ using Java.Lang;
 using LettreForAndroid.Class;
 using LettreForAndroid.Utility;
 
+using AlertDialog = Android.Support.V7.App.AlertDialog;
+
 namespace LettreForAndroid.UI
 {
     [Activity(Label = "WelcomeActivity", Theme = "@style/BasicTheme")]
@@ -70,6 +72,7 @@ namespace LettreForAndroid.UI
         bool _HasPermission = false;
         bool _IsDefaultPackage = false;
 
+        Task<AlertDialog.Builder> _CreatePrivacyDialogTsk;
         Task _MessageDBLoadTsk;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -100,10 +103,14 @@ namespace LettreForAndroid.UI
 
                 if (_IsDefaultPackage == false)                                         //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
-                else if (_HasPermission == false)                                 //권한이 없다면, 권한페이지로 이동.
+                else if (_HasPermission == false)                                       //권한이 없다면, 권한페이지로 이동.
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
                 else                                                                    //이미 설정 다되있으면 피니쉬
                     Finish();
+            }
+            else
+            {
+                _CreatePrivacyDialogTsk = Task.Run(() => CreatePrivacyDialog());        //개인정보취급방침 미리 읽어온다.
             }
         }
 
@@ -138,7 +145,19 @@ namespace LettreForAndroid.UI
             }
         }
 
-        private void ShowPrivacyDialog()
+        private void MoveToNextScreen()
+        {
+            RunOnUiThread(() =>
+            {
+                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
+                _NextBtn.Clickable = true;
+            });
+        }
+
+        //---------------------------------------------------------------------
+        // 개인정보취급방침 다이얼로그
+
+        private AlertDialog.Builder CreatePrivacyDialog()
         {
             string privacyPolicyStr;
             AssetManager assets = this.Assets;
@@ -148,7 +167,7 @@ namespace LettreForAndroid.UI
                 privacyPolicyStr = sr.ReadToEnd();
             }
 
-            Android.Support.V7.App.AlertDialog.Builder builder = new Android.Support.V7.App.AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.SetCancelable(false);
             builder.SetTitle("개인정보취급방침에 동의하시겠습니까?");
             builder.SetMessage(privacyPolicyStr);
@@ -161,20 +180,17 @@ namespace LettreForAndroid.UI
                 RunOnUiThread(() => 
                 {
                     Toast.MakeText(this, "개인정보취급방침에 동의해주셔야 레뜨레를 사용하실 수 있습니다.", ToastLength.Short).Show();
-                    _NextBtn.Clickable = true;          //버튼 누를 수 있게 풀어줘야 됨.
+                    _NextBtn.Clickable = true;                                                          //버튼 누를 수 있게 풀어줘야 됨.
                 });        
             });
-            Dialog dialog = builder.Create();
-            dialog.Show();
+            return builder;
         }
 
-        private void MoveToNextScreen()
+        private async void ShowPrivacyDialog()
         {
-            RunOnUiThread(() => 
-            {
-                _ViewPager.SetCurrentItem(_ViewPager.CurrentItem + 1, true);
-                _NextBtn.Clickable = true;
-            });
+            await _CreatePrivacyDialogTsk;
+            Dialog dialog = _CreatePrivacyDialogTsk.Result.Create();
+            dialog.Show();
         }
 
         //---------------------------------------------------------------------

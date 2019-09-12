@@ -116,16 +116,19 @@ namespace LettreForAndroid.Utility
 
             Dictionary<string, int[]> receivedDatas = SendAndReceiveData(toSendDatas);     //내용이 있는 문자는 전송하고 결과값을 받는다. 내용이 없는 문자는 아래에서 레이블만 병합.
 
-            //서버에서 받은 연락처-레이블 쌍과, 빈 문자 연락처-레이블 쌍을 병합함.
-            foreach(KeyValuePair<string, int> data in emptyCntList)
+            if(receivedDatas != null)
             {
-                if(receivedDatas.ContainsKey(data.Key))
+                //서버에서 받은 연락처-레이블 쌍과, 빈 문자 연락처-레이블 쌍을 병합함.
+                foreach (KeyValuePair<string, int> data in emptyCntList)
                 {
-                    receivedDatas[data.Key][0] += data.Value;
-                }
-                else
-                {
-                    receivedDatas.Add(data.Key, new int[] { data.Value, 0, 0, 0, 0, 0, 0 });
+                    if (receivedDatas.ContainsKey(data.Key))
+                    {
+                        receivedDatas[data.Key][0] += data.Value;
+                    }
+                    else
+                    {
+                        receivedDatas.Add(data.Key, new int[] { data.Value, 0, 0, 0, 0, 0, 0 });
+                    }
                 }
             }
             return receivedDatas;
