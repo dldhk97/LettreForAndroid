@@ -4983,17 +4983,17 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0069
 			public const int action_bar_title = 2131361897;
 			
-			// aapt resource value: 0x7f0a00f6
-			public const int action_container = 2131362038;
+			// aapt resource value: 0x7f0a00f7
+			public const int action_container = 2131362039;
 			
 			// aapt resource value: 0x7f0a008e
 			public const int action_context_bar = 2131361934;
 			
-			// aapt resource value: 0x7f0a0101
-			public const int action_divider = 2131362049;
+			// aapt resource value: 0x7f0a0102
+			public const int action_divider = 2131362050;
 			
-			// aapt resource value: 0x7f0a00f7
-			public const int action_image = 2131362039;
+			// aapt resource value: 0x7f0a00f8
+			public const int action_image = 2131362040;
 			
 			// aapt resource value: 0x7f0a0003
 			public const int action_menu_divider = 2131361795;
@@ -5010,11 +5010,11 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a006b
 			public const int action_mode_close_button = 2131361899;
 			
-			// aapt resource value: 0x7f0a00f8
-			public const int action_text = 2131362040;
+			// aapt resource value: 0x7f0a00f9
+			public const int action_text = 2131362041;
 			
-			// aapt resource value: 0x7f0a0102
-			public const int actions = 2131362050;
+			// aapt resource value: 0x7f0a0103
+			public const int actions = 2131362051;
 			
 			// aapt resource value: 0x7f0a006c
 			public const int activity_chooser_view_content = 2131361900;
@@ -5085,8 +5085,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0086
 			public const int checkbox = 2131361926;
 			
-			// aapt resource value: 0x7f0a0100
-			public const int chronometer = 2131362048;
+			// aapt resource value: 0x7f0a0101
+			public const int chronometer = 2131362049;
 			
 			// aapt resource value: 0x7f0a0061
 			public const int clip_horizontal = 2131361889;
@@ -5310,8 +5310,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0071
 			public const int icon = 2131361905;
 			
-			// aapt resource value: 0x7f0a0103
-			public const int icon_group = 2131362051;
+			// aapt resource value: 0x7f0a0104
+			public const int icon_group = 2131362052;
 			
 			// aapt resource value: 0x7f0a0041
 			public const int ifRoom = 2131361857;
@@ -5319,8 +5319,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a006e
 			public const int image = 2131361902;
 			
-			// aapt resource value: 0x7f0a00fc
-			public const int info = 2131362044;
+			// aapt resource value: 0x7f0a00fd
+			public const int info = 2131362045;
 			
 			// aapt resource value: 0x7f0a0068
 			public const int italic = 2131361896;
@@ -5388,8 +5388,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a00d9
 			public const int ma_toolbar = 2131362009;
 			
-			// aapt resource value: 0x7f0a010e
-			public const int masked = 2131362062;
+			// aapt resource value: 0x7f0a010f
+			public const int masked = 2131362063;
 			
 			// aapt resource value: 0x7f0a009c
 			public const int message = 2131361948;
@@ -5402,6 +5402,9 @@ namespace LettreForAndroid
 			
 			// aapt resource value: 0x7f0a00e6
 			public const int mfh_timeTV = 2131362022;
+			
+			// aapt resource value: 0x7f0a00ee
+			public const int mfr_mmsTagTV = 2131362030;
 			
 			// aapt resource value: 0x7f0a00eb
 			public const int mfr_msgLL = 2131362027;
@@ -5421,17 +5424,17 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a00ed
 			public const int mfr_timeTV = 2131362029;
 			
+			// aapt resource value: 0x7f0a00f1
+			public const int mfs_msgTV = 2131362033;
+			
 			// aapt resource value: 0x7f0a00f0
-			public const int mfs_msgTV = 2131362032;
+			public const int mfs_msg_LL = 2131362032;
 			
 			// aapt resource value: 0x7f0a00ef
-			public const int mfs_msg_LL = 2131362031;
+			public const int mfs_msg_tailIV = 2131362031;
 			
-			// aapt resource value: 0x7f0a00ee
-			public const int mfs_msg_tailIV = 2131362030;
-			
-			// aapt resource value: 0x7f0a00f1
-			public const int mfs_timeTV = 2131362033;
+			// aapt resource value: 0x7f0a00f2
+			public const int mfs_timeTV = 2131362034;
 			
 			// aapt resource value: 0x7f0a0038
 			public const int middle = 2131361848;
@@ -5448,23 +5451,23 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a002f
 			public const int multiply = 2131361839;
 			
-			// aapt resource value: 0x7f0a0104
-			public const int my_toolbar = 2131362052;
+			// aapt resource value: 0x7f0a0105
+			public const int my_toolbar = 2131362053;
 			
 			// aapt resource value: 0x7f0a00b2
 			public const int navigation_header_container = 2131361970;
 			
-			// aapt resource value: 0x7f0a00f4
-			public const int nda_bottomLayout = 2131362036;
-			
 			// aapt resource value: 0x7f0a00f5
-			public const int nda_contactView = 2131362037;
+			public const int nda_bottomLayout = 2131362037;
+			
+			// aapt resource value: 0x7f0a00f6
+			public const int nda_contactView = 2131362038;
+			
+			// aapt resource value: 0x7f0a00f4
+			public const int nda_contactViewRL = 2131362036;
 			
 			// aapt resource value: 0x7f0a00f3
-			public const int nda_contactViewRL = 2131362035;
-			
-			// aapt resource value: 0x7f0a00f2
-			public const int nda_toolbar = 2131362034;
+			public const int nda_toolbar = 2131362035;
 			
 			// aapt resource value: 0x7f0a0042
 			public const int never = 2131361858;
@@ -5475,14 +5478,14 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0025
 			public const int normal = 2131361829;
 			
-			// aapt resource value: 0x7f0a00fe
-			public const int notification_background = 2131362046;
+			// aapt resource value: 0x7f0a00ff
+			public const int notification_background = 2131362047;
+			
+			// aapt resource value: 0x7f0a00fb
+			public const int notification_main_column = 2131362043;
 			
 			// aapt resource value: 0x7f0a00fa
-			public const int notification_main_column = 2131362042;
-			
-			// aapt resource value: 0x7f0a00f9
-			public const int notification_main_column_container = 2131362041;
+			public const int notification_main_column_container = 2131362042;
 			
 			// aapt resource value: 0x7f0a0060
 			public const int outline = 2131361888;
@@ -5511,11 +5514,11 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0055
 			public const int right = 2131361877;
 			
-			// aapt resource value: 0x7f0a00fd
-			public const int right_icon = 2131362045;
+			// aapt resource value: 0x7f0a00fe
+			public const int right_icon = 2131362046;
 			
-			// aapt resource value: 0x7f0a00fb
-			public const int right_side = 2131362043;
+			// aapt resource value: 0x7f0a00fc
+			public const int right_side = 2131362044;
 			
 			// aapt resource value: 0x7f0a000c
 			public const int save_image_matrix = 2131361804;
@@ -5673,8 +5676,8 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a001a
 			public const int textinput_helper_text = 2131361818;
 			
-			// aapt resource value: 0x7f0a00ff
-			public const int time = 2131362047;
+			// aapt resource value: 0x7f0a0100
+			public const int time = 2131362048;
 			
 			// aapt resource value: 0x7f0a0023
 			public const int title = 2131361827;
@@ -5685,20 +5688,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a007e
 			public const int title_template = 2131361918;
 			
-			// aapt resource value: 0x7f0a0110
-			public const int toolbar_category = 2131362064;
-			
 			// aapt resource value: 0x7f0a0111
-			public const int toolbar_deposit = 2131362065;
-			
-			// aapt resource value: 0x7f0a0113
-			public const int toolbar_search = 2131362067;
-			
-			// aapt resource value: 0x7f0a010f
-			public const int toolbar_select = 2131362063;
+			public const int toolbar_category = 2131362065;
 			
 			// aapt resource value: 0x7f0a0112
-			public const int toolbar_settings = 2131362066;
+			public const int toolbar_deposit = 2131362066;
+			
+			// aapt resource value: 0x7f0a0114
+			public const int toolbar_search = 2131362068;
+			
+			// aapt resource value: 0x7f0a0110
+			public const int toolbar_select = 2131362064;
+			
+			// aapt resource value: 0x7f0a0113
+			public const int toolbar_settings = 2131362067;
 			
 			// aapt resource value: 0x7f0a0045
 			public const int top = 2131361861;
@@ -5739,17 +5742,17 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a001b
 			public const int view_offset_helper = 2131361819;
 			
-			// aapt resource value: 0x7f0a010d
-			public const int visible = 2131362061;
-			
-			// aapt resource value: 0x7f0a010b
-			public const int wa_layoutDots = 2131362059;
+			// aapt resource value: 0x7f0a010e
+			public const int visible = 2131362062;
 			
 			// aapt resource value: 0x7f0a010c
-			public const int wa_nextBtn = 2131362060;
+			public const int wa_layoutDots = 2131362060;
 			
-			// aapt resource value: 0x7f0a010a
-			public const int wa_viewpager = 2131362058;
+			// aapt resource value: 0x7f0a010d
+			public const int wa_nextBtn = 2131362061;
+			
+			// aapt resource value: 0x7f0a010b
+			public const int wa_viewpager = 2131362059;
 			
 			// aapt resource value: 0x7f0a0043
 			public const int withText = 2131361859;
@@ -5757,20 +5760,20 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0035
 			public const int wrap_content = 2131361845;
 			
-			// aapt resource value: 0x7f0a0107
-			public const int ws_imageView = 2131362055;
-			
-			// aapt resource value: 0x7f0a0106
-			public const int ws_primaryTV = 2131362054;
-			
 			// aapt resource value: 0x7f0a0108
-			public const int ws_progressBar = 2131362056;
+			public const int ws_imageView = 2131362056;
 			
-			// aapt resource value: 0x7f0a0105
-			public const int ws_rootRL = 2131362053;
+			// aapt resource value: 0x7f0a0107
+			public const int ws_primaryTV = 2131362055;
 			
 			// aapt resource value: 0x7f0a0109
-			public const int ws_secondaryTV = 2131362057;
+			public const int ws_progressBar = 2131362057;
+			
+			// aapt resource value: 0x7f0a0106
+			public const int ws_rootRL = 2131362054;
+			
+			// aapt resource value: 0x7f0a010a
+			public const int ws_secondaryTV = 2131362058;
 			
 			static Id()
 			{

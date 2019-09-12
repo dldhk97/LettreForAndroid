@@ -76,6 +76,18 @@
                 android:layout_marginBottom="5dp"/>
 
         </LinearLayout>
+        <TextView
+            android:text="MMS"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/colorPrimary"
+            android:textSize="8dp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mfr_mmsTagTV"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="2dp"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </RelativeLayout>

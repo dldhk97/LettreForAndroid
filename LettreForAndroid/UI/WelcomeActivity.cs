@@ -332,9 +332,6 @@ namespace LettreForAndroid.UI
             builder.SetNegativeButton("아니오", (senderAlert2, args2) =>
             {
                 DataStorageManager.SaveBoolData(this, "useOfflineMode", true);        //오프라인 모드 사용
-
-				Stopwatch sw = new Stopwatch();
-
                 Categorize();
 
             });
@@ -357,8 +354,6 @@ namespace LettreForAndroid.UI
             //프로그레스바 표기
             _Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
             _ViewPager.Adapter.NotifyDataSetChanged();
-
-			Stopwatch sw = new Stopwatch();
 
             ThreadPool.QueueUserWorkItem(o => CreateLableDB());                                 //카테고리 분류
         }

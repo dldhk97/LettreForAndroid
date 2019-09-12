@@ -178,7 +178,7 @@ namespace LettreForAndroid.UI
             }
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
-            _RecyclerItems = groupByDate(_CurDialogue);
+            _RecyclerItems = GetRecyclerItem(_CurDialogue);
 
             //리사이클러 뷰 내용안에 표시함
             LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
@@ -225,7 +225,7 @@ namespace LettreForAndroid.UI
 
         //-----------------------------------------------------------------
         //대화(메세지 목록)을 리사이클러뷰에 넣기 알맞은 형태로 변환하고, 날짜별로 그룹화 및 헤더추가함.
-        public List<RecyclerItem> groupByDate(Dialogue iDialogue)
+        public List<RecyclerItem> GetRecyclerItem(Dialogue iDialogue)
         {
             string prevTime = "NULL";
             List<RecyclerItem> recyclerItems = new List<RecyclerItem>();
@@ -340,6 +340,7 @@ namespace LettreForAndroid.UI
         public ImageButton mProfileImage { get; private set; }
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
+        public TextView mMmsTag { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public ReceivedMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -348,17 +349,17 @@ namespace LettreForAndroid.UI
             mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mfr_profileIB);
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfr_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfr_timeTV);
+            mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfr_mmsTagTV);
 
             iItemView.LongClick += (sendet, e) =>
              {
-                 //iListener(base.LayoutPosition);
                  Android.Widget.PopupMenu menu = new Android.Widget.PopupMenu(Application.Context, iItemView);
                  menu.MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu.Menu);
                  menu.Show();
              };
         }
 
-        public void bind(List<RecyclerItem> list, int iPosition, ContactData iContact)
+        public void Bind(List<RecyclerItem> list, int iPosition, ContactData iContact)
         {
             MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
@@ -381,11 +382,21 @@ namespace LettreForAndroid.UI
 
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
+
+            if(message.GetType() == typeof(MultiMediaMessage))
+            {
+                mMmsTag.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMmsTag.Visibility = ViewStates.Gone;
+            }
+
         }
     }
 
     //----------------------------------------------------------------------
-    // SetnMessage VIEW HOLDER
+    // SentMessage VIEW HOLDER
 
     public class SentMessageHolder : RecyclerView.ViewHolder
     {
@@ -511,7 +522,7 @@ namespace LettreForAndroid.UI
                     break;
                 case VIEW_TYPE_MESSAGE_RECEIVED:
                     ReceivedMessageHolder b = iHolder as ReceivedMessageHolder;
-                    b.bind(mRecyclerItem, iPosition, mContact);
+                    b.Bind(mRecyclerItem, iPosition, mContact);
                     break;
                 case VIEW_TYPE_MESSAGE_SENT:
                     SentMessageHolder c = iHolder as SentMessageHolder;
