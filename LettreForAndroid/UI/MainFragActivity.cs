@@ -102,6 +102,15 @@ namespace LettreForAndroid.UI
                 //문자가 없으면 없다고 알려준다.
                 _GuideText.Visibility = ViewStates.Visible;
                 _RecyclerView.Visibility = ViewStates.Gone;
+
+                if(MainActivity._Instance._MessageLoadedOnce)
+                {
+                    _GuideText.Text = "메시지가 존재하지 않습니다";
+                }
+                else
+                {
+                    _GuideText.Text = "메시지를 불러오는 중";
+                }
             }
         }
 
@@ -175,19 +184,19 @@ namespace LettreForAndroid.UI
 
             //이름 혹은 연락처 표시, 문자 내용 표시
             address.Text = dialogue.DisplayName;
-            if (dialogue[0].GetType() == typeof(MultiMediaMessage))
+            if (lastMessage.GetType() == typeof(MultiMediaMessage))
             {
-                MultiMediaMessage objMMS = dialogue[0] as MultiMediaMessage;
+                MultiMediaMessage objMMS = lastMessage as MultiMediaMessage;
                 switch (objMMS.MediaType)
                 {
                     case (int)MultiMediaMessage.MEDIA_TYPE.TEXT:
                         msgText.Text = objMMS.Msg;
                         break;
                     case (int)MultiMediaMessage.MEDIA_TYPE.IMAGE:
-                        msgText.Text = "이미지 MMS";
+                        msgText.Text = objMMS.Msg != null ? objMMS.Msg : "이미지 MMS";
                         break;
                     case (int)MultiMediaMessage.MEDIA_TYPE.VCF:
-                        msgText.Text = "VCF MMS";
+                        msgText.Text = objMMS.Msg != null ? objMMS.Msg : "VCF MMS";
                         break;
                 }
             }

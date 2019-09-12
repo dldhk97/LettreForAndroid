@@ -32,6 +32,7 @@ namespace LettreForAndroid
         ContactViewManager _ContactManager;
 
         const int REQUEST_NEWWELCOMECOMPLETE = 0;
+        public bool _MessageLoadedOnce = false;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -62,7 +63,7 @@ namespace LettreForAndroid
         public async void Setup()
         {
             Task contactLoadTsk = Task.Run(() => ContactDBManager.Get());       //연락처를 모두 메모리에 올림
-            Task lableLoadTsk = Task.Run(() => LableDBManager.Get().Load());  //레이블 DB를 모두 메모리에 올림
+            Task lableLoadTsk = Task.Run(() => LableDBManager.Get().Load());    //레이블 DB를 모두 메모리에 올림
 
             CreateNotificationChannel(); 
 
@@ -74,8 +75,14 @@ namespace LettreForAndroid
 
             await lableLoadTsk;
 
-            Task messageLoadTsk = Task.Run(() => MessageDBManager.Get().RefreshLastMessageAll());   //메시지를 모두 메모리에 올림
+            Task messageLoadTsk = Task.Run(() => LoadMessageDB());          //메시지를 모두 메모리에 올림
             SetupDialogueLayout(messageLoadTsk);
+        }
+
+        private void LoadMessageDB()
+        {
+            MessageDBManager.Get().RefreshLastMessageAll();
+            _MessageLoadedOnce = true;
         }
 
         //Notification을 위한 채널 등록
