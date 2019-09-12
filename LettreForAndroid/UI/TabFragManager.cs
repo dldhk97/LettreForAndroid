@@ -126,13 +126,19 @@ namespace LettreForAndroid.UI
 
             }
 
-            //대화목록 새로고침
-            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+            if(DialogueActivity._Instance != null)
             {
-                CustomPagerAdapter._Pages[i].RefreshRecyclerView();
-                if (DialogueActivity._Instance != null)
-                    CustomPagerAdapter._Pages[i].RefreshFrag();
+                //대화목록 새로고침
+                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+                {
+                    CustomPagerAdapter._Pages[i].RefreshRecyclerView();
+                    if (CustomPagerAdapter._Pages[i] != null)
+                    {
+                        CustomPagerAdapter._Pages[i].RefreshFrag();
+                    }
+                }
             }
+            
         }
 
         public int[] ScrollPosition

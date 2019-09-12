@@ -72,10 +72,13 @@ namespace LettreForAndroid.UI
 
         public void RefreshFrag()
         {
-            FragmentTransaction a = FragmentManager.BeginTransaction();
-            a.Detach(this);
-            a.Attach(this);
-            a.CommitAllowingStateLoss();
+            if(FragmentManager != null)
+            {
+                FragmentTransaction a = FragmentManager.BeginTransaction();
+                a.Detach(this);
+                a.Attach(this);
+                a.CommitAllowingStateLoss();
+            }
         }
 
         public void RefreshRecyclerView()
