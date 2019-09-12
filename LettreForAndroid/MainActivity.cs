@@ -19,6 +19,7 @@ using LettreForAndroid.Receivers;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 using Android.Support.Design.Widget;
 using Android.Content.Res;
+using System.Threading.Tasks;
 
 namespace LettreForAndroid
 {
@@ -58,17 +59,23 @@ namespace LettreForAndroid
         }
 
         //웰컴페이지가 끝나거나, 처음사용자가 아닌경우 바로 이 메소드로 옮.
-        public void Setup()
+        public async void Setup()
         {
-            ContactDBManager.Get();                                 //연락처를 모두 메모리에 올림
-            LableDBManager.Get().Load();                            //레이블 DB를 모두 메모리에 올림
-            MessageDBManager.Get().RefreshLastMessageAll();         //메시지를 모두 메모리에 올림
-
-            //ThreadPool.QueueUserWorkItem(o => MessageManager.Get().Initialization(this));     //스레드 풀 이용
+            Task contactLoadTsk = Task.Run(() => ContactDBManager.Get());       //연락처를 모두 메모리에 올림
+            Task lableLoadTsk = Task.Run(() => LableDBManager.Get().Load());  //레이블 DB를 모두 메모리에 올림
 
             CreateNotificationChannel(); 
 
             SetupLayout();
+
+            await contactLoadTsk;
+
+            SetupContactLayout();
+
+            await lableLoadTsk;
+
+            Task messageLoadTsk = Task.Run(() => MessageDBManager.Get().RefreshLastMessageAll());   //메시지를 모두 메모리에 올림
+            SetupDialogueLayout(messageLoadTsk);
         }
 
         //Notification을 위한 채널 등록
@@ -92,10 +99,6 @@ namespace LettreForAndroid
         public void SetupLayout()
         {
             SetupToolBar();
-
-            SetupDialogueLayout();
-
-            SetupContactLayout();
 
             SetupFloatingButton();
 
@@ -125,7 +128,7 @@ namespace LettreForAndroid
         {
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-                //MessageDBManager.Get().Load2();
+                _TabFragManager.RefreshLayout();
             }
             else
             {
@@ -137,11 +140,11 @@ namespace LettreForAndroid
         //---------------------------------------------------------------------
         //대화 레이아웃 세팅
 
-        private void SetupDialogueLayout()
+        private void SetupDialogueLayout(Task messageLoadTsk)
         {
             //탭 레이아웃 및 뷰페이저 세팅
             _TabFragManager = new TabFragManager(this, SupportFragmentManager);
-            _TabFragManager.SetupTabLayout();
+            _TabFragManager.SetupTabLayout(messageLoadTsk);
         }
 
         //---------------------------------------------------------------------

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -53,7 +53,7 @@ namespace LettreForAndroid.UI
         }
 
         // 탭 레이아웃 설정
-        public void SetupTabLayout()
+        public async void SetupTabLayout(Task messageLoadTsk)
         {
             var viewPager = activity.FindViewById<ViewPager>(Resource.Id.ma_pager);
             _TabLayout = activity.FindViewById<TabLayout>(Resource.Id.ma_sliding_tabs);
@@ -67,8 +67,6 @@ namespace LettreForAndroid.UI
             // Setup tablayout with view ma_pager
             _TabLayout.SetupWithViewPager(viewPager);
 
-            UpdateNotiCount();
-
             //모든 탭에 커스텀 뷰 적용
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {
@@ -78,6 +76,9 @@ namespace LettreForAndroid.UI
             }
             _TabLayout.TabSelected += TabLayout_TabSelected;
             _TabLayout.TabUnselected += TabLayout_TabUnselected;
+
+            await messageLoadTsk;
+            RefreshLayout();
         }
 
         private void UpdateNotiCount()
@@ -113,29 +114,35 @@ namespace LettreForAndroid.UI
             tv.SetTypeface(null, Android.Graphics.TypefaceStyle.Normal);
         }
 
-        public void RefreshTabLayout()
+        public void RefreshLayout()
         {
-            UpdateNotiCount();
-            //모든 탭 새로고침
+            if (TabFragManager._Instance != null)
+            {
+                UpdateNotiCount();      //메모리에 올라간 대화로부터 읽지않은 문자 수  갱신
+                RefreshTabs();          //모든 탭 새로고침
+                RefreshPages();         //대화목록 새로고침
+            }
+        }
+
+        private void RefreshTabs()
+        {
             for (int i = 0; i < _TabLayout.TabCount; i++)
             {
                 TabLayout.Tab tab = _TabLayout.GetTabAt(tabFrags[i].Position);
 
                 tab.SetCustomView(null);
                 tab.SetCustomView(_Adapter.GetTabView(tabFrags[i].Position));
-
             }
+        }
 
-            if(DialogueActivity._Instance != null)
+        private void RefreshPages()
+        {
+            for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
             {
-                //대화목록 새로고침
-                for (int i = 0; i < CustomPagerAdapter._Pages.Count; i++)
+                CustomPagerAdapter._Pages[i].RefreshRecyclerView();
+                if (CustomPagerAdapter._Pages[i] != null)
                 {
-                    CustomPagerAdapter._Pages[i].RefreshRecyclerView();
-                    if (CustomPagerAdapter._Pages[i] != null)
-                    {
-                        CustomPagerAdapter._Pages[i].RefreshFrag();
-                    }
+                    CustomPagerAdapter._Pages[i].RefreshFrag();
                 }
             }
             

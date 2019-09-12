@@ -232,7 +232,7 @@ namespace LettreForAndroid.UI
 
             //탭, 메인 새로고침
             if(TabFragManager._Instance != null)
-                TabFragManager._Instance.RefreshTabLayout();
+                TabFragManager._Instance.RefreshLayout();
         }
 
         //----------------------------------------------------------------------

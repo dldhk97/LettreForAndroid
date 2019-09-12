@@ -556,7 +556,6 @@ namespace LettreForAndroid.Utility
                 {
                     while (cursor.MoveToNext())
                     {
-                        string partId = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
                         string mediaType = cursor.GetString(cursor.GetColumnIndexOrThrow("ct"));
                         if ("application/smil".Equals(mediaType))
                         {
@@ -565,6 +564,8 @@ namespace LettreForAndroid.Utility
                         }
 
                         objMMS.Address = GetAddress(id);
+
+                        string partId = cursor.GetString(cursor.GetColumnIndexOrThrow("_id"));
 
                         if ("text/plain".Equals(mediaType))
                         {
