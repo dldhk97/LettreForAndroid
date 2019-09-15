@@ -72,6 +72,8 @@ namespace LettreForAndroid.Utility
 
         public bool IsDBExist()
         {
+            if (_OnMemoryLables == null)
+                return false;
             return _OnMemoryLables.DialogueList.Count > 0;
         }
 

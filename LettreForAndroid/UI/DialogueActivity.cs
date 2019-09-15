@@ -178,7 +178,7 @@ namespace LettreForAndroid.UI
             }
 
             //대화를 리사이클러 뷰에 넣게 알맞은 형태로 변환. 헤더도 이때 포함시킨다.
-            _RecyclerItems = groupByDate(_CurDialogue);
+            _RecyclerItems = GetRecyclerItem(_CurDialogue);
 
             //리사이클러 뷰 내용안에 표시함
             LinearLayoutManager layoutManager = new LinearLayoutManager(Application.Context);
@@ -225,7 +225,7 @@ namespace LettreForAndroid.UI
 
         //-----------------------------------------------------------------
         //대화(메세지 목록)을 리사이클러뷰에 넣기 알맞은 형태로 변환하고, 날짜별로 그룹화 및 헤더추가함.
-        public List<RecyclerItem> groupByDate(Dialogue iDialogue)
+        public List<RecyclerItem> GetRecyclerItem(Dialogue iDialogue)
         {
             string prevTime = "NULL";
             List<RecyclerItem> recyclerItems = new List<RecyclerItem>();
@@ -340,6 +340,8 @@ namespace LettreForAndroid.UI
         public ImageButton mProfileImage { get; private set; }
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
+        public TextView mMmsTag { get; private set; }
+        public ImageView mMmsImage { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public ReceivedMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -348,17 +350,18 @@ namespace LettreForAndroid.UI
             mProfileImage = iItemView.FindViewById<ImageButton>(Resource.Id.mfr_profileIB);
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfr_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfr_timeTV);
+            mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfr_mmsTagTV);
+            mMmsImage = iItemView.FindViewById<ImageView>(Resource.Id.mfr_mmsImageIV);
 
             iItemView.LongClick += (sendet, e) =>
              {
-                 //iListener(base.LayoutPosition);
                  Android.Widget.PopupMenu menu = new Android.Widget.PopupMenu(Application.Context, iItemView);
                  menu.MenuInflater.Inflate(Resource.Menu.toolbar_dialogue, menu.Menu);
                  menu.Show();
              };
         }
 
-        public void bind(List<RecyclerItem> list, int iPosition, ContactData iContact)
+        public void Bind(List<RecyclerItem> list, int iPosition, ContactData iContact)
         {
             MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
@@ -377,20 +380,64 @@ namespace LettreForAndroid.UI
                 //연락처에 사진이 없으면 기본사진으로 설정
                 mProfileImage.SetImageResource(Resource.Drawable.profile_icon_256_background);
             }
+
             mMsg.Text = message.Msg;
+
+            if (message.Msg != string.Empty && message.Msg != null)
+            {
+                mMsg.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMsg.Visibility = ViewStates.Gone;
+            }
 
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
+
+            if(message.GetType() == typeof(MultiMediaMessage))
+            {
+                mMmsTag.Visibility = ViewStates.Visible;
+
+                MultiMediaMessage mms = message as MultiMediaMessage;
+                if (mms.MediaType == (int)MultiMediaMessage.MEDIA_TYPE.IMAGE)
+                {
+                    if(mms.Bitmap != null)
+                    {
+                        mMmsImage.SetImageBitmap(mms.Bitmap);
+                        mMmsImage.Visibility = ViewStates.Visible;
+                    }
+                    else
+                    {
+                        mMmsImage.SetImageBitmap(null);
+                        mMmsImage.Visibility = ViewStates.Gone;
+                    }
+                }
+                else
+                {
+                    mMmsImage.SetImageBitmap(null);
+                    mMmsImage.Visibility = ViewStates.Gone;
+                }
+            }
+            else
+            {
+                mMmsImage.SetImageBitmap(null);
+                mMmsTag.Visibility = ViewStates.Gone;
+                mMmsImage.Visibility = ViewStates.Gone;
+            }
+
         }
     }
 
     //----------------------------------------------------------------------
-    // SetnMessage VIEW HOLDER
+    // SentMessage VIEW HOLDER
 
     public class SentMessageHolder : RecyclerView.ViewHolder
     {
         public TextView mMsg { get; private set; }
         public TextView mTime { get; private set; }
+        public TextView mMmsTag { get; private set; }
+        public ImageView mMmsImage { get; private set; }
 
         // 카드뷰 레이아웃(message_view) 내 객체들 참조.
         public SentMessageHolder(View iItemView, System.Action<int> iListener) : base(iItemView)
@@ -398,6 +445,8 @@ namespace LettreForAndroid.UI
             // Locate and cache view references:
             mMsg = iItemView.FindViewById<TextView>(Resource.Id.mfs_msgTV);
             mTime = iItemView.FindViewById<TextView>(Resource.Id.mfs_timeTV);
+            mMmsTag = iItemView.FindViewById<TextView>(Resource.Id.mfs_mmsTagTV);
+            mMmsImage = iItemView.FindViewById<ImageView>(Resource.Id.mfs_mmsImageIV);
 
             // Detect user clicks on the item view and report which item
             // was clicked (by layout position) to the listener:
@@ -410,15 +459,55 @@ namespace LettreForAndroid.UI
             };
         }
 
-        public void bind(List<RecyclerItem> list, int iPosition)
+        public void Bind(List<RecyclerItem> list, int iPosition)
         {
             MessageItem obj = list[iPosition] as MessageItem;
             TextMessage message = obj.TextMessage;
 
             mMsg.Text = message.Msg;
 
+            if (message.Msg != string.Empty && message.Msg != null)
+            {
+                mMsg.Visibility = ViewStates.Visible;
+            }
+            else
+            {
+                mMsg.Visibility = ViewStates.Gone;
+            }
+
             DateTimeUtillity dtu = new DateTimeUtillity();
             mTime.Text = dtu.MilisecondToDateTimeStr(message.Time, "a hh:mm");
+
+            if (message.GetType() == typeof(MultiMediaMessage))
+            {
+                mMmsTag.Visibility = ViewStates.Visible;
+
+                MultiMediaMessage mms = message as MultiMediaMessage;
+                if (mms.MediaType == (int)MultiMediaMessage.MEDIA_TYPE.IMAGE)
+                {
+                    if (mms.Bitmap != null)
+                    {
+                        mMmsImage.SetImageBitmap(mms.Bitmap);
+                        mMmsImage.Visibility = ViewStates.Visible;
+                    }
+                    else
+                    {
+                        mMmsImage.SetImageBitmap(null);
+                        mMmsImage.Visibility = ViewStates.Gone;
+                    }
+                }
+                else
+                {
+                    mMmsImage.SetImageBitmap(null);
+                    mMmsImage.Visibility = ViewStates.Gone;
+                }
+            }
+            else
+            {
+                mMmsImage.SetImageBitmap(null);
+                mMmsTag.Visibility = ViewStates.Gone;
+                mMmsImage.Visibility = ViewStates.Gone;
+            }
         }
     }
 
@@ -511,11 +600,11 @@ namespace LettreForAndroid.UI
                     break;
                 case VIEW_TYPE_MESSAGE_RECEIVED:
                     ReceivedMessageHolder b = iHolder as ReceivedMessageHolder;
-                    b.bind(mRecyclerItem, iPosition, mContact);
+                    b.Bind(mRecyclerItem, iPosition, mContact);
                     break;
                 case VIEW_TYPE_MESSAGE_SENT:
                     SentMessageHolder c = iHolder as SentMessageHolder;
-                    c.bind(mRecyclerItem, iPosition);
+                    c.Bind(mRecyclerItem, iPosition);
                     break;
             }
 

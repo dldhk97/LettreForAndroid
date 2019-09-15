@@ -10,7 +10,7 @@
         android:id="@+id/fragPage_recyclerView1" 
         android:scrollbars="vertical"/>
     <TextView
-        android:text="메시지가 존재하지 않습니다"
+        android:text="메시지를 불러오는 중"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textColor="@color/textColorDark"

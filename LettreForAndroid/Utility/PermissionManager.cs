@@ -19,17 +19,13 @@ namespace LettreForAndroid.Utility
             Manifest.Permission.SendSms,
             Manifest.Permission.ReceiveSms,
             Manifest.Permission.ReadSms,
-            Manifest.Permission.ReceiveWapPush,
             Manifest.Permission.ReceiveMms,
             Manifest.Permission.ReadContacts,
-            Manifest.Permission.WriteContacts,
-            Manifest.Permission.ReadPhoneState,
         };
 
         public static readonly string[] sendSMSPermission = 
         {
             Manifest.Permission.SendSms,
-            Manifest.Permission.ReadPhoneState,
         };
 
 

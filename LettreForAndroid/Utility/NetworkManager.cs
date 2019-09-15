@@ -57,8 +57,6 @@ namespace LettreForAndroid.Utility
         private bool _IsConnected = false;
         private Socket _CurrentSocket = null;
 
-        
-
         private void MakeConnection()
         {
             if (_CurrentSocket != null)
@@ -82,6 +80,8 @@ namespace LettreForAndroid.Utility
                 _IsConnected = false;
             }
         }
+        
+        //---------------------------------------------------------------
 
         //서버와 통신 후 연락처-레이블 쌍의 목록을 반환함. 일반적으로 첫 카테고리 분류시 호출됨
         public Dictionary<string, int[]> GetLablesFromServer(DialogueSet dialogues)
@@ -116,16 +116,19 @@ namespace LettreForAndroid.Utility
 
             Dictionary<string, int[]> receivedDatas = SendAndReceiveData(toSendDatas);     //내용이 있는 문자는 전송하고 결과값을 받는다. 내용이 없는 문자는 아래에서 레이블만 병합.
 
-            //서버에서 받은 연락처-레이블 쌍과, 빈 문자 연락처-레이블 쌍을 병합함.
-            foreach(KeyValuePair<string, int> data in emptyCntList)
+            if(receivedDatas != null)
             {
-                if(receivedDatas.ContainsKey(data.Key))
+                //서버에서 받은 연락처-레이블 쌍과, 빈 문자 연락처-레이블 쌍을 병합함.
+                foreach (KeyValuePair<string, int> data in emptyCntList)
                 {
-                    receivedDatas[data.Key][0] += data.Value;
-                }
-                else
-                {
-                    receivedDatas.Add(data.Key, new int[] { data.Value, 0, 0, 0, 0, 0, 0 });
+                    if (receivedDatas.ContainsKey(data.Key))
+                    {
+                        receivedDatas[data.Key][0] += data.Value;
+                    }
+                    else
+                    {
+                        receivedDatas.Add(data.Key, new int[] { data.Value, 0, 0, 0, 0, 0, 0 });
+                    }
                 }
             }
             return receivedDatas;
@@ -184,6 +187,7 @@ namespace LettreForAndroid.Utility
             return result;
         }
 
+        //------------------------------------------------------------------
         //데이터를 서버에 보내기 전 전처리과정. 연락처-문자 쌍이 반환된다.
         private List<string[]> ConvertToSendData(List<TextMessage> messageList)
         {
@@ -200,6 +204,9 @@ namespace LettreForAndroid.Utility
             return toSendData;
         }
 
+        //---------------------------------------------------------------------------------
+        // 실제 송수신 부분
+
         //데이터를 여러개 보낼 때(어플 -> 서버)
         private Dictionary<string, int[]> SendAndReceiveData(List<string[]> dataList)
         {
@@ -213,101 +220,14 @@ namespace LettreForAndroid.Utility
 
             if (_IsConnected)
             {
-                receivedData = new Dictionary<string, int[]>();
-
-                //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X, 현재 서버측에서 타입1일때 처리를 못하므로 0으로 보냄
-                //int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
-                int type = 0;
-                byte[] typeByte = IntToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
-                _CurrentSocket.Send(typeByte, SocketFlags.None);
-
-                //데이터 수량 전송
-                byte[] amountByte = IntToByteArray(dataList.Count, 2);
-                _CurrentSocket.Send(amountByte, SocketFlags.None);
-
-                //실 데이터 전송
-                for (int i = 0; i < dataList.Count; i++)
+                try
                 {
-                    //변수 명시
-                    string addr = dataList[i][0];
-                    string msg = dataList[i][1];
-
-                    //미리 바이트 배열로 변환
-                    byte[] addrByte = StringToByteArray(addr, addr.Length);                     //연락처를 바이트로 바꾼 값
-                    byte[] addr_lengthByte = IntToByteArray(addrByte.Length, 2);                //연락처를 바이트로 바꾼 값의 길이
-
-                    byte[] msgByte = StringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
-                    byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);                  //문자내용을 바이트로 바꾼 값의 길이
-
-                    //디버깅용 출력부분<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                    //System.Diagnostics.Debug.Print("연락처 : \n" + addr+"\n\n연락처 길이 : \n" + addr.Length + "\n\n문자 내용 : \n" + msg + "\n\n문자 길이 : \n" + msg.Length + "\n\n문자내용 바이트 수 : \n" + msgByte.Length + "\n\n바이트 : \n"  );
-
-                    //string debugByte = "";
-                    //foreach(byte elem in msgByte)
-                    //{
-                    //    debugByte += elem.ToString() + " ";
-                    //}
-                    //System.Diagnostics.Debug.Print(debugByte.ToString() + "\n\n----------------------------");
-
-                    //디버깅용 출력부분<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                    //연락처 길이 전송
-                    _CurrentSocket.Send(addr_lengthByte, SocketFlags.None);
-
-                    //연락처 전송
-                    _CurrentSocket.Send(addrByte, SocketFlags.None);
-
-                    //메세지 길이 전송
-                    _CurrentSocket.Send(msg_lengthByte, SocketFlags.None);
-
-                    //메세지 전송
-                    _CurrentSocket.Send(msgByte, SocketFlags.None);
+                    SendData(dataList);
+                    receivedData = ReceiveData();
                 }
-
-                //---------------------------------------------------------------------------
-
-                //데이터 수량 수신
-                byte[] receive_amount_byte = new byte[2];
-                _CurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
-
-                //받은 바이트 배열을 string으로 바꾼 뒤 int로 변환
-                int receive_amount = ByteToInt(receive_amount_byte);
-
-                for (int i = 0; i < receive_amount; i++)
+                catch(Exception e)
                 {
-                    //연락처 길이 수신
-                    byte[] receive_addr_length_byte = new byte[2];
-                    _CurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
-
-                    //받은 바이트를 int로 변환
-                    int receive_addr_length = ByteToInt(receive_addr_length_byte);
-
-                    //-------------------------------------------------------
-
-                    //연락처 수신
-                    byte[] receive_addr_byte = new byte[receive_addr_length];
-                    _CurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
-
-                    //받은 바이트를 string으로 변환
-                    string receive_addr_str = Encoding.UTF8.GetString(receive_addr_byte);
-
-                    //-------------------------------------------------------
-
-                    //레이블 수신
-                    int[] receive_lables = new int[Dialogue.Lable_COUNT];
-                    for (int j = 0; j < Dialogue.Lable_COUNT; j++)
-                    {
-                        byte[] receive_lable_byte = new byte[2];
-                        _CurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
-
-                        //받은 바이트를 int로 변환
-                        receive_lables[j] = ByteToInt(receive_lable_byte);
-                    }
-
-                    //-------------------------------------------------------
-
-                    receivedData.Add(receive_addr_str, receive_lables);             //결과 리스트에 삽입.
+                    System.Diagnostics.Debug.WriteLine("NetworkManager.SendAndReceiveData" + e.Message);
                 }
             }
             // (4) 소켓 닫기
@@ -316,6 +236,96 @@ namespace LettreForAndroid.Utility
 
             return receivedData;
         }
+
+        private void SendData(List<string[]> dataList)
+        {
+            //타입 전송, 타입은 1이면 데이터 제공, 0이면 데이터 제공 X, 현재 서버측에서 타입1일때 처리를 못하므로 0으로 보냄
+            //int type = DataStorageManager.LoadBoolData(Application.Context, "supportMachineLearning", false) ? 1 : 0 ;
+            int type = 0;
+            byte[] typeByte = IntToByteArray(type, 1);      //일단 0으로 보낸다고 가정함.
+            _CurrentSocket.Send(typeByte, SocketFlags.None);
+
+            //데이터 수량 전송
+            byte[] amountByte = IntToByteArray(dataList.Count, 2);
+            _CurrentSocket.Send(amountByte, SocketFlags.None);
+
+            //실 데이터 전송
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                //변수 명시
+                string addr = dataList[i][0];
+                string msg = dataList[i][1];
+
+                //미리 바이트 배열로 변환
+                byte[] addrByte = StringToByteArray(addr, addr.Length);                     //연락처를 바이트로 바꾼 값
+                byte[] addr_lengthByte = IntToByteArray(addrByte.Length, 2);                //연락처를 바이트로 바꾼 값의 길이
+
+                byte[] msgByte = StringToByteArray(msg, msg.Length);                        //문자내용을 바이트로 바꾼 값
+                byte[] msg_lengthByte = IntToByteArray(msgByte.Length, 2);                  //문자내용을 바이트로 바꾼 값의 길이
+
+                //연락처 길이 전송
+                _CurrentSocket.Send(addr_lengthByte, SocketFlags.None);
+
+                //연락처 전송
+                _CurrentSocket.Send(addrByte, SocketFlags.None);
+
+                //메세지 길이 전송
+                _CurrentSocket.Send(msg_lengthByte, SocketFlags.None);
+
+                //메세지 전송
+                _CurrentSocket.Send(msgByte, SocketFlags.None);
+            }
+        }
+
+        private Dictionary<string, int[]> ReceiveData()
+        {
+            Dictionary<string, int[]> receivedData = new Dictionary<string, int[]>();
+
+            //데이터 수량 수신
+            byte[] receive_amount_byte = new byte[2];
+            _CurrentSocket.Receive(receive_amount_byte, 2, SocketFlags.None);
+
+            //받은 바이트 배열을 string으로 바꾼 뒤 int로 변환
+            int receive_amount = ByteToInt(receive_amount_byte);
+
+            for (int i = 0; i < receive_amount; i++)
+            {
+                //연락처 길이 수신
+                byte[] receive_addr_length_byte = new byte[2];
+                _CurrentSocket.Receive(receive_addr_length_byte, 2, SocketFlags.None);
+
+                //받은 바이트를 int로 변환
+                int receive_addr_length = ByteToInt(receive_addr_length_byte);
+
+                //-------------------------------------------------------
+
+                //연락처 수신
+                byte[] receive_addr_byte = new byte[receive_addr_length];
+                _CurrentSocket.Receive(receive_addr_byte, receive_addr_length, SocketFlags.None);
+
+                //받은 바이트를 string으로 변환
+                string receive_addr_str = Encoding.UTF8.GetString(receive_addr_byte);
+
+                //-------------------------------------------------------
+
+                //레이블 수신
+                int[] receive_lables = new int[Dialogue.Lable_COUNT];
+                for (int j = 0; j < Dialogue.Lable_COUNT; j++)
+                {
+                    byte[] receive_lable_byte = new byte[2];
+                    _CurrentSocket.Receive(receive_lable_byte, 2, SocketFlags.None);
+
+                    //받은 바이트를 int로 변환
+                    receive_lables[j] = ByteToInt(receive_lable_byte);
+                }
+
+                receivedData.Add(receive_addr_str, receive_lables);             //결과 리스트에 삽입.
+            }
+            return receivedData;
+        }
+
+        //--------------------------------------------------------------
+        // 바이트 변환
 
         //str을 고정길이 length만큼 바이트 배열로 변환함.
         static byte[] StringToByteArray(string str, int length)
