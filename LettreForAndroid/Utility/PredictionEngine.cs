@@ -1,5 +1,7 @@
 ﻿using Android.Content.Res;
 using Android.OS;
+using Java.IO;
+using Java.Nio.FileNio;
 using LettreForAndroid.Class;
 using System;
 using System.Collections.Generic;
@@ -20,8 +22,10 @@ namespace LettreForAndroid.Utility
 			// 문서 유사도 분석을 위한 TfIdf
 			tfidf = new TfIdf();
 
+
 			// Assets 폴더내 파일 읽기
 			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
+	
 			Stopwatch sw = new Stopwatch();
 
 			sw.Start();
@@ -48,6 +52,7 @@ namespace LettreForAndroid.Utility
 				foreach (var textMessage in elem.TextMessageList)
 				{
 					//문자메시지에 대해 훈련된 문서로 유사도를 분석
+
 					Similarity[] sim = tfidf.Similarities(dataEmbedding.to_ngram(dataEmbedding.del_digit(textMessage.Msg), 4));
 
 					//가장 높은 유사도를 가지는 문서의 레이블을 가져옴
