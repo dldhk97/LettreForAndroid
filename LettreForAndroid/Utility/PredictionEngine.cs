@@ -26,15 +26,8 @@ namespace LettreForAndroid.Utility
 			// Assets 폴더내 파일 읽기
 			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
 	
-			Stopwatch sw = new Stopwatch();
-
-			sw.Start();
-
 			// 미리 n그램으로 분리된 문서를 불러와서 예측하는데 걸리는 연산시간을 단축
 			tfidf.Load_documents(filename);
-
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine("TFIDF 훈련 시간 : " + sw.ElapsedMilliseconds.ToString() + "ms");
 
 		}
 			
@@ -64,7 +57,7 @@ namespace LettreForAndroid.Utility
 					else
 						maxObj = new Similarity(7, 0);
 
-					System.Diagnostics.Debug.WriteLine("유사도 : " + maxObj.similarity + " 레이블 : " + maxObj.label);
+					//System.Diagnostics.Debug.WriteLine("유사도 : " + maxObj.similarity + " 레이블 : " + maxObj.label);
 					receive_labels[maxObj.label - 1]++;
 				}
 				receivedDatas.Add(elem.Address, receive_labels);
