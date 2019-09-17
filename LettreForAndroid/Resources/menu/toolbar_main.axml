@@ -27,4 +27,9 @@
       local:showAsAction="never"
       android:title="설정"
       android:orderInCategory="500"/>
+  <item
+      android:id="@+id/toolbar_recategorize"
+      local:showAsAction="never"
+      android:title="재분류"
+      android:orderInCategory="600"/>
 </menu>

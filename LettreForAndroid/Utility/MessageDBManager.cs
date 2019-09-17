@@ -717,7 +717,10 @@ namespace LettreForAndroid.Utility
                         objDialogue.Address = address;
                         objDialogue.Thread_id = thread_id;
 
-                        dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                        if (!dialogueSet.IsContain(thread_id))
+                            dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                        else
+                            System.Diagnostics.Debug.WriteLine("DEBUG : LoadSMSMetaDatas duplication thread_id");
                     }
                 }
                 cursor.Close();
@@ -752,7 +755,10 @@ namespace LettreForAndroid.Utility
                             objDialogue.Thread_id = thread_id;
                             objDialogue.Address = GetAddress(id);
 
-                            dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                            if (!dialogueSet.IsContain(thread_id))
+                                dialogueSet.DialogueList.Add(thread_id, objDialogue);
+                            else
+                                System.Diagnostics.Debug.WriteLine("DEBUG : LoadMMSMetaDatas duplication thread_id");
                         }
                         else
                         {
@@ -774,12 +780,19 @@ namespace LettreForAndroid.Utility
             DialogueSet smsMetaDatas = LoadSMSMetaDatas();
             DialogueSet mmsMetaDatas = LoadMMSMetaDatas();
 
-            //smsMetaData에 병합
+            //mms메타데이터와 smsMetaData를 병합, sms메타데이터 리스트에 mms메타데이터를 넣는다.
             foreach(Dialogue objDialogue in mmsMetaDatas.DialogueList.Values)
             {
+                //mms만 있는 경우 리스트에 추가
                 if(!smsMetaDatas.IsContain(objDialogue.Thread_id))
                 {
                     smsMetaDatas.DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                }
+                //mms와 sms가 둘다 있는 경우 sms 리스트에 mms를 하나씩 추가함.
+                else
+                {
+                    foreach (MultiMediaMessage mms in objDialogue.TextMessageList)
+                        smsMetaDatas.DialogueList[objDialogue.Thread_id].Add(mms);
                 }
             }
 
@@ -788,7 +801,10 @@ namespace LettreForAndroid.Utility
             {
                 if(ContactDBManager.Get().GetContactDataByAddress(objDialogue.Address, false) == null)
                 {
-                    _UnknownDialogueSet.DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                    if (!_UnknownDialogueSet.IsContain(objDialogue.Thread_id))
+                        _UnknownDialogueSet.DialogueList.Add(objDialogue.Thread_id, objDialogue);
+                    else
+                        _UnknownDialogueSet.DialogueList[objDialogue.Thread_id] = objDialogue;
                 }
             }
         }

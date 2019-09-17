@@ -111,7 +111,10 @@ namespace LettreForAndroid.Utility
                     }
                 }
 
-                emptyCntList.Add(objDialogue.Address, emptyCnt);                           //현 대화에서 빈 문자의 수를 리스트에 저장
+                if (!emptyCntList.ContainsKey(objDialogue.Address))
+                    emptyCntList.Add(objDialogue.Address, emptyCnt);                           //현 대화에서 빈 문자의 수를 리스트에 저장
+                else
+                    emptyCntList[objDialogue.Address] = emptyCnt;
             }
 
             Dictionary<string, int[]> receivedDatas = SendAndReceiveData(toSendDatas);     //내용이 있는 문자는 전송하고 결과값을 받는다. 내용이 없는 문자는 아래에서 레이블만 병합.

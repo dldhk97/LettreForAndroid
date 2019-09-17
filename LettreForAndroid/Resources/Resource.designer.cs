@@ -5703,6 +5703,9 @@ namespace LettreForAndroid
 			// aapt resource value: 0x7f0a0115
 			public const int toolbar_deposit = 2131362069;
 			
+			// aapt resource value: 0x7f0a0118
+			public const int toolbar_recategorize = 2131362072;
+			
 			// aapt resource value: 0x7f0a0117
 			public const int toolbar_search = 2131362071;
 			

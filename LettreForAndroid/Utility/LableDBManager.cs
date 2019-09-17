@@ -70,6 +70,12 @@ namespace LettreForAndroid.Utility
             _OnMemoryLables = _Helper.Load(Application.Context);
         }
 
+        public void Drop()
+        {
+            _Helper.DropAndCreate(Application.Context);
+            _OnMemoryLables.Clear();
+        }
+
         public bool IsDBExist()
         {
             if (_OnMemoryLables == null)

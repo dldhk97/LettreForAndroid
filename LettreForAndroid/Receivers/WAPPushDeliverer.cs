@@ -20,7 +20,7 @@ namespace LettreForAndroid.Receivers
     {
         public override void OnReceive(Context context, Intent intent)
         {
-            Toast.MakeText(context, "WAPPushDeliverer Intent!", ToastLength.Short).Show();
+            Toast.MakeText(context, "MMS를 수신했지만 저장하지 못했습니다!", ToastLength.Short).Show();
         }
     }
 }

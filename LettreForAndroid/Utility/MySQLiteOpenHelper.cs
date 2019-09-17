@@ -111,6 +111,13 @@ namespace LettreForAndroid.Utility
             db.Close();
             return result;
         }
+
+        public void DropAndCreate(Context context)
+        {
+            SQLiteDatabase db = new MySQLiteOpenHelper(context).ReadableDatabase;
+            db.ExecSQL(DeleteQuery);
+            OnCreate(db);
+        }
     }
 
     

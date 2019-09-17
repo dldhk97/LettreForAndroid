@@ -31,7 +31,8 @@ namespace LettreForAndroid
         TabFragManager _TabFragManager;
         ContactViewManager _ContactManager;
 
-        const int REQUEST_NEWWELCOMECOMPLETE = 0;
+        const int REQUEST_NEWWELCOME_COMPLETE = 0;
+        const int REQUEST_RECATEGORIZE_COMPLETE = 1;
         public bool _MessageLoadedOnce = false;
 
         protected override void OnCreate(Bundle bundle)
@@ -42,10 +43,7 @@ namespace LettreForAndroid
 
             _Instance = this;
 
-            StartActivityForResult(typeof(WelcomeActivity), REQUEST_NEWWELCOMECOMPLETE);
-
-			AssetManager assets = this.Assets;
-			
+            StartActivityForResult(typeof(WelcomeActivity), REQUEST_NEWWELCOME_COMPLETE);
         }
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
@@ -53,8 +51,13 @@ namespace LettreForAndroid
             base.OnActivityResult(requestCode, resultCode, data);
             switch (requestCode)
             {
-                case REQUEST_NEWWELCOMECOMPLETE:
+                case REQUEST_NEWWELCOME_COMPLETE:
                     Setup();
+                    break;
+                case REQUEST_RECATEGORIZE_COMPLETE:
+                    LableDBManager.Get().Load();
+                    LoadMessageDB();
+                    _TabFragManager.RefreshLayout();
                     break;
             }
         }
@@ -135,11 +138,17 @@ namespace LettreForAndroid
         {
             if(item.ItemId == Resource.Id.toolbar_search)
             {
-                _TabFragManager.RefreshLayout();
+                RunOnUiThread(() => { Toast.MakeText(this, "준비중인 기능입니다.", ToastLength.Short).Show(); });
+            }
+            else if (item.ItemId == Resource.Id.toolbar_recategorize)
+            {
+                DataStorageManager.SaveBoolData(this, "needRecategorize", true);
+                LableDBManager.Get().Drop();
+                StartActivityForResult(typeof(WelcomeActivity), REQUEST_RECATEGORIZE_COMPLETE);
             }
             else
             {
-
+                RunOnUiThread(() => { Toast.MakeText(this, "준비중인 기능입니다.", ToastLength.Short).Show(); });
             }
             return base.OnOptionsItemSelected(item);
         }

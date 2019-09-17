@@ -71,6 +71,7 @@ namespace LettreForAndroid.UI
         bool _IsFirst = true;
         bool _HasPermission = false;
         bool _IsDefaultPackage = false;
+        bool _NeedRecategorize = false;
 
         Task<AlertDialog.Builder> _CreatePrivacyDialogTsk;
         Task _MessageDBLoadTsk;
@@ -97,16 +98,30 @@ namespace LettreForAndroid.UI
                 if (PackageName.Equals(Telephony.Sms.GetDefaultSmsPackage(this)))
                     _IsDefaultPackage = true;
 
+                _NeedRecategorize = DataStorageManager.LoadBoolData(this, "needRecategorize", false);
+
                 //권한이 있는가?
                 if (PermissionManager.HasPermission(this, PermissionManager.essentialPermissions));
                     _HasPermission = true;
 
                 if (_IsDefaultPackage == false)                                         //기본 패키지가 아니라면, 기본앱 설정 페이지로 이동.
+                {
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PACKAGE, false);
+                }
                 else if (_HasPermission == false)                                       //권한이 없다면, 권한페이지로 이동.
+                {
                     _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.PERMISSION, false);
+                }
+                else if (_NeedRecategorize == true)
+                {
+                    _MessageDBLoadTsk = Task.Run(() => LoadMessageDBAsync());           //미리 메시지 로드
+                    _ViewPager.SetCurrentItem((int)WELCOME_SCREEN.CATEGORIZE, false);
+                    DataStorageManager.SaveBoolData(this, "needRecategorize", false);   
+                }
                 else                                                                    //이미 설정 다되있으면 피니쉬
+                {
                     Finish();
+                }
             }
             else
             {
@@ -322,6 +337,8 @@ namespace LettreForAndroid.UI
 
         private void LoadMessageDBAsync()
         {
+            MessageDBManager.Get().UnknownDialogueSet.Clear();
+
             //전체탭에 들어간 대화 중 연락처가 없는 대화는 모두 로드하여 Unknown 카테고리에 넣음.
             MessageDBManager.Get().LoadUnknownMetaDatas();
 
