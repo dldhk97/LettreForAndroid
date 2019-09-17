@@ -69,7 +69,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="TFIDF_for_xamarin">
-      <HintPath>..\..\TFIDF_for_xamarin\TFIDF_for_xamarin\bin\Debug\TFIDF_for_xamarin.dll</HintPath>
+      <HintPath>..\TFIDF_for_xamarin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
