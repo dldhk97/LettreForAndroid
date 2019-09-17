@@ -14,13 +14,15 @@ namespace LettreForAndroid.Utility
     {
         public enum REQUESTS { ESSENTIAL = 1, SENDSMS, }
 
-        public static readonly string[] essentialPermissions = 
+        public static readonly string[] essentialPermissions =
         {
+            Manifest.Permission.ReadContacts,
             Manifest.Permission.SendSms,
             Manifest.Permission.ReceiveSms,
             Manifest.Permission.ReadSms,
             Manifest.Permission.ReceiveMms,
-            Manifest.Permission.ReadContacts,
+            Manifest.Permission.WriteSms,
+            Manifest.Permission.Internet,
         };
 
         public static readonly string[] sendSMSPermission = 
