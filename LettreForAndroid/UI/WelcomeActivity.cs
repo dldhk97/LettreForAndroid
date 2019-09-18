@@ -398,7 +398,6 @@ namespace LettreForAndroid.UI
 			Thread thread;
 			thread = new Thread(() => CreateLableDB());
 			thread.Start();
-			thread.Join();
 
 			//ThreadPool.QueueUserWorkItem(o => CreateLableDB);
 		}
