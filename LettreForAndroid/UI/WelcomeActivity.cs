@@ -394,7 +394,13 @@ namespace LettreForAndroid.UI
 			_Screens[(int)WELCOME_SCREEN.CATEGORIZE].ProgressBarViewStates = ViewStates.Visible;
 			_ViewPager.Adapter.NotifyDataSetChanged();
 
-			ThreadPool.QueueUserWorkItem(o => CreateLableDB());                                 //카테고리 분류
+			//카테고리 분류
+			Thread thread;
+			thread = new Thread(() => CreateLableDB());
+			thread.Start();
+			thread.Join();
+
+			//ThreadPool.QueueUserWorkItem(o => CreateLableDB);
 		}
 
 		private void WelcomeActivity_OnCategorizeComplete(object sender, EventArgs e)

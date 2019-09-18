@@ -1,5 +1,6 @@
 ﻿using LettreForAndroid.Class;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using TFIDF;
@@ -17,13 +18,12 @@ namespace LettreForAndroid.Utility
 
 
 			// Assets 폴더내 파일 읽기
-			var filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
+			Stream filename = Android.App.Application.Context.Assets.Open("msg_non_ratio_4ngram_trainset.csv");
 
 			// 미리 n그램으로 분리된 문서를 불러와서 예측하는데 걸리는 연산시간을 단축
+
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
 			tfidf.Load_documents(filename,Encoding.GetEncoding("euc-kr"));
-
 		}
 			
 		public Dictionary<string, int[]> Predict(DialogueSet dialogueSet)
