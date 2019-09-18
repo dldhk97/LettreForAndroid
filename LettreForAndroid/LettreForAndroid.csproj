@@ -39,7 +39,7 @@
     <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
-    <MandroidI18n />
+    <MandroidI18n>CJK</MandroidI18n>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
   </PropertyGroup>
@@ -53,13 +53,14 @@
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidLinkMode>Full</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
     <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <MandroidI18n>CJK</MandroidI18n>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -69,7 +70,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="TFIDF_for_xamarin">
-      <HintPath>..\TFIDF_for_xamarin.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\TFIDF_for_xamarin\TFIDF_for_xamarin\bin\Debug\TFIDF_for_xamarin.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -104,8 +105,6 @@
     <Compile Include="Utility\SpamFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\msg_non_ratio_2ngram_trainset.csv" />
-    <AndroidAsset Include="Assets\msg_non_ratio_3ngram_trainset.csv" />
     <AndroidAsset Include="Assets\msg_non_ratio_4ngram_trainset.csv" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml" />
@@ -138,6 +137,9 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages">
+      <Version>4.5.1</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.1" />
