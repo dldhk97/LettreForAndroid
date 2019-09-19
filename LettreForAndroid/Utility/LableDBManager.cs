@@ -125,31 +125,31 @@ namespace LettreForAndroid.Utility
 
 			CreateDBProgressEvent("내장 분석기로 예측하는 중...[2/4]");
 
-			//PredictionEngine을 통해 dialogue의 레이블을 예측
-			PredictionEngine predEngine = new PredictionEngine();
-			//try
-			//{
-			//	predEngine 
-			//}
-			//catch
-			//{
-			//	CreateDBProgressEvent("[ERROR] 내장 분석기 오류 발생! 분류를 중단합니다. (PredictEngine)");
-			//	return;
-			//}
+            //PredictionEngine을 통해 dialogue의 레이블을 예측
+            PredictionEngine predEngine;
+            try
+            {
+                predEngine = new PredictionEngine();
+            }
+            catch
+            {
+                CreateDBProgressEvent("[ERROR] 내장 분석기 오류 발생! 분류를 중단합니다. (PredictEngine)");
+                return;
+            }
 
-			Dictionary<string, int[]> receivedData = predEngine.Predict(dialogueSet);
+            Dictionary<string, int[]> receivedData;
 
-			//try
-			//{
-			//	receivedData =
-			//}
-			//catch (Exception e)
-			//{
-			//	CreateDBProgressEvent("[ERROR] 내장 분석기 오류 발생! 분류를 중단합니다. (Predict)");
-			//	return;
-			//}
+            try
+            {
+                receivedData = predEngine.Predict(dialogueSet);
+            }
+            catch (Exception e)
+            {
+                CreateDBProgressEvent("[ERROR] 내장 분석기 오류 발생! 분류를 중단합니다. (Predict)");
+                return;
+            }
 
-			CreateDBProgressEvent("예측 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
+            CreateDBProgressEvent("예측 성공. 레이블을 로컬 DB에 삽입하는 중...[3/4]");
 			//받은 결과값들을 하나하나 DB에 넣는다.
 			foreach (KeyValuePair<string, int[]> data in receivedData)
 			{

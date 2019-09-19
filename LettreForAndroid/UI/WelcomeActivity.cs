@@ -342,7 +342,7 @@ namespace LettreForAndroid.UI
 			{
 				MessageDBManager.Get().ReLoadDialogue(objDialogue, (int)TextMessage.MESSAGE_TYPE.RECEIVED);
 			}
-		}
+        }
 
 		//---------------------------------------------------------------------
 		// 오프라인 모드 여부 (서버 통신 X)
@@ -456,9 +456,7 @@ namespace LettreForAndroid.UI
 					//온라인 분석이 끝나면 다음 화면으로 이동.
 					MoveToNextScreen();
 				}
-
 			}
-
 		}
 
 		private void ShowRetryDialog()
