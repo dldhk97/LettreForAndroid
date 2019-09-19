@@ -74,8 +74,10 @@ namespace LettreForAndroid.Utility
             if (needRefresh)
                 Refresh();
 
-            //System.Diagnostics.Debug.WriteLine("GetContactDataByAddress : " + address);
             string refinedAddress = PhoneNumberUtils.FormatNumber(address, "KR");
+
+            if (refinedAddress == null)
+                refinedAddress = address;
 
             if (_ContactDataList.ContainsKey(refinedAddress))
                 return _ContactDataList[refinedAddress];
