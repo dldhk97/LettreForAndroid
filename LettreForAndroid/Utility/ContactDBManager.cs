@@ -50,25 +50,6 @@ namespace LettreForAndroid.Utility
             get { return _ContactList.Count; }
         }
 
-        public ContactData GetContactDataByAddress2(string address, bool needRefresh)
-        {
-            if (needRefresh)
-                Refresh();
-
-            string formattedAddress = PhoneNumberUtils.FormatNumber(address);
-            foreach (Contact objContact in _ContactList.Values)
-            {
-                string objAddress = objContact.PrimaryContactData.Address;
-                objAddress = Regex.Replace(objAddress, "[^\\d]", "");
-                string formattedObjAddress = PhoneNumberUtils.FormatNumber(objAddress);
-                if (formattedAddress.CompareTo(formattedObjAddress) == 0)
-                {
-                    return objContact.PrimaryContactData;
-                }
-            }
-            return null;
-        }
-
         public ContactData GetContactDataByAddress(string address, bool needRefresh)
         {
             if (needRefresh)
@@ -90,26 +71,27 @@ namespace LettreForAndroid.Utility
             _ContactDataList.Clear();
 
             LoadRawContact();
+            LoadContact();
             LoadContactData();
-            LoadContactData2();
         }
 
         //TODO : 더 최적화할 건덕지가 있다.
         //LoadContactData()와 RawContact와 LoadContactData2랑 합칠수 있을듯...
-        private void LoadContactData2()
+        private void LoadContactData()
         {
             foreach (Contact objContact in _ContactList.Values)
             {
                 string refinedAddress = PhoneNumberUtils.FormatNumber(objContact.PrimaryContactData.Address, "KR");
 
+                if (refinedAddress == null)
+                    refinedAddress = objContact.PrimaryContactData.Address;
+
                 if (_ContactDataList.ContainsKey(refinedAddress) == false)
                     _ContactDataList.Add(refinedAddress, objContact.PrimaryContactData);
-
-                //System.Diagnostics.Debug.WriteLine("LoadContactData2 : " + refinedAddress);
             }
         }
 
-        private void LoadContactData()
+        private void LoadContact()
         {
             ContentResolver cr = Application.Context.ContentResolver;
 
